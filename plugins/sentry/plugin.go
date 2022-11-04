@@ -7,7 +7,7 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "sentry-cli",
+		Name: "sentry",
 		Platform: schema.PlatformInfo{
 			Name:     "Sentry",
 			Homepage: sdk.URL("https://sentry.io"),

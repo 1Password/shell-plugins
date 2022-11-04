@@ -7,7 +7,7 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "GitHub",
+		Name: "github",
 		Platform: schema.PlatformInfo{
 			Name:     "GitHub",
 			Homepage: sdk.URL("https://github.com"),
