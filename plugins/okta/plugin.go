@@ -7,7 +7,7 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "Okta",
+		Name: "okta",
 		Platform: schema.PlatformInfo{
 			Name:     "Okta CLI",
 			Homepage: sdk.URL("https://www.okta.com"),
