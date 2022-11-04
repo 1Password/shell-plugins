@@ -30,18 +30,16 @@ func List() []schema.Plugin {
 	return list
 }
 
-func Get(pluginQuery string) (schema.Plugin, error) {
+func Get(pluginName string) (schema.Plugin, error) {
 	for _, p := range registry {
-		for _, e := range p.Executables {
-			if strings.EqualFold(pluginQuery, e.Command()) || strings.EqualFold(pluginQuery, e.Name) {
-				return p, nil
-			}
+		if p.Name == pluginName {
+			return p, nil
 		}
 	}
-	return schema.Plugin{}, fmt.Errorf("unknown plugin: %s", pluginQuery)
+	return schema.Plugin{}, fmt.Errorf("unknown plugin: %s", pluginName)
 }
 
-func GetPluginAndExecutable(executableQuery string) (schema.Plugin, schema.Executable, error) {
+func GetByExecutable(executableQuery string) (schema.Plugin, schema.Executable, error) {
 	for _, p := range registry {
 		for _, e := range p.Executables {
 			if strings.EqualFold(executableQuery, e.Command()) || strings.EqualFold(executableQuery, e.Name) {
