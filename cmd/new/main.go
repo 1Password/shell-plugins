@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"os"
@@ -10,11 +11,21 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/1Password/shell-plugins/plugins"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/strgenerator"
 	"github.com/AlecAivazis/survey/v2"
 )
 
+const exampleSecretsCommandSuffix = "example-secrets"
+
 func main() {
+	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], exampleSecretsCommandSuffix) {
+		pluginName := strings.Split(os.Args[1], "/")[0]
+		printExampleSecrets(pluginName)
+		return
+	}
+
 	err := newPlugin()
 	if err != nil {
 		log.Fatal(err)
@@ -328,4 +339,30 @@ func Executable_{{ .Executable }}() schema.Executable {
 	}
 }
 `,
+}
+
+func printExampleSecrets(pluginName string) {
+	plugin, err := plugins.Get(pluginName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	example := generateSecretsExample(plugin)
+	fmt.Printf("%s", example)
+}
+
+func generateSecretsExample(plugin schema.Plugin) string {
+	var example string
+
+	for _, credential := range plugin.Credentials {
+		example += credential.Name + ":\n"
+		for _, field := range credential.Fields {
+			if field.Composition != nil {
+				valueExample, _ := strgenerator.ExampleSecretFromComposition(field.Composition)
+				example += fmt.Sprintf("\t%s: %s\n", field.Name, valueExample)
+			}
+		}
+	}
+
+	return example
 }
