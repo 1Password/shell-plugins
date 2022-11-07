@@ -358,7 +358,7 @@ func generateSecretsExample(plugin schema.Plugin) string {
 		example += credential.Name + ":\n"
 		for _, field := range credential.Fields {
 			if field.Composition != nil {
-				valueExample := plugintest.ExampleSecretFromComposition(field.Composition)
+				valueExample := plugintest.ExampleSecretFromComposition(*field.Composition)
 				example += fmt.Sprintf("  %s: %s\n", field.Name, valueExample)
 			}
 		}

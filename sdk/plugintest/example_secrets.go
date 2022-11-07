@@ -21,7 +21,7 @@ const (
 var seededRand = rand.New(
 	rand.NewSource(time.Now().UnixNano()))
 
-func ExampleSecretFromComposition(v *schema.ValueComposition) string {
+func ExampleSecretFromComposition(v schema.ValueComposition) string {
 	prefix := getPrefix(v)
 	suffix := getSuffix(v)
 	base := generateBase(v, v.Length-len(prefix)-len(suffix))
@@ -29,7 +29,7 @@ func ExampleSecretFromComposition(v *schema.ValueComposition) string {
 	return prefix + base + suffix
 }
 
-func getPrefix(v *schema.ValueComposition) string {
+func getPrefix(v schema.ValueComposition) string {
 	if v.Prefix != "" {
 		return v.Prefix
 	}
@@ -37,7 +37,7 @@ func getPrefix(v *schema.ValueComposition) string {
 	return ""
 }
 
-func generateBase(v *schema.ValueComposition, baseLength int) string {
+func generateBase(v schema.ValueComposition, baseLength int) string {
 	chars := charsToUse(v.Charset)
 	generatedStr, err := stringFromCharset(baseLength, chars)
 
@@ -48,12 +48,12 @@ func generateBase(v *schema.ValueComposition, baseLength int) string {
 	return generatedStr
 }
 
-func getSuffix(v *schema.ValueComposition) string {
+func getSuffix(v schema.ValueComposition) string {
 	var suffix string
 
 	if v.Length > len(secretExampleSuffix) && (v.Charset.Uppercase || v.Charset.Lowercase) {
 		suffix = secretExampleSuffix
-		if v.Charset.Lowercase {
+		if v.Charset.Lowercase && !v.Charset.Uppercase {
 			suffix = strings.ToLower(secretExampleSuffix)
 		}
 	}

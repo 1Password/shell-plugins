@@ -10,7 +10,7 @@ import (
 )
 
 func TestSecretContainsSuffix(t *testing.T) {
-	v := &schema.ValueComposition{
+	v := schema.ValueComposition{
 		Length: 10,
 		Charset: schema.Charset{
 			Uppercase: true,
@@ -23,7 +23,7 @@ func TestSecretContainsSuffix(t *testing.T) {
 }
 
 func TestSecretContainsLowercaseSuffix(t *testing.T) {
-	v := &schema.ValueComposition{
+	v := schema.ValueComposition{
 		Length: 10,
 		Charset: schema.Charset{
 			Lowercase: true,
@@ -56,7 +56,7 @@ func TestSecretHasNoSuffix(t *testing.T) {
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
-			v := &schema.ValueComposition{
+			v := schema.ValueComposition{
 				Length:  tc.secretLength,
 				Charset: tc.charset,
 			}
@@ -69,7 +69,7 @@ func TestSecretHasNoSuffix(t *testing.T) {
 }
 
 func TestSecretContainsDigitsOnly(t *testing.T) {
-	v := &schema.ValueComposition{
+	v := schema.ValueComposition{
 		Length: 10,
 		Charset: schema.Charset{
 			Digits: true,
@@ -83,7 +83,7 @@ func TestSecretContainsDigitsOnly(t *testing.T) {
 
 func TestSecretContainsPrefix(t *testing.T) {
 	prefix := "ABC"
-	v := &schema.ValueComposition{
+	v := schema.ValueComposition{
 		Length: 10,
 		Prefix: prefix,
 		Charset: schema.Charset{
@@ -98,7 +98,7 @@ func TestSecretContainsPrefix(t *testing.T) {
 
 func TestSecretWithExpectedLength(t *testing.T) {
 	expectedLength := 20
-	v := &schema.ValueComposition{
+	v := schema.ValueComposition{
 		Length: expectedLength,
 		Charset: schema.Charset{
 			Uppercase: true,
