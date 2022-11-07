@@ -12,8 +12,8 @@ import (
 	"unicode"
 
 	"github.com/1Password/shell-plugins/plugins"
+	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema"
-	"github.com/1Password/shell-plugins/sdk/strgenerator"
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -358,8 +358,8 @@ func generateSecretsExample(plugin schema.Plugin) string {
 		example += credential.Name + ":\n"
 		for _, field := range credential.Fields {
 			if field.Composition != nil {
-				valueExample, _ := strgenerator.ExampleSecretFromComposition(field.Composition)
-				example += fmt.Sprintf("\t%s: %s\n", field.Name, valueExample)
+				valueExample := plugintest.ExampleSecretFromComposition(field.Composition)
+				example += fmt.Sprintf("  %s: %s\n", field.Name, valueExample)
 			}
 		}
 	}

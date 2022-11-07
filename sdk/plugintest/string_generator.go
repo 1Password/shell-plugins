@@ -1,8 +1,10 @@
-package strgenerator
+package plugintest
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
@@ -19,21 +21,44 @@ const (
 var seededRand = rand.New(
 	rand.NewSource(time.Now().UnixNano()))
 
-func ExampleSecretFromComposition(v *schema.ValueComposition) (string, error) {
-	var exampleStr string
-	chars := charsToUse(v.Charset)
+func ExampleSecretFromComposition(v *schema.ValueComposition) string {
+	prefix := getPrefix(v)
+	suffix := getSuffix(v)
+	base := generateBase(v, v.Length-len(prefix)-len(suffix))
 
+	return prefix + base + suffix
+}
+
+func getPrefix(v *schema.ValueComposition) string {
 	if v.Prefix != "" {
-		exampleStr += v.Prefix
+		return v.Prefix
 	}
-	generatedStr, err := stringFromCharset(v.Length-len(v.Prefix)-len(secretExampleSuffix), chars)
-	if err != nil {
-		return "", err
-	}
-	exampleStr += generatedStr
-	exampleStr += secretExampleSuffix
 
-	return exampleStr, nil
+	return ""
+}
+
+func generateBase(v *schema.ValueComposition, baseLength int) string {
+	chars := charsToUse(v.Charset)
+	generatedStr, err := stringFromCharset(baseLength, chars)
+
+	if err != nil {
+		log.Fatalf("Error while generating secret: %v", err)
+	}
+
+	return generatedStr
+}
+
+func getSuffix(v *schema.ValueComposition) string {
+	var suffix string
+
+	if v.Length > len(secretExampleSuffix) && (v.Charset.Uppercase || v.Charset.Lowercase) {
+		suffix = secretExampleSuffix
+		if v.Charset.Lowercase {
+			suffix = strings.ToLower(secretExampleSuffix)
+		}
+	}
+
+	return suffix
 }
 
 func stringFromCharset(length int, charset string) (string, error) {
