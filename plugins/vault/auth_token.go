@@ -34,7 +34,7 @@ func AuthToken() schema.CredentialType {
 		Provisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryVaultTokenFile(),
+			TryVaultTokenFile("~/.vault-token"),
 		),
 	}
 }
@@ -45,7 +45,7 @@ var defaultEnvVarMapping = map[string]string{
 	fieldname.Namespace: "VAULT_NAMESPACE",
 }
 
-func TryVaultTokenFile() sdk.Importer {
+func TryVaultTokenFile(path string) sdk.Importer {
 	// TODO: Try importing from ~/.vault-token file
 	return importer.NoOp()
 }

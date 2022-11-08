@@ -60,7 +60,8 @@ type ImportSource struct {
 }
 
 type ImportInput struct {
-	HomeDir string
+	HomeDir       string
+	XDGConfigHome string
 }
 
 type ImportOutput struct {

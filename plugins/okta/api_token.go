@@ -36,7 +36,7 @@ func APIToken() schema.CredentialType {
 		Provisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryOktaConfigFile(),
+			TryOktaConfigFile("~/.okta/okta.yaml"),
 		),
 	}
 }
@@ -48,7 +48,7 @@ var defaultEnvVarMapping = map[string]string{
 
 const FieldNameOrgURL = "Org URL"
 
-func TryOktaConfigFile() sdk.Importer {
+func TryOktaConfigFile(path string) sdk.Importer {
 	// TODO: Try importing from ~/.okta/okta.yaml
 	return importer.NoOp()
 }

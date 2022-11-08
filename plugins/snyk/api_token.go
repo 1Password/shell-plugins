@@ -31,7 +31,7 @@ func APIToken() schema.CredentialType {
 		Provisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TrySnykConfigFile(),
+			TrySnykConfigFile("$XDG_CONFIG_HOME/configstore/snyk.json"),
 		)}
 }
 
@@ -39,7 +39,7 @@ var defaultEnvVarMapping = map[string]string{
 	fieldname.Token: "SNYK_TOKEN",
 }
 
-func TrySnykConfigFile() sdk.Importer {
-	// TODO: Import `api` field from ~/.config/configstore/snyk.json
+func TrySnykConfigFile(path string) sdk.Importer {
+	// TODO: Import `api` field from $XDG_CONFIG_HOME/configstore/snyk.json
 	return importer.NoOp()
 }

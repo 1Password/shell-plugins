@@ -16,8 +16,10 @@ import (
 
 func TryFile(path string, result func(ctx context.Context, contents FileContents, in sdk.ImportInput, out *sdk.ImportOutput)) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
-		if strings.HasPrefix(path, "~/") {
-			path = filepath.Join(in.HomeDir, strings.TrimPrefix(path, "~/"))
+		if strings.HasPrefix(path, "~") {
+			path = filepath.Join(in.HomeDir, strings.TrimPrefix(path, "~"))
+		} else if strings.HasPrefix(path, "$XDG_CONFIG_HOME") {
+			path = filepath.Join(in.XDGConfigHome, strings.TrimPrefix(path, "$XDG_CONFIG_HOME"))
 		}
 
 		contents, err := os.ReadFile(path)

@@ -37,7 +37,7 @@ func PersonalAPIToken() schema.CredentialType {
 			importer.TryEnvVarPair(map[string]string{
 				fieldname.Token: "CIRCLECI_CLI_TOKEN",
 			}),
-			TryCircleCIConfigFile(),
+			TryCircleCIConfigFile("~/.circleci/cli.yml"),
 		),
 	}
 }
@@ -46,8 +46,8 @@ type Config struct {
 	Token string `yaml:"token"`
 }
 
-func TryCircleCIConfigFile() sdk.Importer {
-	return importer.TryFile("~/.circleci/cli.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+func TryCircleCIConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)

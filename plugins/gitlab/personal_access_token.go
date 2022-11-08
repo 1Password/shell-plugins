@@ -43,7 +43,7 @@ func PersonalAccessToken() schema.CredentialType {
 		Provisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryGlabConfigFile(),
+			TryGlabConfigFile("$XDG_CONFIG_HOME/glab-cli/config.yml"),
 		),
 	}
 }
@@ -54,7 +54,7 @@ var defaultEnvVarMapping = map[string]string{
 	fieldname.APIHost: "GITLAB_API_HOST",
 }
 
-func TryGlabConfigFile() sdk.Importer {
-	// TODO: Try importing token from ~/.config/glab-cli/config.yml
+func TryGlabConfigFile(path string) sdk.Importer {
+	// TODO: Try importing token from $XDG_CONFIG_HOME/glab-cli/config.yml
 	return importer.NoOp()
 }
