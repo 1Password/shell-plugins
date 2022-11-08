@@ -16,4 +16,5 @@ const (
 	DatabaseCredentials = "Database Credentials"
 	RegistryCredentials = "Registry Credentials"
 	Credential          = "Credential"
+	SecretKey           = "Secret Key"
 )
