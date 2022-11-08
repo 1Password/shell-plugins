@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_gh() schema.Executable {
+func GitHubCLI() schema.Executable {
 	return schema.Executable{
 		Runs:    []string{"gh"},
 		Name:    "GitHub CLI",

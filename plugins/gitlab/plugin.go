@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			PersonalAccessToken(),
 		},
 		Executables: []schema.Executable{
-			Executable_glab(),
+			GitLabCLI(),
 		},
 	}
 }

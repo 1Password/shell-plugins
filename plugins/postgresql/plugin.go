@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
-			Executable_psql(),
+			Psql(),
 		},
 	}
 }

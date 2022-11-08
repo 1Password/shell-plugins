@@ -17,7 +17,7 @@ func New() schema.Plugin {
 			APIToken(),
 		},
 		Executables: []schema.Executable{
-			Executable_example(),
+			ExampleCLI(),
 		},
 	}
 }

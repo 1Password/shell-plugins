@@ -6,10 +6,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_vault() schema.Executable {
+func VaultCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"vault"},
-		Name:      "HashiCorp Vault CLI",
+		Name:      "Vault CLI",
 		DocsURL:   sdk.URL("https://developer.hashicorp.com/vault/docs/commands"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Credentials: []schema.CredentialType{

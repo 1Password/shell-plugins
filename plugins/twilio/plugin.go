@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			APIKey(),
 		},
 		Executables: []schema.Executable{
-			Executable_twilio(),
+			TwilioCLI(),
 		},
 	}
 }

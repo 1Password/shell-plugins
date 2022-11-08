@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_glab() schema.Executable {
+func GitLabCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"glab"},
 		Name:      "GitLab CLI",

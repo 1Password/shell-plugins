@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			PersonalAPIToken(),
 		},
 		Executables: []schema.Executable{
-			Executable_circleci(),
+			CircleCICLI(),
 		},
 	}
 }

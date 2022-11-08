@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			AuthToken(),
 		},
 		Executables: []schema.Executable{
-			Executable_vault(),
+			VaultCLI(),
 		},
 	}
 }

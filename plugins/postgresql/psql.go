@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_psql() schema.Executable {
+func Psql() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"psql"},
 		Name:      "psql",

@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_snyk() schema.Executable {
+func SnykCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"snyk"},
 		Name:      "Snyk CLI",

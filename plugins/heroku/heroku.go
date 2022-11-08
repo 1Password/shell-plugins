@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_heroku() schema.Executable {
+func HerokuCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"heroku"},
 		Name:      "Heroku CLI",

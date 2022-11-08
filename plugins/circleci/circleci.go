@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_circleci() schema.Executable {
+func CircleCICLI() schema.Executable {
 	return schema.Executable{
 		Runs:    []string{"circleci"},
 		Name:    "CircleCI CLI",
