@@ -47,7 +47,7 @@ type Config struct {
 }
 
 func TryCircleCIConfigFile() sdk.Importer {
-	return importer.TryFile("~/.circleci/cli.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+	return importer.TryFile("~/.circleci/cli.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)

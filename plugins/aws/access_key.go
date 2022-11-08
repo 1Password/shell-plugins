@@ -81,7 +81,7 @@ const FieldNameDefaultRegion = "Default Region"
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
 func TryCredentialsFile() sdk.Importer {
-	return importer.TryFile("~/.aws/credentials", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+	return importer.TryFile("~/.aws/credentials", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		credentialsFile, err := contents.ToINI()
 		if err != nil {
 			out.AddError(err)

@@ -9,10 +9,11 @@ import (
 
 func TryAllEnvVars(fieldName string, possibleEnvVarNames ...string) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
-		matches := ScanEnvironment(fieldName, possibleEnvVarNames...)
+		attempt := out.NewAttempt(SourceEnvVars(possibleEnvVarNames...))
 
+		matches := ScanEnvironment(fieldName, possibleEnvVarNames...)
 		for _, match := range matches {
-			out.AddCandidate(sdk.ImportCandidate{
+			attempt.AddCandidate(sdk.ImportCandidate{
 				Fields: []sdk.ImportCandidateField{match},
 			})
 		}
@@ -21,15 +22,21 @@ func TryAllEnvVars(fieldName string, possibleEnvVarNames ...string) sdk.Importer
 
 func TryEnvVarPairVariations(pairPossibilities map[string][]string) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		var envVarNames []string
 		var detectedFields []sdk.ImportCandidateField
+
 		for fieldName, possibleEnvVarNames := range pairPossibilities {
+			envVarNames = append(envVarNames, possibleEnvVarNames...)
+
 			matches := ScanEnvironment(fieldName, possibleEnvVarNames...)
 			if len(matches) > 0 {
 				detectedFields = append(detectedFields, matches[0])
 			}
 		}
+
+		attempt := out.NewAttempt(SourceEnvVars(envVarNames...))
 		if len(detectedFields) != 0 {
-			out.AddCandidate(sdk.ImportCandidate{
+			attempt.AddCandidate(sdk.ImportCandidate{
 				Fields: detectedFields,
 			})
 		}
@@ -38,16 +45,21 @@ func TryEnvVarPairVariations(pairPossibilities map[string][]string) sdk.Importer
 
 func TryEnvVarPair(pairPossibilities map[string]string) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		var envVarNames []string
 		var detectedFields []sdk.ImportCandidateField
+
 		for fieldName, possibleEnvVarName := range pairPossibilities {
+			envVarNames = append(envVarNames, possibleEnvVarName)
+
 			matches := ScanEnvironment(fieldName, possibleEnvVarName)
 			if len(matches) > 0 {
 				detectedFields = append(detectedFields, matches[0])
 			}
 		}
 
+		attempt := out.NewAttempt(SourceEnvVars(envVarNames...))
 		if len(detectedFields) != 0 {
-			out.AddCandidate(sdk.ImportCandidate{
+			attempt.AddCandidate(sdk.ImportCandidate{
 				Fields: detectedFields,
 			})
 		}
