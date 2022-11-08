@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_dogshell() schema.Executable {
+func Dogshell() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"dog"},
 		Name:      "Dogshell",

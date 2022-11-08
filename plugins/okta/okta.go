@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_Okta() schema.Executable {
+func OktaCLI() schema.Executable {
 	return schema.Executable{
 		Runs:    []string{"okta"},
 		Name:    "Okta CLI",

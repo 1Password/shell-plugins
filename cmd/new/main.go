@@ -239,7 +239,7 @@ func New() schema.Plugin {
 		{{- end }}
 		{{- if .Executable }}
 		Executables: []schema.Executable{
-			Executable_{{ .Executable }}(),
+			{{ .PlatformNameUpperCamelCase }}CLI(),
 		},
 		{{- end }}
 	}
@@ -325,7 +325,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_{{ .Executable }}() schema.Executable {
+func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"{{ .Executable }}"},
 		Name:      "{{ .PlatformName }} CLI", // TODO: Check if this is correct

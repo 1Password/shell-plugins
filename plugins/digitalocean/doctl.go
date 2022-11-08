@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_doctl() schema.Executable {
+func DigitalOceanCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"doctl"},
 		Name:      "DigitalOcean CLI",

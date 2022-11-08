@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_example() schema.Executable {
+func ExampleCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"example"},
 		Name:      "Example CLI",

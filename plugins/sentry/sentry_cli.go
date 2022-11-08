@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_sentry_cli() schema.Executable {
+func SentryCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"sentry-cli"},
 		Name:      "Sentry CLI",

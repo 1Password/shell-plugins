@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			AccessKey(),
 		},
 		Executables: []schema.Executable{
-			Executable_aws(),
+			AWSCLI(),
 		},
 	}
 }

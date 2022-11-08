@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			APIToken(),
 		},
 		Executables: []schema.Executable{
-			Executable_snyk(),
+			SnykCLI(),
 		},
 	}
 }

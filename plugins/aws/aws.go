@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_aws() schema.Executable {
+func AWSCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"aws"},
 		Name:      "AWS CLI",

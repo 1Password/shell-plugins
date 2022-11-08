@@ -6,7 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-func Executable_twilio() schema.Executable {
+func TwilioCLI() schema.Executable {
 	return schema.Executable{
 		Runs:      []string{"twilio"},
 		Name:      "Twilio CLI",
