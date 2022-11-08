@@ -18,11 +18,22 @@ import (
 )
 
 const exampleSecretsCommandSuffix = "example-secrets"
+const validateCommandSuffix = "validate"
 
 func main() {
 	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], exampleSecretsCommandSuffix) {
 		pluginName := strings.Split(os.Args[1], "/")[0]
 		printExampleSecrets(pluginName)
+		return
+	}
+
+	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], validateCommandSuffix) {
+		pluginName := strings.Split(os.Args[1], "/")[0]
+		plugin, err := plugins.Get(pluginName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		printValidationReport(plugin)
 		return
 	}
 
@@ -365,4 +376,9 @@ func generateSecretsExample(plugin schema.Plugin) string {
 	}
 
 	return example
+}
+
+func printValidationReport(plugin schema.Plugin) {
+	report := plugintest.MakeValidationReport(plugin)
+	fmt.Printf("%s", report)
 }
