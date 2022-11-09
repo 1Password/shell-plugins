@@ -49,14 +49,31 @@ func (vrp ValidationReportPrinter) PrintSectionReport(report schema.ValidationRe
 	vrp.printFields(report.Fields)
 }
 
-func (vrp ValidationReportPrinter) sortFields(fields []schema.ValidationReportField) {
-	for _, field := range fields {
-		vrp.printField(field)
+func (vrp ValidationReportPrinter) sortFields(fields *[]schema.ValidationReportField) {
+	var successFields []schema.ValidationReportField
+	var warningFields []schema.ValidationReportField
+	var erroneousFields []schema.ValidationReportField
+
+	for _, f := range *fields {
+		if !schema.IsErroneousField(f) {
+			successFields = append(successFields, f)
+			continue
+		}
+
+		if schema.IsOptionalField(f) {
+			warningFields = append(warningFields, f)
+			continue
+		}
+
+		erroneousFields = append(erroneousFields, f)
 	}
-	fmt.Println()
+
+	*fields = append(successFields, warningFields...)
+	*fields = append(*fields, erroneousFields...)
 }
 
 func (vrp ValidationReportPrinter) printFields(fields []schema.ValidationReportField) {
+	vrp.sortFields(&fields)
 	for _, field := range fields {
 		vrp.printField(field)
 	}
@@ -78,7 +95,7 @@ func (vrp ValidationReportPrinter) printField(field schema.ValidationReportField
 		return
 	}
 
-	vrp.Format.Error.Printf("𝘹 %s\n", field.ReportText)
+	vrp.Format.Error.Printf("𝘹%s\n", field.ReportText)
 }
 
 func PrintValidationReport(plugin schema.Plugin) {
