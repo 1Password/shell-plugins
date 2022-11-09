@@ -34,38 +34,96 @@ type PlatformInfo struct {
 	Logo *url.URL
 }
 
-func (p Plugin) Validate() (isValid bool, errors []error) {
-	if p.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
-	}
+func (p Plugin) Validate() (bool, ValidationReport) {
+	report := ValidationReport{Heading: fmt.Sprintf("Plugin: %s", p.Name)}
+	isValid, fields := validate(p)
+	report.Fields = fields
 
-	if p.Platform.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("platform.name"))
-	}
+	return isValid, report
+}
 
-	if p.Platform.Homepage == nil {
-		errors = append(errors, ErrMissingRequiredField("platform.homepage"))
-	}
+func (p Plugin) MakeValidationReport() map[ValidationReportSection][]ValidationReport {
+	report := map[ValidationReportSection][]ValidationReport{}
 
-	if len(p.Credentials) == 0 && len(p.Executables) == 0 {
-		errors = append(errors, ErrMissingOneOfRequiredFields("credentials", "executables"))
-	}
+	_, pluginReport := p.Validate()
+	report[pluginSection] = []ValidationReport{pluginReport}
 
-	if len(p.Credentials) > 1 {
-		errors = append(errors, ErrNotYetSupported("provisioning multiple credentials to an executable"))
-	}
-
+	report[credentialsSection] = []ValidationReport{}
 	for _, cred := range p.Credentials {
-		_, credErrors := cred.Validate()
-		errors = append(errors, credErrors...)
+		_, credReport := cred.Validate()
+		report[credentialsSection] = append(report[credentialsSection], credReport)
 	}
 
+	report[executablesSection] = []ValidationReport{}
 	for _, exe := range p.Executables {
-		_, exeErrors := exe.Validate()
-		errors = append(errors, exeErrors...)
+		_, exeReport := exe.Validate()
+		report[executablesSection] = append(report[executablesSection], exeReport)
 	}
 
-	return len(errors) == 0, errors
+	return report
+}
+
+func (p Plugin) ValidationSchema() ValidationSchema {
+	return ValidationSchema{
+		Fields: []ValidationSchemaField{
+			{
+				ReportText: "Has name set",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if p.Name == "" {
+						errors = append(errors, ErrMissingRequiredField("name"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Name only using lowercase characters or digits",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					// TODO: implement
+					return errors
+				},
+			},
+			{
+				ReportText: "Has platform name set",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if p.Platform.Name == "" {
+						errors = append(errors, ErrMissingRequiredField("platform.name"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has platform homepage URL set",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if p.Platform.Homepage == nil {
+						errors = append(errors, ErrMissingRequiredField("platform.homepage"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has a credential type or executable defined",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if len(p.Credentials) == 0 && len(p.Executables) == 0 {
+						errors = append(errors, ErrMissingOneOfRequiredFields("credentials", "executables"))
+					}
+					if len(p.Credentials) > 1 {
+						errors = append(errors, ErrNotYetSupported("provisioning multiple credentials to an executable"))
+					}
+					return errors
+				},
+			},
+		},
+	}
 }
 
 var (

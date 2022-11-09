@@ -76,47 +76,79 @@ type Charset struct {
 	Specific  []rune
 }
 
-func (c CredentialType) Validate() (isValid bool, errors []error) {
-	if c.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
+func (c CredentialType) Validate() (bool, ValidationReport) {
+	report := ValidationReport{Heading: fmt.Sprintf("Credential: %s", c.Name)}
+	isValid, fields := validate(c)
+	report.Fields = fields
+
+	return isValid, report
+	//if c.Name == "" {
+	//	errors = append(errors, ErrMissingRequiredField("name"))
+	//}
+	//
+	//if len(c.Fields) == 0 {
+	//	errors = append(errors, ErrMissingRequiredField("fields"))
+	//}
+	//
+	//credentialTypeHasSecret := true
+	//for _, f := range c.Fields {
+	//	if f.Name == "" {
+	//		errors = append(errors, ErrMissingRequiredField("name"))
+	//	}
+	//
+	//	if f.MarkdownDescription == "" {
+	//		errors = append(errors, ErrMissingRequiredField("markdownDescription"))
+	//	}
+	//
+	//	if f.Secret {
+	//		credentialTypeHasSecret = true
+	//	}
+	//
+	//	comp := f.Composition
+	//	if comp != nil {
+	//		cs := comp.Charset
+	//		if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
+	//			errors = append(errors, ErrMissingOneOfRequiredFields(
+	//				"composition.charset.lowercase",
+	//				"composition.charset.uppercase",
+	//				"composition.charset.digits",
+	//				"composition.charset.symbols",
+	//				"composition.charset.specific",
+	//			))
+	//		}
+	//	}
+	//}
+	//
+	//if !credentialTypeHasSecret {
+	//	errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
+	//}
+	//
+	//return len(errors) == 0, errors
+}
+
+func (c CredentialType) ValidationSchema() ValidationSchema {
+	return ValidationSchema{
+		Fields: []ValidationSchemaField{
+			{
+				ReportText: "Has name set",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if c.Name == "" {
+						errors = append(errors, ErrMissingRequiredField("name"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Name is using title case",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					// TODO: implement
+					return errors
+				},
+			},
+		},
 	}
-
-	if len(c.Fields) == 0 {
-		errors = append(errors, ErrMissingRequiredField("fields"))
-	}
-
-	credentialTypeHasSecret := true
-	for _, f := range c.Fields {
-		if f.Name == "" {
-			errors = append(errors, ErrMissingRequiredField("name"))
-		}
-
-		if f.MarkdownDescription == "" {
-			errors = append(errors, ErrMissingRequiredField("markdownDescription"))
-		}
-
-		if f.Secret {
-			credentialTypeHasSecret = true
-		}
-
-		comp := f.Composition
-		if comp != nil {
-			cs := comp.Charset
-			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-				errors = append(errors, ErrMissingOneOfRequiredFields(
-					"composition.charset.lowercase",
-					"composition.charset.uppercase",
-					"composition.charset.digits",
-					"composition.charset.symbols",
-					"composition.charset.specific",
-				))
-			}
-		}
-	}
-
-	if !credentialTypeHasSecret {
-		errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
-	}
-
-	return len(errors) == 0, errors
 }

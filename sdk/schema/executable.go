@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -24,16 +25,40 @@ type Executable struct {
 	NeedsAuth sdk.NeedsAuthentication
 }
 
-func (e Executable) Validate() (isValid bool, errors []error) {
-	if e.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
-	}
+func (e Executable) Validate() (bool, ValidationReport) {
+	report := ValidationReport{Heading: fmt.Sprintf("Executable: %s", e.Name)}
+	isValid, fields := validate(e)
+	report.Fields = fields
 
-	if len(e.Runs) == 0 {
-		errors = append(errors, ErrMissingRequiredField("runs"))
-	}
+	return isValid, report
 
-	return len(errors) == 0, errors
+	//if e.Name == "" {
+	//	errors = append(errors, ErrMissingRequiredField("name"))
+	//}
+	//
+	//if len(e.Runs) == 0 {
+	//	errors = append(errors, ErrMissingRequiredField("runs"))
+	//}
+	//
+	//return len(errors) == 0, errors
+}
+
+func (e Executable) ValidationSchema() ValidationSchema {
+	return ValidationSchema{
+		Fields: []ValidationSchemaField{
+			{
+				ReportText: "Has name set",
+				Errors:     []error{},
+				Validate: func() []error {
+					var errors []error
+					if e.Name == "" {
+						errors = append(errors, ErrMissingRequiredField("name"))
+					}
+					return errors
+				},
+			},
+		},
+	}
 }
 
 func (e Executable) Command() string {
