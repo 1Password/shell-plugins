@@ -7,6 +7,8 @@ import (
 )
 
 func TestPlugin(t *testing.T) {
-	_, errs := New().Validate()
-	assert.Empty(t, errs)
+	_, report := New().Validate()
+	for _, f := range report.Fields {
+		assert.Empty(t, f.Errors)
+	}
 }

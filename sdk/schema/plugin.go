@@ -42,25 +42,23 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	return isValid, report
 }
 
-func (p Plugin) MakeValidationReport() map[ValidationReportSection][]ValidationReport {
-	report := map[ValidationReportSection][]ValidationReport{}
+func (p Plugin) MakePluginValidationReports() []ValidationReport {
+	var reports []ValidationReport
 
 	_, pluginReport := p.Validate()
-	report[pluginSection] = []ValidationReport{pluginReport}
+	reports = append(reports, pluginReport)
 
-	report[credentialsSection] = []ValidationReport{}
 	for _, cred := range p.Credentials {
 		_, credReport := cred.Validate()
-		report[credentialsSection] = append(report[credentialsSection], credReport)
+		reports = append(reports, credReport)
 	}
 
-	report[executablesSection] = []ValidationReport{}
 	for _, exe := range p.Executables {
 		_, exeReport := exe.Validate()
-		report[executablesSection] = append(report[executablesSection], exeReport)
+		reports = append(reports, exeReport)
 	}
 
-	return report
+	return reports
 }
 
 func (p Plugin) ValidationSchema() ValidationSchema {
@@ -83,6 +81,7 @@ func (p Plugin) ValidationSchema() ValidationSchema {
 				Validate: func() []error {
 					var errors []error
 					// TODO: implement
+					errors = append(errors, fmt.Errorf("not implemented"))
 					return errors
 				},
 			},

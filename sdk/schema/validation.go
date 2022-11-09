@@ -2,12 +2,6 @@ package schema
 
 type ValidationReportSection string
 
-const (
-	pluginSection      ValidationReportSection = "plugin"
-	credentialsSection ValidationReportSection = "credentials"
-	executablesSection ValidationReportSection = "executables"
-)
-
 type Validator interface {
 	Validate() (bool, ValidationReport)
 	ValidationSchema() ValidationSchema
@@ -55,4 +49,12 @@ func validate(v Validator) (bool, []ValidationReportField) {
 	}
 
 	return isValid, reportFields
+}
+
+func IsErroneousField(field ValidationReportField) bool {
+	return len(field.Errors) > 0
+}
+
+func IsOptionalField(field ValidationReportField) bool {
+	return field.Optional
 }

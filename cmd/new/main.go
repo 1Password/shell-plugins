@@ -33,7 +33,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		printValidationReport(plugin)
+		plugintest.PrintValidationReport(plugin)
 		return
 	}
 
@@ -376,9 +376,4 @@ func generateSecretsExample(plugin schema.Plugin) string {
 	}
 
 	return example
-}
-
-func printValidationReport(plugin schema.Plugin) {
-	report := plugintest.MakeValidationReport(plugin)
-	fmt.Printf("%s", report)
 }
