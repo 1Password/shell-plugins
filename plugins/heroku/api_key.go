@@ -42,7 +42,7 @@ func APIKey() schema.CredentialType {
 
 // TryNetrcFile tries to find Heroku API keys in the ~/.netrc file
 func TryNetrcFile() sdk.Importer {
-	return importer.TryFile("~/.netrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+	return importer.TryFile("~/.netrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		// TODO: Iterate over 'machine' entries to look for 'api.heroku.com' or 'git.heroku.com'
 		// Example contents:
 		//
