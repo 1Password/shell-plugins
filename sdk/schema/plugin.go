@@ -30,7 +30,7 @@ type PlatformInfo struct {
 	// The full URL of the homepage of the platform.
 	Homepage *url.URL
 
-	// The full URL to the logo of the platform, in SVG or PNG format.
+	// (Optional) The full URL to the logo of the platform, in SVG or PNG format.
 	Logo *url.URL
 }
 
@@ -80,8 +80,9 @@ func (p Plugin) ValidationSchema() ValidationSchema {
 				Errors:     []error{},
 				Validate: func() []error {
 					var errors []error
-					// TODO: implement
-					errors = append(errors, fmt.Errorf("not implemented"))
+					if !ContainsLowercaseLettersOrDigits(p.Name) {
+						errors = append(errors, ErrInvalidFormat("name"))
+					}
 					return errors
 				},
 			},
@@ -101,8 +102,26 @@ func (p Plugin) ValidationSchema() ValidationSchema {
 				Errors:     []error{},
 				Validate: func() []error {
 					var errors []error
-					if p.Platform.Homepage == nil {
+					if p.Platform.Homepage.String() == "" {
 						errors = append(errors, ErrMissingRequiredField("platform.homepage"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has platform logo in SVG or PNG format",
+				Errors:     []error{},
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if p.Platform.Logo == nil {
+						errors = append(errors, ErrMissingOneOfRequiredFields("platform.logo"))
+						return errors
+					}
+
+					logoUrl := p.Platform.Logo.String()
+					if !strings.HasSuffix(logoUrl, ".png") || !strings.HasSuffix(logoUrl, ".svg") {
+						errors = append(errors, ErrInvalidFormat("platform.logo"))
 					}
 					return errors
 				},
@@ -142,7 +161,7 @@ var (
 		return fmt.Errorf("%s is not yet supporterd", action)
 	}
 
-	ErrTitleCase = func(fieldName string) error {
-		return fmt.Errorf("%s should be in title case", fieldName)
+	ErrInvalidFormat = func(fieldName string) error {
+		return fmt.Errorf("%s has invalid format", fieldName)
 	}
 )

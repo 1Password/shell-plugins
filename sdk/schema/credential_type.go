@@ -101,9 +101,8 @@ func (c CredentialType) ValidationSchema() ValidationSchema {
 				ReportText: "Name is using title case",
 				Validate: func() []error {
 					var errors []error
-					isTitleCase, err := IsTitleCase(c.Name)
-					if !isTitleCase || err != nil {
-						errors = append(errors, ErrTitleCase("name"))
+					if !IsTitleCaseString(c.Name) {
+						errors = append(errors, ErrInvalidFormat("name"))
 					}
 					return errors
 				},
@@ -157,9 +156,8 @@ func (c CredentialType) ValidationSchema() ValidationSchema {
 				Validate: func() []error {
 					var errors []error
 					for _, f := range c.Fields {
-						isTitleCase, err := IsTitleCase(f.Name)
-						if !isTitleCase || err != nil {
-							errors = append(errors, ErrTitleCase("field.name"))
+						if !IsTitleCaseString(f.Name) {
+							errors = append(errors, ErrInvalidFormat("field.name"))
 						}
 					}
 					return errors
