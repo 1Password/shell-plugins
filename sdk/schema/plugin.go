@@ -130,6 +130,10 @@ var (
 		return fmt.Errorf("missing required field: %s", fieldName)
 	}
 
+	ErrMissingOptionalField = func(fieldName string) error {
+		return fmt.Errorf("missing optional field: %s", fieldName)
+	}
+
 	ErrMissingOneOfRequiredFields = func(fields ...string) error {
 		return fmt.Errorf("required to specify at least one of: %s", strings.Join(fields, ", "))
 	}

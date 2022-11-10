@@ -31,16 +31,6 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	report.Fields = fields
 
 	return isValid, report
-
-	//if e.Name == "" {
-	//	errors = append(errors, ErrMissingRequiredField("name"))
-	//}
-	//
-	//if len(e.Runs) == 0 {
-	//	errors = append(errors, ErrMissingRequiredField("runs"))
-	//}
-	//
-	//return len(errors) == 0, errors
 }
 
 func (e Executable) ValidationSchema() ValidationSchema {
@@ -48,11 +38,52 @@ func (e Executable) ValidationSchema() ValidationSchema {
 		Fields: []ValidationSchemaField{
 			{
 				ReportText: "Has name set",
-				Errors:     []error{},
 				Validate: func() []error {
 					var errors []error
 					if e.Name == "" {
 						errors = append(errors, ErrMissingRequiredField("name"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has docs URL set",
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if e.DocsURL == nil {
+						errors = append(errors, ErrMissingOptionalField("docsURL"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has specified which commands need authentication",
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if e.NeedsAuth == nil {
+						errors = append(errors, ErrMissingOptionalField("docsURL"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has executable command set",
+				Validate: func() []error {
+					var errors []error
+					if len(e.Runs) == 0 {
+						errors = append(errors, ErrMissingRequiredField("runs"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has a credential type defined",
+				Validate: func() []error {
+					var errors []error
+					if len(e.Credentials) == 0 {
+						errors = append(errors, ErrMissingRequiredField("credentials"))
 					}
 					return errors
 				},
