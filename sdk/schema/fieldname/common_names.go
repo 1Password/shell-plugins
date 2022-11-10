@@ -35,4 +35,5 @@ const (
 	Namespace       = "Namespace"
 	Region          = "Region"
 	Organization    = "Organization"
+	OneTimePassword = "One-Time Password"
 )
