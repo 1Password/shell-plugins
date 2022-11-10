@@ -30,7 +30,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[string]string{
 			fieldname.APIKey: "HEROKU_API_KEY",
 		}),
 		Importer: importer.TryAll(

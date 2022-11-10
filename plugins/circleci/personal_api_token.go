@@ -30,7 +30,7 @@ func PersonalAPIToken() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[string]string{
 			fieldname.Token: "CIRCLECI_CLI_TOKEN",
 		}),
 		Importer: importer.TryAll(

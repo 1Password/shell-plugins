@@ -39,7 +39,7 @@ func SecretKey() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryAllEnvVars(fieldname.Key, "STRIPE_SECRET_KEY"),

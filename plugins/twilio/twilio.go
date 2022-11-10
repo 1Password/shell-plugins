@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func TwilioCLI() schema.Executable {
@@ -12,8 +13,10 @@ func TwilioCLI() schema.Executable {
 		Name:      "Twilio CLI",
 		DocsURL:   sdk.URL("https://twilio.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Credentials: []schema.CredentialType{
-			APIKey(),
+		UsesCredentials: []schema.CredentialUsage{
+			{
+				Name: credname.APIKey,
+			},
 		},
 	}
 }

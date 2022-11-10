@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func CircleCICLI() schema.Executable {
@@ -15,8 +16,10 @@ func CircleCICLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotForArgs("config"),
 		),
-		Credentials: []schema.CredentialType{
-			PersonalAPIToken(),
+		UsesCredentials: []schema.CredentialUsage{
+			{
+				Name: credname.PersonalAPIToken,
+			},
 		},
 	}
 }

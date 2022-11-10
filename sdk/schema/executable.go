@@ -16,13 +16,27 @@ type Executable struct {
 	Name string
 
 	// Which credentials the executable requires to run and how these should be provisioned.
-	Credentials []CredentialType
+	UsesCredentials []CredentialUsage
 
 	// (Optional) A URL to the documentation about this executable.
 	DocsURL *url.URL
 
 	// (Optional) Whether the exectuable needs authentication for certain args.
 	NeedsAuth sdk.NeedsAuthentication
+}
+
+type CredentialUsage struct {
+	// The name of the credential to use in the executable.
+	Name string
+
+	// (Optional) The plugin name that contains the credential. Defaults to the current package. This can be used to
+	// include credentials from other plugins.
+	Plugin string
+
+	// (Optional) The provisioner to use to provision this credential to the executable. Overrides the DefaultProvisioner
+	// set in the credential schema, so should only be used if this executable requires a custom configuration, that deviates
+	// from the way the credential is usually provisioned.
+	Provisioner sdk.Provisioner
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {
@@ -57,7 +71,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type defined",
-		Assertion:   len(e.Credentials) > 0,
+		Assertion:   len(e.UsesCredentials) > 0,
 		Severity:    ValidationSeverityError,
 	})
 
@@ -66,9 +80,4 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 func (e Executable) Command() string {
 	return strings.Join(e.Runs, " ")
-}
-
-func CredentialWithProvisioner(credential CredentialType, provisioner sdk.Provisioner) CredentialType {
-	credential.Provisioner = provisioner
-	return credential
 }

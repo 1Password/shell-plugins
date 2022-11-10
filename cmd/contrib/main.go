@@ -309,7 +309,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 				{{- end }}
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			Try{{ .PlatformNameUpperCamelCase }}ConfigFile(),
@@ -369,8 +369,10 @@ func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 		DocsURL:   sdk.URL("https://{{ .Name }}.com/docs/cli"), // TODO: Replace with actual URL
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		{{- if .CredentialName }}
-		Credentials: []schema.CredentialType{
-			{{ .CredentialNameUpperCamelCase }}(),
+		Credentials: []schema.CredentialUsage{
+			{
+				Name: credname.{{ .CredentialNameUpperCamelCase }},
+			},
 		},
 		{{- end }}
 	}

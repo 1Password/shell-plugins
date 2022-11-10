@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func SentryCLI() schema.Executable {
@@ -12,8 +13,10 @@ func SentryCLI() schema.Executable {
 		Name:      "Sentry CLI",
 		DocsURL:   sdk.URL("https://docs.sentry.io/product/cli/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Credentials: []schema.CredentialType{
-			AuthToken(),
+		UsesCredentials: []schema.CredentialUsage{
+			{
+				Name: credname.AuthToken,
+			},
 		},
 	}
 }

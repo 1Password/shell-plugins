@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func GitLabCLI() schema.Executable {
@@ -12,8 +13,10 @@ func GitLabCLI() schema.Executable {
 		Name:      "GitLab CLI",
 		DocsURL:   sdk.URL("https://glab.readthedocs.io"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Credentials: []schema.CredentialType{
-			PersonalAccessToken(),
+		UsesCredentials: []schema.CredentialUsage{
+			{
+				Name: credname.PersonalAccessToken,
+			},
 		},
 	}
 }
