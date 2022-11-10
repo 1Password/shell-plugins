@@ -1,5 +1,7 @@
 package schema
 
+import "regexp"
+
 type ValidationReportSection string
 
 type Validator interface {
@@ -57,4 +59,8 @@ func IsErroneousField(field ValidationReportField) bool {
 
 func IsOptionalField(field ValidationReportField) bool {
 	return field.Optional
+}
+
+func IsTitleCase(str string) (bool, error) {
+	return regexp.Match("^[a-z]+$", []byte(str))
 }

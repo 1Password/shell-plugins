@@ -137,4 +137,8 @@ var (
 	ErrNotYetSupported = func(action string) error {
 		return fmt.Errorf("%s is not yet supporterd", action)
 	}
+
+	ErrTitleCase = func(fieldName string) error {
+		return fmt.Errorf("%s should be in title case", fieldName)
+	}
 )

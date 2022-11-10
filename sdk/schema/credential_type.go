@@ -82,48 +82,6 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	report.Fields = fields
 
 	return isValid, report
-	//if c.Name == "" {
-	//	errors = append(errors, ErrMissingRequiredField("name"))
-	//}
-	//
-	//if len(c.Fields) == 0 {
-	//	errors = append(errors, ErrMissingRequiredField("fields"))
-	//}
-	//
-	//credentialTypeHasSecret := true
-	//for _, f := range c.Fields {
-	//	if f.Name == "" {
-	//		errors = append(errors, ErrMissingRequiredField("name"))
-	//	}
-	//
-	//	if f.MarkdownDescription == "" {
-	//		errors = append(errors, ErrMissingRequiredField("markdownDescription"))
-	//	}
-	//
-	//	if f.Secret {
-	//		credentialTypeHasSecret = true
-	//	}
-	//
-	//	comp := f.Composition
-	//	if comp != nil {
-	//		cs := comp.Charset
-	//		if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-	//			errors = append(errors, ErrMissingOneOfRequiredFields(
-	//				"composition.charset.lowercase",
-	//				"composition.charset.uppercase",
-	//				"composition.charset.digits",
-	//				"composition.charset.symbols",
-	//				"composition.charset.specific",
-	//			))
-	//		}
-	//	}
-	//}
-	//
-	//if !credentialTypeHasSecret {
-	//	errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
-	//}
-	//
-	//return len(errors) == 0, errors
 }
 
 func (c CredentialType) ValidationSchema() ValidationSchema {
@@ -131,7 +89,6 @@ func (c CredentialType) ValidationSchema() ValidationSchema {
 		Fields: []ValidationSchemaField{
 			{
 				ReportText: "Has name set",
-				Errors:     []error{},
 				Validate: func() []error {
 					var errors []error
 					if c.Name == "" {
@@ -142,10 +99,153 @@ func (c CredentialType) ValidationSchema() ValidationSchema {
 			},
 			{
 				ReportText: "Name is using title case",
-				Errors:     []error{},
 				Validate: func() []error {
 					var errors []error
-					// TODO: implement
+					isTitleCase, err := IsTitleCase(c.Name)
+					if !isTitleCase || err != nil {
+						errors = append(errors, ErrTitleCase("name"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has docs URL set",
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if c.DocsURL == nil {
+						errors = append(errors, ErrMissingRequiredField("docsURL"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has management URL set",
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if c.ManagementURL == nil {
+						errors = append(errors, ErrMissingRequiredField("managementURL"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has at least 1 field",
+				Validate: func() []error {
+					var errors []error
+					if len(c.Fields) == 0 {
+						errors = append(errors, ErrMissingRequiredField("fields"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "All fields have name set",
+				Validate: func() []error {
+					var errors []error
+					for _, f := range c.Fields {
+						if f.Name == "" {
+							errors = append(errors, ErrMissingRequiredField("field.name"))
+						}
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "All field names are using title case",
+				Validate: func() []error {
+					var errors []error
+					for _, f := range c.Fields {
+						isTitleCase, err := IsTitleCase(f.Name)
+						if !isTitleCase || err != nil {
+							errors = append(errors, ErrTitleCase("field.name"))
+						}
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "All fields have a description set",
+				Validate: func() []error {
+					var errors []error
+					for _, f := range c.Fields {
+						if f.MarkdownDescription == "" {
+							errors = append(errors, ErrMissingRequiredField("field.markdownDescription"))
+						}
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "All specified value compositions are valid",
+				Validate: func() []error {
+					var errors []error
+					for _, f := range c.Fields {
+						if f.MarkdownDescription == "" {
+							errors = append(errors, ErrMissingRequiredField("field.name"))
+						}
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "All specified value compositions are valid",
+				Validate: func() []error {
+					var errors []error
+					for _, f := range c.Fields {
+						comp := f.Composition
+						if comp != nil {
+							cs := comp.Charset
+							if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
+								errors = append(errors, ErrMissingOneOfRequiredFields(
+									"composition.charset.lowercase",
+									"composition.charset.uppercase",
+									"composition.charset.digits",
+									"composition.charset.symbols",
+									"composition.charset.specific",
+								))
+							}
+						}
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has at least 1 field that is secret",
+				Validate: func() []error {
+					var errors []error
+					var credentialTypeHasSecret bool
+					for _, f := range c.Fields {
+						if f.Secret {
+							credentialTypeHasSecret = true
+							break
+						}
+					}
+					if !credentialTypeHasSecret {
+						errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has a provisioner set",
+				Validate: func() []error {
+					var errors []error
+					if c.Provisioner == nil {
+						errors = append(errors, ErrMissingRequiredField("field.provisioner"))
+					}
+					return errors
+				},
+			},
+			{
+				ReportText: "Has an importer set",
+				Optional:   true,
+				Validate: func() []error {
+					var errors []error
+					if c.Importer == nil {
+						errors = append(errors, ErrMissingRequiredField("field.importer"))
+					}
 					return errors
 				},
 			},
