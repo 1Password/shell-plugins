@@ -9,20 +9,20 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-type AWSProvisioner struct {
+type awsProvisioner struct {
 	stsProvisioner    STSProvisioner
 	envVarProvisioner provision.EnvVarProvisioner
 }
 
-func makeProvisioner(envVarToFieldName map[string]string) sdk.Provisioner {
-	return AWSProvisioner{
+func AWSProvisioner(envVarToFieldName map[string]string) sdk.Provisioner {
+	return awsProvisioner{
 		envVarProvisioner: provision.EnvVarProvisioner{
 			Schema: envVarToFieldName,
 		},
 	}
 }
 
-func (p AWSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	totpCode, foundTotp := in.ItemFields[fieldname.OneTimePassword]
 	serialNumber, foundSerialNumber := in.ItemFields[FieldNameSerialNumber]
 	if foundTotp && foundSerialNumber {
@@ -34,10 +34,10 @@ func (p AWSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 }
 
-func (p AWSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p AWSProvisioner) Description() string {
+func (p awsProvisioner) Description() string {
 	return fmt.Sprintf("%s, and, if MFA is present, %s", p.envVarProvisioner.Description(), p.stsProvisioner.Description())
 }
