@@ -263,6 +263,8 @@ var credentialTemplate = Template{
 	Contents: `package {{ .Name }}
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -315,14 +317,38 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]string{
-	fieldname.{{ .FieldName }}: "{{ .CredentialEnvVarName }}",
+	fieldname.{{ .FieldName }}: "{{ .CredentialEnvVarName }}", // TODO: Check if this is correct
 }
 
-func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer { // TODO: See if function name should be more specific
-	return importer.TryFile("~/path/to/config/file", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
-		// TODO: Write importer that tries to find a {{ .CredentialName }} in the platform's config file, if such a concept exists.
+// TODO: Check if the platform stores the {{ .CredentialName }} in a local config file, and if so,
+// implement the function below to add support for importing it.
+func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
+	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+		// var config Config
+		// if err := contents.ToYAML(&config); err != nil {
+		// 	out.AddError(err)
+		// 	return
+		// }
+
+		// if config.{{ .FieldName }} == "" {
+		// 	return
+		// }
+
+		// out.AddCandidate(sdk.ImportCandidate{
+		// 	Fields: []sdk.ImportCandidateField{
+		// 		{
+		// 			Field: fieldname.{{ .FieldName }},
+		// 			Value: config.{{ .FieldName }},
+		// 		},
+		// 	},
+		// })
 	})
 }
+
+// TODO: Implement the config file schema
+// type Config struct {
+//	{{ .FieldName }} string
+// }
 `,
 }
 
