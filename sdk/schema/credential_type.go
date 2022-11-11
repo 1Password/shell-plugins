@@ -79,7 +79,7 @@ type Charset struct {
 func (c CredentialType) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
 		Heading: fmt.Sprintf("Credential: %s", c.Name),
-		Checks:  &[]ValidationCheck{},
+		Checks:  []ValidationCheck{},
 	}
 
 	areAllFieldsHasNameSet := true

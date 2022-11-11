@@ -28,7 +28,7 @@ type Executable struct {
 func (e Executable) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
 		Heading: fmt.Sprintf("Executable: %s", e.Name),
-		Checks:  &[]ValidationCheck{},
+		Checks:  []ValidationCheck{},
 	}
 
 	report.AddCheck(ValidationCheck{

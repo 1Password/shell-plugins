@@ -131,7 +131,7 @@ func TestPluginValidateEachReportFieldHasError(t *testing.T) {
 	p := Plugin{}
 	_, report := p.Validate()
 
-	for _, c := range *report.Checks {
+	for _, c := range report.Checks {
 		assert.False(t, c.Assertion, fmt.Sprintf("\"%s\" validation is erroneous", c.Description))
 	}
 }

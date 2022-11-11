@@ -7,17 +7,17 @@ import (
 
 type ValidationReport struct {
 	Heading string
-	Checks  *[]ValidationCheck
+	Checks  []ValidationCheck
 }
 
-func (vr ValidationReport) AddCheck(check ValidationCheck) {
-	*vr.Checks = append(*vr.Checks, check)
+func (vr *ValidationReport) AddCheck(check ValidationCheck) {
+	vr.Checks = append(vr.Checks, check)
 }
 
-func (vr ValidationReport) IsValid() bool {
+func (vr *ValidationReport) IsValid() bool {
 	isValid := true
 
-	for _, check := range *vr.Checks {
+	for _, check := range vr.Checks {
 		if !check.Assertion {
 			isValid = false
 			break

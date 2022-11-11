@@ -55,7 +55,7 @@ func (p ValidationReportPrinter) Print() {
 
 func (p ValidationReportPrinter) PrintSectionReport(report schema.ValidationReport) {
 	p.printHeading(report.Heading)
-	p.printChecks(report.Checks)
+	p.printChecks(&report.Checks)
 }
 
 // sortChecks in the order ["success", "warning", "error"]

@@ -37,7 +37,7 @@ type PlatformInfo struct {
 func (p Plugin) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
 		Heading: fmt.Sprintf("Plugin: %s", p.Name),
-		Checks:  &[]ValidationCheck{},
+		Checks:  []ValidationCheck{},
 	}
 
 	report.AddCheck(ValidationCheck{
