@@ -8,7 +8,7 @@ import (
 )
 
 func PrintValidationReport(plugin schema.Plugin) {
-	reports := plugin.MakePluginValidationReports()
+	reports := plugin.DeepValidate()
 	printer := &ValidationReportPrinter{
 		Reports: reports,
 		Format:  PrintFormat{}.ValidationReportFormat(),

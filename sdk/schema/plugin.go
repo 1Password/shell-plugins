@@ -85,7 +85,7 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	return report.IsValid(), report
 }
 
-func (p Plugin) MakePluginValidationReports() []ValidationReport {
+func (p Plugin) DeepValidate() []ValidationReport {
 	var reports []ValidationReport
 
 	_, pluginReport := p.Validate()
