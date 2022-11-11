@@ -62,7 +62,7 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: getProvisioner(officialEnvVarMapping),
+		Provisioner: makeProvisioner(officialEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(officialEnvVarMapping),
 			importer.TryEnvVarPair(map[string]string{

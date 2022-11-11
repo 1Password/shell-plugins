@@ -12,48 +12,48 @@ import (
 	"github.com/aws/aws-sdk-go/service/sts"
 )
 
-type StsProvisioner struct {
-	TotpCode     string
-	SerialNumber string
+type STSProvisioner struct {
+	TOTPCode  string
+	MFASerial string
 }
 
-func (p StsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(in.ItemFields[FieldNameDefaultRegion]),
 		Credentials: credentials.NewStaticCredentials(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], ""),
 	})
 	if err != nil {
-		out.Diagnostics.Errors = append(out.Diagnostics.Errors, sdk.Error{Message: fmt.Sprintf("Could not start aws STS session: %s", err.Error())})
+		out.AddError(fmt.Errorf("could not start aws STS session: %s", err))
 		return
 	}
 	stsProvider := sts.New(sess)
 	input := &sts.GetSessionTokenInput{
 		DurationSeconds: aws.Int64(900), // minimum expiration time - 15 minutes
-		SerialNumber:    aws.String(p.SerialNumber),
-		TokenCode:       aws.String(p.TotpCode),
+		SerialNumber:    aws.String(p.MFASerial),
+		TokenCode:       aws.String(p.TOTPCode),
 	}
 
 	result, err := stsProvider.GetSessionToken(input)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			if aerr.Code() == sts.ErrCodeRegionDisabledException {
-				out.Diagnostics.Errors = append(out.Diagnostics.Errors, sdk.Error{Message: fmt.Sprint(sts.ErrCodeRegionDisabledException, aerr.Error())})
+				out.AddError(fmt.Errorf(sts.ErrCodeRegionDisabledException+": %s", aerr.Error()))
 			}
 		} else {
-			out.Diagnostics.Errors = append(out.Diagnostics.Errors, sdk.Error{Message: aerr.Error()})
+			out.AddError(aerr)
 		}
 
 		return
 	}
-	out.Environment["AWS_ACCESS_KEY_ID"] = *result.Credentials.AccessKeyId
-	out.Environment["AWS_ACCESS_KEY_ID"] = *result.Credentials.AccessKeyId
-	out.Environment["AWS_ACCESS_KEY_ID"] = *result.Credentials.SessionToken
+	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
+	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.AccessKeyId)
+	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
 }
 
-func (p StsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p StsProvisioner) Description() string {
+func (p STSProvisioner) Description() string {
 	return fmt.Sprintf("Provision environment variables with the temporary credentials AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID")
 }

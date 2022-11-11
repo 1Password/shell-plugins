@@ -9,11 +9,11 @@ import (
 )
 
 type AWSProvisioner struct {
-	stsProvisioner    StsProvisioner
+	stsProvisioner    STSProvisioner
 	envVarProvisioner provision.EnvVarProvisioner
 }
 
-func getProvisioner(envVarToFieldName map[string]string) sdk.Provisioner {
+func makeProvisioner(envVarToFieldName map[string]string) sdk.Provisioner {
 	return AWSProvisioner{
 		envVarProvisioner: provision.EnvVarProvisioner{
 			Schema: envVarToFieldName,
@@ -25,8 +25,8 @@ func (p AWSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	totpCode, foundTotp := in.ItemFields[fieldname.OneTimePassword]
 	serialNumber, foundSerialNumber := in.ItemFields[FieldNameSerialNumber]
 	if foundTotp && foundSerialNumber {
-		p.stsProvisioner.TotpCode = totpCode
-		p.stsProvisioner.SerialNumber = serialNumber
+		p.stsProvisioner.TOTPCode = totpCode
+		p.stsProvisioner.MFASerial = serialNumber
 		p.stsProvisioner.Provision(ctx, in, out)
 	} else {
 		p.envVarProvisioner.Provision(ctx, in, out)
