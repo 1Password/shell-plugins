@@ -5,11 +5,15 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/aws/aws-sdk-go-v2/config"
+)
+
+const (
+	FieldNameDefaultRegion = "Default Region"
+	FieldNameSerialNumber  = "MFA Serial"
 )
 
 func AccessKey() schema.CredentialType {
@@ -47,8 +51,18 @@ func AccessKey() schema.CredentialType {
 				MarkdownDescription: "The default region to use for this access key.",
 				Optional:            true,
 			},
+			{
+				Name:                fieldname.OneTimePassword,
+				MarkdownDescription: "The one-time code value for MFA authentication.",
+				Optional:            true,
+			},
+			{
+				Name:                FieldNameSerialNumber,
+				MarkdownDescription: "The identification number of the MFA device that is associated with the user who is making the GetSessionToken call, usually an Amazon Resource Name (ARN) for a virtual device (such as arn:aws:iam::123456789012:mfa/user).",
+				Optional:            true,
+			},
 		},
-		Provisioner: provision.EnvVars(officialEnvVarMapping),
+		Provisioner: AWSProvisioner(),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(officialEnvVarMapping),
 			importer.TryEnvVarPair(map[string]string{
@@ -76,8 +90,6 @@ var officialEnvVarMapping = map[string]string{
 	fieldname.SecretAccessKey: "AWS_SECRET_ACCESS_KEY",
 	FieldNameDefaultRegion:    "AWS_DEFAULT_REGION",
 }
-
-const FieldNameDefaultRegion = "Default Region"
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
 func TryCredentialsFile() sdk.Importer {
