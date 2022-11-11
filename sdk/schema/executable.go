@@ -26,70 +26,42 @@ type Executable struct {
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {
-	report := ValidationReport{Heading: fmt.Sprintf("Executable: %s", e.Name)}
-	isValid, fields := validate(e)
-	report.Fields = fields
-
-	return isValid, report
-}
-
-func (e Executable) ValidationSchema() ValidationSchema {
-	return ValidationSchema{
-		Fields: []ValidationSchemaField{
-			{
-				ReportText: "Has name set",
-				Validate: func() []error {
-					var errors []error
-					if e.Name == "" {
-						errors = append(errors, ErrMissingRequiredField("name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has docs URL set",
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if e.DocsURL == nil {
-						errors = append(errors, ErrMissingOptionalField("docsURL"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has specified which commands need authentication",
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if e.NeedsAuth == nil {
-						errors = append(errors, ErrMissingOptionalField("docsURL"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has executable command set",
-				Validate: func() []error {
-					var errors []error
-					if len(e.Runs) == 0 {
-						errors = append(errors, ErrMissingRequiredField("runs"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has a credential type defined",
-				Validate: func() []error {
-					var errors []error
-					if len(e.Credentials) == 0 {
-						errors = append(errors, ErrMissingRequiredField("credentials"))
-					}
-					return errors
-				},
-			},
-		},
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Executable: %s", e.Name),
+		Checks:  &[]ValidationCheck{},
 	}
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   e.Name != "",
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has docs URL set",
+		Assertion:   e.DocsURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has specified which commands need authentication",
+		Assertion:   e.NeedsAuth != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has executable command set",
+		Assertion:   len(e.Runs) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a credential type defined",
+		Assertion:   len(e.Credentials) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	return IsValidReport(report), report
 }
 
 func (e Executable) Command() string {

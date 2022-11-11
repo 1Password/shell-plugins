@@ -8,7 +8,7 @@ import (
 
 func TestPlugin(t *testing.T) {
 	_, report := New().Validate()
-	for _, f := range report.Fields {
-		assert.Empty(t, f.Errors)
+	for _, c := range *report.Checks {
+		assert.Equal(t, true, c.Assertion)
 	}
 }

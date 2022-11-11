@@ -1,7 +1,6 @@
 package plugintest
 
 import (
-	"errors"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/stretchr/testify/assert"
@@ -10,14 +9,14 @@ import (
 
 func TestValidationReportPrinter_printFields(t *testing.T) {
 	printer := &ValidationReportPrinter{}
-	fields := []schema.ValidationReportField{
-		{ReportText: "error", Optional: false, Errors: []error{errors.New("1")}},
-		{ReportText: "success", Errors: []error{}},
-		{ReportText: "warning", Optional: true, Errors: []error{errors.New("1")}},
+	fields := []schema.ValidationCheck{
+		{Description: "error", Assertion: false, Severity: schema.ValidationSeverityError},
+		{Description: "success", Assertion: true},
+		{Description: "warning", Assertion: false, Severity: schema.ValidationSeverityWarning},
 	}
-	printer.sortFields(&fields)
+	printer.sortChecks(&fields)
 
-	assert.Equal(t, "success", fields[0].ReportText, fmt.Sprint("first filed should be success"))
-	assert.Equal(t, "warning", fields[1].ReportText, fmt.Sprint("second filed should be warning"))
-	assert.Equal(t, "error", fields[2].ReportText, fmt.Sprint("third filed should be error"))
+	assert.Equal(t, "success", fields[0].Description, fmt.Sprint("first filed should be success"))
+	assert.Equal(t, "warning", fields[1].Description, fmt.Sprint("second filed should be warning"))
+	assert.Equal(t, "error", fields[2].Description, fmt.Sprint("third filed should be error"))
 }

@@ -77,176 +77,150 @@ type Charset struct {
 }
 
 func (c CredentialType) Validate() (bool, ValidationReport) {
-	report := ValidationReport{Heading: fmt.Sprintf("Credential: %s", c.Name)}
-	isValid, fields := validate(c)
-	report.Fields = fields
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Credential: %s", c.Name),
+		Checks:  &[]ValidationCheck{},
+	}
 
-	return isValid, report
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   c.Name != "",
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Name is using title case",
+		Assertion:   IsTitleCaseString(c.Name),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has docs URL set",
+		Assertion:   c.DocsURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has management URL set",
+		Assertion:   c.ManagementURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has at least 1 field",
+		Assertion:   len(c.Fields) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All fields have name set",
+		Assertion:   areAllFieldsHasNameSet(c),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All field names are using title case",
+		Assertion:   areAllFieldsInTitleCase(c),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All fields have a description set",
+		Assertion:   areAllFieldsHasDescriptionSet(c),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All specified value compositions are valid",
+		Assertion:   areAllCompositionsValid(c),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has at least 1 field that is secret",
+		Assertion:   hasSecretField(c),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a provisioner set",
+		Assertion:   c.Provisioner != nil,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has an importer set",
+		Assertion:   c.Importer != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	return IsValidReport(report), report
 }
 
-func (c CredentialType) ValidationSchema() ValidationSchema {
-	return ValidationSchema{
-		Fields: []ValidationSchemaField{
-			{
-				ReportText: "Has name set",
-				Validate: func() []error {
-					var errors []error
-					if c.Name == "" {
-						errors = append(errors, ErrMissingRequiredField("name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Name is using title case",
-				Validate: func() []error {
-					var errors []error
-					if !IsTitleCaseString(c.Name) {
-						errors = append(errors, ErrInvalidFormat("name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has docs URL set",
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if c.DocsURL == nil {
-						errors = append(errors, ErrMissingRequiredField("docsURL"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has management URL set",
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if c.ManagementURL == nil {
-						errors = append(errors, ErrMissingRequiredField("managementURL"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has at least 1 field",
-				Validate: func() []error {
-					var errors []error
-					if len(c.Fields) == 0 {
-						errors = append(errors, ErrMissingRequiredField("fields"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "All fields have name set",
-				Validate: func() []error {
-					var errors []error
-					for _, f := range c.Fields {
-						if f.Name == "" {
-							errors = append(errors, ErrMissingRequiredField("field.name"))
-						}
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "All field names are using title case",
-				Validate: func() []error {
-					var errors []error
-					for _, f := range c.Fields {
-						if !IsTitleCaseString(f.Name) {
-							errors = append(errors, ErrInvalidFormat("field.name"))
-						}
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "All fields have a description set",
-				Validate: func() []error {
-					var errors []error
-					for _, f := range c.Fields {
-						if f.MarkdownDescription == "" {
-							errors = append(errors, ErrMissingRequiredField("field.markdownDescription"))
-						}
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "All specified value compositions are valid",
-				Validate: func() []error {
-					var errors []error
-					for _, f := range c.Fields {
-						if f.MarkdownDescription == "" {
-							errors = append(errors, ErrMissingRequiredField("field.name"))
-						}
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "All specified value compositions are valid",
-				Validate: func() []error {
-					var errors []error
-					for _, f := range c.Fields {
-						comp := f.Composition
-						if comp != nil {
-							cs := comp.Charset
-							if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-								errors = append(errors, ErrMissingOneOfRequiredFields(
-									"composition.charset.lowercase",
-									"composition.charset.uppercase",
-									"composition.charset.digits",
-									"composition.charset.symbols",
-									"composition.charset.specific",
-								))
-							}
-						}
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has at least 1 field that is secret",
-				Validate: func() []error {
-					var errors []error
-					var credentialTypeHasSecret bool
-					for _, f := range c.Fields {
-						if f.Secret {
-							credentialTypeHasSecret = true
-							break
-						}
-					}
-					if !credentialTypeHasSecret {
-						errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has a provisioner set",
-				Validate: func() []error {
-					var errors []error
-					if c.Provisioner == nil {
-						errors = append(errors, ErrMissingRequiredField("field.provisioner"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has an importer set",
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if c.Importer == nil {
-						errors = append(errors, ErrMissingRequiredField("field.importer"))
-					}
-					return errors
-				},
-			},
-		},
+func areAllFieldsHasNameSet(c CredentialType) bool {
+	isNameSet := true
+
+	for _, f := range c.Fields {
+		if f.Name == "" {
+			isNameSet = false
+			break
+		}
 	}
+
+	return isNameSet
+}
+
+func areAllFieldsHasDescriptionSet(c CredentialType) bool {
+	isNameSet := true
+
+	for _, f := range c.Fields {
+		if f.MarkdownDescription == "" {
+			isNameSet = false
+			break
+		}
+	}
+
+	return isNameSet
+}
+
+func areAllFieldsInTitleCase(c CredentialType) bool {
+	isInTitleCase := true
+
+	for _, f := range c.Fields {
+		if !IsTitleCaseString(f.Name) {
+			isInTitleCase = false
+			break
+		}
+	}
+
+	return isInTitleCase
+}
+
+func areAllCompositionsValid(c CredentialType) bool {
+	isValid := true
+
+	for _, f := range c.Fields {
+		comp := f.Composition
+		if comp != nil {
+			cs := comp.Charset
+			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
+				isValid = false
+			}
+		}
+	}
+
+	return isValid
+}
+
+func hasSecretField(c CredentialType) bool {
+	var credentialTypeHasSecret bool
+
+	for _, f := range c.Fields {
+		if f.Secret {
+			credentialTypeHasSecret = true
+			break
+		}
+	}
+
+	return credentialTypeHasSecret
 }

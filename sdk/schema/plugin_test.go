@@ -18,11 +18,7 @@ func TestPluginValidateEachReportFieldHasError(t *testing.T) {
 	p := Plugin{}
 	_, report := p.Validate()
 
-	for _, f := range report.Fields {
-		assert.Equal(t, true, isInvalidField(f), fmt.Sprintf("\"%s\" validation is erroneous", f.ReportText))
+	for _, c := range *report.Checks {
+		assert.Equal(t, false, c.Assertion, fmt.Sprintf("\"%s\" validation is erroneous", c.Description))
 	}
-}
-
-func isInvalidField(field ValidationReportField) bool {
-	return len(field.Errors) > 0
 }

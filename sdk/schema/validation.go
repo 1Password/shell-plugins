@@ -6,64 +6,30 @@ import (
 	"strings"
 )
 
-type ValidationReportSection string
-
-type Validator interface {
-	Validate() (bool, ValidationReport)
-	ValidationSchema() ValidationSchema
-}
-
-type ValidationSchema struct {
-	Fields []ValidationSchemaField
-}
-
-type ValidationSchemaField struct {
-	ReportText string
-	Optional   bool
-	Errors     []error
-	Validate   func() []error
-}
-
 type ValidationReport struct {
 	Heading string
-	Fields  []ValidationReportField
+	Checks  *[]ValidationCheck
 }
 
-type ValidationReportField struct {
-	ReportText string
-	Optional   bool
-	Errors     []error
+func (vr ValidationReport) AddCheck(check ValidationCheck) {
+	*vr.Checks = append(*vr.Checks, check)
 }
 
-func validate(v Validator) (bool, []ValidationReportField) {
-	isValid := true
-	var reportFields []ValidationReportField
-	schema := v.ValidationSchema()
-
-	for _, f := range schema.Fields {
-		reportField := ValidationReportField{
-			ReportText: f.ReportText,
-			Optional:   f.Optional,
-			Errors:     []error{},
-		}
-		errors := f.Validate()
-		if len(errors) > 0 {
-			reportField.Errors = errors
-			isValid = false
-		}
-		reportFields = append(reportFields, reportField)
-	}
-
-	return isValid, reportFields
+type ValidationCheck struct {
+	// Description explains what we want to validate
+	Description string
+	// Assertion
+	Assertion bool
+	// Severity is "warning" for Optional fields that are not passed and "error" for Required fields
+	Severity ValidationSeverity
 }
 
-func IsErroneousField(field ValidationReportField) bool {
-	return len(field.Errors) > 0
-}
+type ValidationSeverity string
 
-func IsOptionalField(field ValidationReportField) bool {
-	return field.Optional
-}
+const (
+	ValidationSeverityWarning ValidationSeverity = "warning"
+	ValidationSeverityError   ValidationSeverity = "error"
+)
 
 func IsTitleCaseWord(word string) bool {
 	words := strings.Split(word, " ")
@@ -107,4 +73,17 @@ func ContainsLowercaseLettersOrDigits(str string) bool {
 		return false
 	}
 	return matched
+}
+
+func IsValidReport(report ValidationReport) bool {
+	isValid := true
+
+	for _, check := range *report.Checks {
+		if !check.Assertion {
+			isValid = false
+			break
+		}
+	}
+
+	return isValid
 }

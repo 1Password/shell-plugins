@@ -7,6 +7,15 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
+func PrintValidationReport(plugin schema.Plugin) {
+	reports := plugin.MakePluginValidationReports()
+	printer := &ValidationReportPrinter{
+		Reports: reports,
+		Format:  PrintFormat{}.ValidationReportFormat(),
+	}
+	printer.Print()
+}
+
 type PrintFormat struct {
 	Heading *color.Color
 	Warning *color.Color
@@ -46,36 +55,37 @@ func (vrp ValidationReportPrinter) Print() {
 
 func (vrp ValidationReportPrinter) PrintSectionReport(report schema.ValidationReport) {
 	vrp.printHeading(report.Heading)
-	vrp.printFields(report.Fields)
+	vrp.printChecks(report.Checks)
 }
 
-func (vrp ValidationReportPrinter) sortFields(fields *[]schema.ValidationReportField) {
-	var successFields []schema.ValidationReportField
-	var warningFields []schema.ValidationReportField
-	var erroneousFields []schema.ValidationReportField
+// sortChecks in the order ["success", "warning", "error"]
+func (vrp ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) {
+	var successChecks []schema.ValidationCheck
+	var warningChecks []schema.ValidationCheck
+	var erroneousChecks []schema.ValidationCheck
 
-	for _, f := range *fields {
-		if !schema.IsErroneousField(f) {
-			successFields = append(successFields, f)
+	for _, c := range *checks {
+		if c.Assertion {
+			successChecks = append(successChecks, c)
 			continue
 		}
 
-		if schema.IsOptionalField(f) {
-			warningFields = append(warningFields, f)
+		if c.Severity == schema.ValidationSeverityWarning {
+			warningChecks = append(warningChecks, c)
 			continue
 		}
 
-		erroneousFields = append(erroneousFields, f)
+		erroneousChecks = append(erroneousChecks, c)
 	}
 
-	*fields = append(successFields, warningFields...)
-	*fields = append(*fields, erroneousFields...)
+	*checks = append(successChecks, warningChecks...)
+	*checks = append(*checks, erroneousChecks...)
 }
 
-func (vrp ValidationReportPrinter) printFields(fields []schema.ValidationReportField) {
-	vrp.sortFields(&fields)
-	for _, field := range fields {
-		vrp.printField(field)
+func (vrp ValidationReportPrinter) printChecks(checks *[]schema.ValidationCheck) {
+	vrp.sortChecks(checks)
+	for _, c := range *checks {
+		vrp.printCheck(c)
 	}
 	fmt.Println()
 }
@@ -84,25 +94,16 @@ func (vrp ValidationReportPrinter) printHeading(heading string) {
 	vrp.Format.Heading.Printf("# %s\n\n", heading)
 }
 
-func (vrp ValidationReportPrinter) printField(field schema.ValidationReportField) {
-	if !schema.IsErroneousField(field) {
-		vrp.Format.Success.Printf("✔ %s\n", field.ReportText)
+func (vrp ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
+	if check.Assertion {
+		vrp.Format.Success.Printf("✔ %s\n", check.Description)
 		return
 	}
 
-	if schema.IsOptionalField(field) {
-		vrp.Format.Warning.Printf("⚠ %s\n", field.ReportText)
+	if check.Severity == schema.ValidationSeverityWarning {
+		vrp.Format.Warning.Printf("⚠ %s\n", check.Description)
 		return
 	}
 
-	vrp.Format.Error.Printf("𝘹%s\n", field.ReportText)
-}
-
-func PrintValidationReport(plugin schema.Plugin) {
-	reports := plugin.MakePluginValidationReports()
-	printer := &ValidationReportPrinter{
-		Reports: reports,
-		Format:  PrintFormat{}.ValidationReportFormat(),
-	}
-	printer.Print()
+	vrp.Format.Error.Printf("𝘹%s\n", check.Description)
 }

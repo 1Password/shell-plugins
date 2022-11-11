@@ -35,11 +35,54 @@ type PlatformInfo struct {
 }
 
 func (p Plugin) Validate() (bool, ValidationReport) {
-	report := ValidationReport{Heading: fmt.Sprintf("Plugin: %s", p.Name)}
-	isValid, fields := validate(p)
-	report.Fields = fields
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Plugin: %s", p.Name),
+		Checks:  &[]ValidationCheck{},
+	}
 
-	return isValid, report
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   p.Name != "",
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Name only using lowercase characters or digits",
+		Assertion:   ContainsLowercaseLettersOrDigits(p.Name),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform name set",
+		Assertion:   p.Platform.Name != "",
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform homepage URL set",
+		Assertion:   p.Platform.Homepage != nil,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform logo in SVG or PNG format",
+		Assertion:   checkPlatformLogoFormat(p),
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a credential type or executable defined",
+		Assertion:   len(p.Credentials) > 0 && len(p.Executables) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has no more than one credential type defined",
+		Assertion:   len(p.Credentials) == 1,
+		Severity:    ValidationSeverityError,
+	})
+
+	return IsValidReport(report), report
 }
 
 func (p Plugin) MakePluginValidationReports() []ValidationReport {
@@ -61,107 +104,15 @@ func (p Plugin) MakePluginValidationReports() []ValidationReport {
 	return reports
 }
 
-func (p Plugin) ValidationSchema() ValidationSchema {
-	return ValidationSchema{
-		Fields: []ValidationSchemaField{
-			{
-				ReportText: "Has name set",
-				Errors:     []error{},
-				Validate: func() []error {
-					var errors []error
-					if p.Name == "" {
-						errors = append(errors, ErrMissingRequiredField("name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Name only using lowercase characters or digits",
-				Errors:     []error{},
-				Validate: func() []error {
-					var errors []error
-					if !ContainsLowercaseLettersOrDigits(p.Name) {
-						errors = append(errors, ErrInvalidFormat("name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has platform name set",
-				Errors:     []error{},
-				Validate: func() []error {
-					var errors []error
-					if p.Platform.Name == "" {
-						errors = append(errors, ErrMissingRequiredField("platform.name"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has platform homepage URL set",
-				Errors:     []error{},
-				Validate: func() []error {
-					var errors []error
-					if p.Platform.Homepage.String() == "" {
-						errors = append(errors, ErrMissingRequiredField("platform.homepage"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has platform logo in SVG or PNG format",
-				Errors:     []error{},
-				Optional:   true,
-				Validate: func() []error {
-					var errors []error
-					if p.Platform.Logo == nil {
-						errors = append(errors, ErrMissingOneOfRequiredFields("platform.logo"))
-						return errors
-					}
-
-					logoUrl := p.Platform.Logo.String()
-					if !strings.HasSuffix(logoUrl, ".png") || !strings.HasSuffix(logoUrl, ".svg") {
-						errors = append(errors, ErrInvalidFormat("platform.logo"))
-					}
-					return errors
-				},
-			},
-			{
-				ReportText: "Has a credential type or executable defined",
-				Errors:     []error{},
-				Validate: func() []error {
-					var errors []error
-					if len(p.Credentials) == 0 && len(p.Executables) == 0 {
-						errors = append(errors, ErrMissingOneOfRequiredFields("credentials", "executables"))
-					}
-					if len(p.Credentials) > 1 {
-						errors = append(errors, ErrNotYetSupported("provisioning multiple credentials to an executable"))
-					}
-					return errors
-				},
-			},
-		},
+func checkPlatformLogoFormat(p Plugin) bool {
+	if p.Platform.Logo == nil {
+		return false
 	}
+
+	logoUrl := p.Platform.Logo.String()
+	if strings.HasSuffix(logoUrl, ".png") || strings.HasSuffix(logoUrl, ".svg") {
+		return true
+	}
+
+	return false
 }
-
-var (
-	ErrMissingRequiredField = func(fieldName string) error {
-		return fmt.Errorf("missing required field: %s", fieldName)
-	}
-
-	ErrMissingOptionalField = func(fieldName string) error {
-		return fmt.Errorf("missing optional field: %s", fieldName)
-	}
-
-	ErrMissingOneOfRequiredFields = func(fields ...string) error {
-		return fmt.Errorf("required to specify at least one of: %s", strings.Join(fields, ", "))
-	}
-
-	ErrNotYetSupported = func(action string) error {
-		return fmt.Errorf("%s is not yet supporterd", action)
-	}
-
-	ErrInvalidFormat = func(fieldName string) error {
-		return fmt.Errorf("%s has invalid format", fieldName)
-	}
-)
