@@ -14,10 +14,10 @@ type awsProvisioner struct {
 	envVarProvisioner provision.EnvVarProvisioner
 }
 
-func AWSProvisioner(envVarToFieldName map[string]string) sdk.Provisioner {
+func AWSProvisioner() sdk.Provisioner {
 	return awsProvisioner{
 		envVarProvisioner: provision.EnvVarProvisioner{
-			Schema: envVarToFieldName,
+			Schema: officialEnvVarMapping,
 		},
 	}
 }
