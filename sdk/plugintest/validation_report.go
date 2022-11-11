@@ -105,5 +105,5 @@ func (p ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 		return
 	}
 
-	p.Format.Error.Printf("𝘹%s\n", check.Description)
+	p.Format.Error.Printf("✘ %s\n", check.Description)
 }
