@@ -38,7 +38,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has docs URL set",
+		Description: "Has documentation URL set",
 		Assertion:   e.DocsURL != nil,
 		Severity:    ValidationSeverityWarning,
 	})
@@ -61,7 +61,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
-	return IsValidReport(report), report
+	return report.IsValid(), report
 }
 
 func (e Executable) Command() string {

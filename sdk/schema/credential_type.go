@@ -82,6 +82,33 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Checks:  &[]ValidationCheck{},
 	}
 
+	areAllFieldsHasNameSet := true
+	areAllFieldsHasDescriptionSet := true
+	areAllFieldsInTitleCase := true
+	areAllCompositionsValid := true
+	hasSecretField := false
+	for _, f := range c.Fields {
+		if f.Name == "" {
+			areAllFieldsHasNameSet = false
+		}
+		if f.MarkdownDescription == "" {
+			areAllFieldsHasDescriptionSet = false
+		}
+		if !IsTitleCaseString(f.Name) {
+			areAllFieldsInTitleCase = false
+		}
+		comp := f.Composition
+		if comp != nil {
+			cs := comp.Charset
+			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
+				areAllCompositionsValid = false
+			}
+		}
+		if f.Secret {
+			hasSecretField = true
+		}
+	}
+
 	report.AddCheck(ValidationCheck{
 		Description: "Has name set",
 		Assertion:   c.Name != "",
@@ -95,7 +122,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has docs URL set",
+		Description: "Has documentation URL set",
 		Assertion:   c.DocsURL != nil,
 		Severity:    ValidationSeverityWarning,
 	})
@@ -114,31 +141,31 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "All fields have name set",
-		Assertion:   areAllFieldsHasNameSet(c),
+		Assertion:   areAllFieldsHasNameSet,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All field names are using title case",
-		Assertion:   areAllFieldsInTitleCase(c),
+		Assertion:   areAllFieldsInTitleCase,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All fields have a description set",
-		Assertion:   areAllFieldsHasDescriptionSet(c),
+		Assertion:   areAllFieldsHasDescriptionSet,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All specified value compositions are valid",
-		Assertion:   areAllCompositionsValid(c),
+		Assertion:   areAllCompositionsValid,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has at least 1 field that is secret",
-		Assertion:   hasSecretField(c),
+		Assertion:   hasSecretField,
 		Severity:    ValidationSeverityError,
 	})
 
@@ -154,73 +181,5 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityWarning,
 	})
 
-	return IsValidReport(report), report
-}
-
-func areAllFieldsHasNameSet(c CredentialType) bool {
-	isNameSet := true
-
-	for _, f := range c.Fields {
-		if f.Name == "" {
-			isNameSet = false
-			break
-		}
-	}
-
-	return isNameSet
-}
-
-func areAllFieldsHasDescriptionSet(c CredentialType) bool {
-	isNameSet := true
-
-	for _, f := range c.Fields {
-		if f.MarkdownDescription == "" {
-			isNameSet = false
-			break
-		}
-	}
-
-	return isNameSet
-}
-
-func areAllFieldsInTitleCase(c CredentialType) bool {
-	isInTitleCase := true
-
-	for _, f := range c.Fields {
-		if !IsTitleCaseString(f.Name) {
-			isInTitleCase = false
-			break
-		}
-	}
-
-	return isInTitleCase
-}
-
-func areAllCompositionsValid(c CredentialType) bool {
-	isValid := true
-
-	for _, f := range c.Fields {
-		comp := f.Composition
-		if comp != nil {
-			cs := comp.Charset
-			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-				isValid = false
-			}
-		}
-	}
-
-	return isValid
-}
-
-func hasSecretField(c CredentialType) bool {
-	var credentialTypeHasSecret bool
-
-	for _, f := range c.Fields {
-		if f.Secret {
-			credentialTypeHasSecret = true
-			break
-		}
-	}
-
-	return credentialTypeHasSecret
+	return report.IsValid(), report
 }

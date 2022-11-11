@@ -42,27 +42,27 @@ type ValidationReportPrinter struct {
 	Format  PrintFormat
 }
 
-func (vrp ValidationReportPrinter) Print() {
-	if vrp.Reports == nil || len(vrp.Reports) == 0 {
+func (p ValidationReportPrinter) Print() {
+	if p.Reports == nil || len(p.Reports) == 0 {
 		color.Cyan("No reports to print")
 		return
 	}
 
-	for _, report := range vrp.Reports {
-		vrp.PrintSectionReport(report)
+	for _, report := range p.Reports {
+		p.PrintSectionReport(report)
 	}
 }
 
-func (vrp ValidationReportPrinter) PrintSectionReport(report schema.ValidationReport) {
-	vrp.printHeading(report.Heading)
-	vrp.printChecks(report.Checks)
+func (p ValidationReportPrinter) PrintSectionReport(report schema.ValidationReport) {
+	p.printHeading(report.Heading)
+	p.printChecks(report.Checks)
 }
 
 // sortChecks in the order ["success", "warning", "error"]
-func (vrp ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) {
+func (p ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) {
 	var successChecks []schema.ValidationCheck
 	var warningChecks []schema.ValidationCheck
-	var erroneousChecks []schema.ValidationCheck
+	var errorChecks []schema.ValidationCheck
 
 	for _, c := range *checks {
 		if c.Assertion {
@@ -75,35 +75,35 @@ func (vrp ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) 
 			continue
 		}
 
-		erroneousChecks = append(erroneousChecks, c)
+		errorChecks = append(errorChecks, c)
 	}
 
 	*checks = append(successChecks, warningChecks...)
-	*checks = append(*checks, erroneousChecks...)
+	*checks = append(*checks, errorChecks...)
 }
 
-func (vrp ValidationReportPrinter) printChecks(checks *[]schema.ValidationCheck) {
-	vrp.sortChecks(checks)
+func (p ValidationReportPrinter) printChecks(checks *[]schema.ValidationCheck) {
+	p.sortChecks(checks)
 	for _, c := range *checks {
-		vrp.printCheck(c)
+		p.printCheck(c)
 	}
 	fmt.Println()
 }
 
-func (vrp ValidationReportPrinter) printHeading(heading string) {
-	vrp.Format.Heading.Printf("# %s\n\n", heading)
+func (p ValidationReportPrinter) printHeading(heading string) {
+	p.Format.Heading.Printf("# %s\n\n", heading)
 }
 
-func (vrp ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
+func (p ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 	if check.Assertion {
-		vrp.Format.Success.Printf("✔ %s\n", check.Description)
+		p.Format.Success.Printf("✔ %s\n", check.Description)
 		return
 	}
 
 	if check.Severity == schema.ValidationSeverityWarning {
-		vrp.Format.Warning.Printf("⚠ %s\n", check.Description)
+		p.Format.Warning.Printf("⚠ %s\n", check.Description)
 		return
 	}
 
-	vrp.Format.Error.Printf("𝘹%s\n", check.Description)
+	p.Format.Error.Printf("𝘹%s\n", check.Description)
 }

@@ -82,7 +82,7 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
-	return IsValidReport(report), report
+	return report.IsValid(), report
 }
 
 func (p Plugin) MakePluginValidationReports() []ValidationReport {

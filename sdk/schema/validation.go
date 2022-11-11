@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"log"
 	"regexp"
 	"strings"
 )
@@ -13,6 +12,19 @@ type ValidationReport struct {
 
 func (vr ValidationReport) AddCheck(check ValidationCheck) {
 	*vr.Checks = append(*vr.Checks, check)
+}
+
+func (vr ValidationReport) IsValid() bool {
+	isValid := true
+
+	for _, check := range *vr.Checks {
+		if !check.Assertion {
+			isValid = false
+			break
+		}
+	}
+
+	return isValid
 }
 
 type ValidationCheck struct {
@@ -38,7 +50,6 @@ func IsTitleCaseWord(word string) bool {
 	}
 	matched, err := regexp.Match("[A-Z][^\\s]*", []byte(word))
 	if err != nil {
-		log.Printf("error checking regexp %s", err)
 		return false
 	}
 
@@ -69,21 +80,7 @@ func IsTitleCaseString(str string) bool {
 func ContainsLowercaseLettersOrDigits(str string) bool {
 	matched, err := regexp.Match("^[a-z0-9]+$", []byte(str))
 	if err != nil {
-		log.Printf("error checking regexp %s", err)
 		return false
 	}
 	return matched
-}
-
-func IsValidReport(report ValidationReport) bool {
-	isValid := true
-
-	for _, check := range *report.Checks {
-		if !check.Assertion {
-			isValid = false
-			break
-		}
-	}
-
-	return isValid
 }

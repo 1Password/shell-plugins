@@ -6,125 +6,132 @@ import (
 	"testing"
 )
 
-func TestIsTitleCaseWord_ReturnsTrue(t *testing.T) {
-	isTitleCase := IsTitleCaseWord("Title")
-	assert.Equal(t, true, isTitleCase, fmt.Sprint("should return true"))
-}
-
-func TestIsTitleCaseWord_ReturnsFalse(t *testing.T) {
+func TestIsTitleCaseWord(t *testing.T) {
 	cases := map[string]struct {
-		word string
+		word     string
+		expected bool
 	}{
+		"when title case string provided": {
+			word:     "Title",
+			expected: true,
+		},
 		"when empty string provided": {
-			word: "",
+			word:     "",
+			expected: false,
 		},
 		"when starts with special character": {
-			word: "_",
+			word:     "_",
+			expected: false,
 		},
 		"when string with more than one str provided": {
-			word: "Access Token",
+			word:     "Access Token",
+			expected: false,
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			isTitleCase := IsTitleCaseWord(tc.word)
-			assert.Equal(t, false, isTitleCase, fmt.Sprint("should return false"))
+			assert.Equal(t, tc.expected, isTitleCase, fmt.Sprintf("should return %t", tc.expected))
 		})
 	}
 }
 
-func TestIsTitleCaseString_ReturnsTrue(t *testing.T) {
+func TestIsTitleCaseString(t *testing.T) {
 	cases := map[string]struct {
-		str string
+		str      string
+		expected bool
 	}{
 		"when one str string provided": {
-			str: "Title",
+			str:      "Title",
+			expected: true,
 		},
 		"when string has more than one str": {
-			str: "Title Case String",
+			str:      "Title Case String",
+			expected: true,
 		},
-	}
-
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			isTitleCase := IsTitleCaseString(tc.str)
-			assert.Equal(t, true, isTitleCase, fmt.Sprint("should return true"))
-		})
-	}
-}
-
-func TestIsTitleCaseString_ReturnsFalse(t *testing.T) {
-	cases := map[string]struct {
-		str string
-	}{
 		"when empty string provided": {
-			str: "",
+			str:      "",
+			expected: false,
 		},
 		"when first word in lowercase": {
-			str: "title Case String",
+			str:      "title Case String",
+			expected: false,
 		},
 		"when middle word in lowercase": {
-			str: "Title case String",
+			str:      "Title case String",
+			expected: false,
 		},
 		"when last word in lowercase": {
-			str: "Title Case string",
+			str:      "Title Case string",
+			expected: false,
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			isTitleCase := IsTitleCaseString(tc.str)
-			assert.Equal(t, false, isTitleCase, fmt.Sprint("should return false"))
+			assert.Equal(t, tc.expected, isTitleCase, fmt.Sprintf("should return %t", tc.expected))
 		})
 	}
 }
 
-func TestContainsLowercaseLettersOrDigits_ReturnsTrue(t *testing.T) {
+func TestContainsLowercaseLettersOrDigits(t *testing.T) {
 	cases := map[string]struct {
-		str string
+		str      string
+		expected bool
 	}{
 		"when there are only lowercase letters": {
-			str: "aws",
+			str:      "aws",
+			expected: true,
 		},
 		"when there are only digits": {
-			str: "911",
+			str:      "911",
+			expected: true,
 		},
 		"when there are lowercase letters and digits": {
-			str: "aws911",
+			str:      "aws911",
+			expected: true,
+		},
+		"when empty string provided": {
+			str:      "",
+			expected: false,
+		},
+		"when there is Capital letter": {
+			str:      "Aws",
+			expected: false,
+		},
+		"when string has more than one word": {
+			str:      "aws911 test",
+			expected: false,
+		},
+		"when string contains special char": {
+			str:      "aws911_.test",
+			expected: false,
 		},
 	}
 
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			isValid := ContainsLowercaseLettersOrDigits(tc.str)
-			assert.Equal(t, true, isValid, fmt.Sprint("should return true"))
+			assert.Equal(t, tc.expected, isValid, fmt.Sprintf("should return %t", tc.expected))
 		})
 	}
 }
 
-func TestContainsLowercaseLettersOrDigits_ReturnsFalse(t *testing.T) {
-	cases := map[string]struct {
-		str string
-	}{
-		"when empty string provided": {
-			str: "",
-		},
-		"when there is Capital letter": {
-			str: "Aws",
-		},
-		"when string has more than one word": {
-			str: "aws911 test",
-		},
-		"when string contains special char": {
-			str: "aws911_.test",
-		},
-	}
+func TestPluginValidateHasHeading(t *testing.T) {
+	expectedHeading := "Plugin: test"
+	p := Plugin{Name: "test"}
+	_, report := p.Validate()
 
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			isValid := ContainsLowercaseLettersOrDigits(tc.str)
-			assert.Equal(t, false, isValid, fmt.Sprint("should return true"))
-		})
+	assert.Equal(t, expectedHeading, report.Heading, fmt.Sprintf("plugin should have heading %s", expectedHeading))
+}
+
+func TestPluginValidateEachReportFieldHasError(t *testing.T) {
+	p := Plugin{}
+	_, report := p.Validate()
+
+	for _, c := range *report.Checks {
+		assert.False(t, c.Assertion, fmt.Sprintf("\"%s\" validation is erroneous", c.Description))
 	}
 }
