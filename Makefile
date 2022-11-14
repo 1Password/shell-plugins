@@ -1,11 +1,11 @@
 new-plugin:
-	go run cmd/new/main.go plugin
+	go run cmd/contrib/main.go plugin
 
 %/example-secrets:
-	go run cmd/new/main.go $@
+	go run cmd/contrib/main.go $@
 
 %/validate:
-	go run cmd/new/main.go $@
+	go run cmd/contrib/main.go $@
 
 test:
 	go test ./...
