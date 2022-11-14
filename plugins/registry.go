@@ -14,6 +14,7 @@ import (
 	"github.com/1Password/shell-plugins/plugins/postgresql"
 	"github.com/1Password/shell-plugins/plugins/sentry"
 	"github.com/1Password/shell-plugins/plugins/snyk"
+	"github.com/1Password/shell-plugins/plugins/stripe"
 	"github.com/1Password/shell-plugins/plugins/twilio"
 	"github.com/1Password/shell-plugins/plugins/vault"
 
@@ -66,6 +67,7 @@ func init() {
 	Register(postgresql.New())
 	Register(sentry.New())
 	Register(snyk.New())
+	Register(stripe.New())
 	Register(twilio.New())
 	Register(vault.New())
 }
