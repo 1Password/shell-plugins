@@ -69,7 +69,7 @@ type ProjectConfig struct {
 }
 
 func TryStripeConfigFile() sdk.Importer {
-	return importer.TryFile("~/.config/stripe/config.toml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+	return importer.TryFile("~/.config/stripe/config.toml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToTOML(&config); err != nil {
 			out.AddError(err)
