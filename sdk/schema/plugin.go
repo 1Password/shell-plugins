@@ -30,54 +30,89 @@ type PlatformInfo struct {
 	// The full URL of the homepage of the platform.
 	Homepage *url.URL
 
-	// The full URL to the logo of the platform, in SVG or PNG format.
+	// (Optional) The full URL to the logo of the platform, in SVG or PNG format.
 	Logo *url.URL
 }
 
-func (p Plugin) Validate() (isValid bool, errors []error) {
-	if p.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
+func (p Plugin) Validate() (bool, ValidationReport) {
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Plugin: %s", p.Name),
+		Checks:  []ValidationCheck{},
 	}
 
-	if p.Platform.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("platform.name"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   p.Name != "",
+		Severity:    ValidationSeverityError,
+	})
 
-	if p.Platform.Homepage == nil {
-		errors = append(errors, ErrMissingRequiredField("platform.homepage"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Name only using lowercase characters or digits",
+		Assertion:   ContainsLowercaseLettersOrDigits(p.Name),
+		Severity:    ValidationSeverityError,
+	})
 
-	if len(p.Credentials) == 0 && len(p.Executables) == 0 {
-		errors = append(errors, ErrMissingOneOfRequiredFields("credentials", "executables"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform name set",
+		Assertion:   p.Platform.Name != "",
+		Severity:    ValidationSeverityError,
+	})
 
-	if len(p.Credentials) > 1 {
-		errors = append(errors, ErrNotYetSupported("provisioning multiple credentials to an executable"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform homepage URL set",
+		Assertion:   p.Platform.Homepage != nil,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has platform logo in SVG or PNG format",
+		Assertion:   checkPlatformLogoFormat(p),
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a credential type or executable defined",
+		Assertion:   len(p.Credentials) > 0 && len(p.Executables) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has no more than one credential type defined",
+		Assertion:   len(p.Credentials) == 1,
+		Severity:    ValidationSeverityError,
+	})
+
+	return report.IsValid(), report
+}
+
+func (p Plugin) DeepValidate() []ValidationReport {
+	var reports []ValidationReport
+
+	_, pluginReport := p.Validate()
+	reports = append(reports, pluginReport)
 
 	for _, cred := range p.Credentials {
-		_, credErrors := cred.Validate()
-		errors = append(errors, credErrors...)
+		_, credReport := cred.Validate()
+		reports = append(reports, credReport)
 	}
 
 	for _, exe := range p.Executables {
-		_, exeErrors := exe.Validate()
-		errors = append(errors, exeErrors...)
+		_, exeReport := exe.Validate()
+		reports = append(reports, exeReport)
 	}
 
-	return len(errors) == 0, errors
+	return reports
 }
 
-var (
-	ErrMissingRequiredField = func(fieldName string) error {
-		return fmt.Errorf("missing required field: %s", fieldName)
+func checkPlatformLogoFormat(p Plugin) bool {
+	if p.Platform.Logo == nil {
+		return false
 	}
 
-	ErrMissingOneOfRequiredFields = func(fields ...string) error {
-		return fmt.Errorf("required to specify at least one of: %s", strings.Join(fields, ", "))
+	logoUrl := p.Platform.Logo.String()
+	if strings.HasSuffix(logoUrl, ".png") || strings.HasSuffix(logoUrl, ".svg") {
+		return true
 	}
 
-	ErrNotYetSupported = func(action string) error {
-		return fmt.Errorf("%s is not yet supporterd", action)
-	}
-)
+	return false
+}

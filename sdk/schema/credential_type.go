@@ -76,47 +76,110 @@ type Charset struct {
 	Specific  []rune
 }
 
-func (c CredentialType) Validate() (isValid bool, errors []error) {
-	if c.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
+func (c CredentialType) Validate() (bool, ValidationReport) {
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Credential: %s", c.Name),
+		Checks:  []ValidationCheck{},
 	}
 
-	if len(c.Fields) == 0 {
-		errors = append(errors, ErrMissingRequiredField("fields"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   c.Name != "",
+		Severity:    ValidationSeverityError,
+	})
 
-	credentialTypeHasSecret := true
+	report.AddCheck(ValidationCheck{
+		Description: "Name is using title case",
+		Assertion:   IsTitleCaseString(c.Name),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has documentation URL set",
+		Assertion:   c.DocsURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has management URL set",
+		Assertion:   c.ManagementURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has at least 1 field",
+		Assertion:   len(c.Fields) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	allFieldsHaveNameSet := true
+	allFieldsHaveDescriptionSet := true
+	allFieldsInTitleCase := true
+	allCompositionsValid := true
+	hasSecretField := false
 	for _, f := range c.Fields {
 		if f.Name == "" {
-			errors = append(errors, ErrMissingRequiredField("name"))
+			allFieldsHaveNameSet = false
 		}
-
 		if f.MarkdownDescription == "" {
-			errors = append(errors, ErrMissingRequiredField("markdownDescription"))
+			allFieldsHaveDescriptionSet = false
 		}
-
-		if f.Secret {
-			credentialTypeHasSecret = true
+		if !IsTitleCaseString(f.Name) {
+			allFieldsInTitleCase = false
 		}
-
 		comp := f.Composition
 		if comp != nil {
 			cs := comp.Charset
 			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-				errors = append(errors, ErrMissingOneOfRequiredFields(
-					"composition.charset.lowercase",
-					"composition.charset.uppercase",
-					"composition.charset.digits",
-					"composition.charset.symbols",
-					"composition.charset.specific",
-				))
+				allCompositionsValid = false
 			}
+		}
+		if f.Secret {
+			hasSecretField = true
 		}
 	}
 
-	if !credentialTypeHasSecret {
-		errors = append(errors, fmt.Errorf("credential type must contain at least 1 secret field"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "All fields have name set",
+		Assertion:   allFieldsHaveNameSet,
+		Severity:    ValidationSeverityError,
+	})
 
-	return len(errors) == 0, errors
+	report.AddCheck(ValidationCheck{
+		Description: "All field names are using title case",
+		Assertion:   allFieldsInTitleCase,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All fields have a description set",
+		Assertion:   allFieldsHaveDescriptionSet,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "All specified value compositions are valid",
+		Assertion:   allCompositionsValid,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has at least 1 field that is secret",
+		Assertion:   hasSecretField,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a provisioner set",
+		Assertion:   c.Provisioner != nil,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has an importer set",
+		Assertion:   c.Importer != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	return report.IsValid(), report
 }

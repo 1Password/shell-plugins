@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -24,16 +25,43 @@ type Executable struct {
 	NeedsAuth sdk.NeedsAuthentication
 }
 
-func (e Executable) Validate() (isValid bool, errors []error) {
-	if e.Name == "" {
-		errors = append(errors, ErrMissingRequiredField("name"))
+func (e Executable) Validate() (bool, ValidationReport) {
+	report := ValidationReport{
+		Heading: fmt.Sprintf("Executable: %s", e.Name),
+		Checks:  []ValidationCheck{},
 	}
 
-	if len(e.Runs) == 0 {
-		errors = append(errors, ErrMissingRequiredField("runs"))
-	}
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   e.Name != "",
+		Severity:    ValidationSeverityError,
+	})
 
-	return len(errors) == 0, errors
+	report.AddCheck(ValidationCheck{
+		Description: "Has documentation URL set",
+		Assertion:   e.DocsURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has specified which commands need authentication",
+		Assertion:   e.NeedsAuth != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has executable command set",
+		Assertion:   len(e.Runs) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has a credential type defined",
+		Assertion:   len(e.Credentials) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
+	return report.IsValid(), report
 }
 
 func (e Executable) Command() string {
