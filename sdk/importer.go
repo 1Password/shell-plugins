@@ -64,15 +64,42 @@ type ImportInput struct {
 }
 
 type ImportOutput struct {
+	Attempts []*ImportAttempt
+}
+
+type ImportAttempt struct {
 	Candidates  []ImportCandidate
+	Source      ImportSource
 	Diagnostics Diagnostics
 }
 
-func (out *ImportOutput) AddCandidate(candidate ImportCandidate) {
+func (out *ImportOutput) Errors() (errors []Error) {
+	for _, attempt := range out.Attempts {
+		errors = append(errors, attempt.Diagnostics.Errors...)
+	}
+	return
+}
+
+func (out *ImportOutput) AllCandidates() (candidates []ImportCandidate) {
+	for _, attempt := range out.Attempts {
+		candidates = append(candidates, attempt.Candidates...)
+	}
+	return
+}
+
+func (out *ImportOutput) NewAttempt(src ImportSource) *ImportAttempt {
+	attempt := &ImportAttempt{
+		Source: src,
+	}
+	out.Attempts = append(out.Attempts, attempt)
+	return attempt
+}
+
+func (out *ImportAttempt) AddCandidate(candidate ImportCandidate) {
 	out.Candidates = append(out.Candidates, candidate)
 }
 
-func (out *ImportOutput) AddError(err error) {
+func (out *ImportAttempt) AddError(err error) {
 	out.Diagnostics.Errors = append(out.Diagnostics.Errors, Error{err.Error()})
 }
 
