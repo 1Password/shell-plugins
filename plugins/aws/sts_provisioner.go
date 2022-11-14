@@ -46,8 +46,9 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
-	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.AccessKeyId)
+	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.SecretAccessKey)
 	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
+	out.AddEnvVar("AWS_DEFAULT_REGION", in.ItemFields[FieldNameDefaultRegion])
 }
 
 func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
