@@ -112,10 +112,10 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
-	areAllFieldsHasNameSet := true
-	areAllFieldsHasDescriptionSet := true
-	areAllFieldsInTitleCase := true
-	areAllCompositionsValid := true
+	allFieldsHaveNameSet := true
+	allFieldsHaveDescriptionSet := true
+	allFieldsInTitleCase := true
+	allCompositionsValid := true
 	hasSecretField := false
 	for _, f := range c.Fields {
 		if f.Name == "" {
