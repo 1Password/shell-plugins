@@ -82,9 +82,36 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Checks:  []ValidationCheck{},
 	}
 
-	isNameSet := c.Name != ""
-	isDocUrlSet := c.DocsURL != nil
-	isManagementUrlSet := c.ManagementURL != nil
+	report.AddCheck(ValidationCheck{
+		Description: "Has name set",
+		Assertion:   c.Name != "",
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Name is using title case",
+		Assertion:   IsTitleCaseString(c.Name),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has documentation URL set",
+		Assertion:   c.DocsURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has management URL set",
+		Assertion:   c.ManagementURL != nil,
+		Severity:    ValidationSeverityWarning,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Has at least 1 field",
+		Assertion:   len(c.Fields) > 0,
+		Severity:    ValidationSeverityError,
+	})
+
 	areAllFieldsHasNameSet := true
 	areAllFieldsHasDescriptionSet := true
 	areAllFieldsInTitleCase := true
@@ -111,36 +138,6 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 			hasSecretField = true
 		}
 	}
-
-	report.AddCheck(ValidationCheck{
-		Description: "Has name set",
-		Assertion:   isNameSet,
-		Severity:    ValidationSeverityError,
-	})
-
-	report.AddCheck(ValidationCheck{
-		Description: "Name is using title case",
-		Assertion:   IsTitleCaseString(c.Name),
-		Severity:    ValidationSeverityError,
-	})
-
-	report.AddCheck(ValidationCheck{
-		Description: "Has documentation URL set",
-		Assertion:   isDocUrlSet,
-		Severity:    ValidationSeverityWarning,
-	})
-
-	report.AddCheck(ValidationCheck{
-		Description: "Has management URL set",
-		Assertion:   isManagementUrlSet,
-		Severity:    ValidationSeverityWarning,
-	})
-
-	report.AddCheck(ValidationCheck{
-		Description: "Has at least 1 field",
-		Assertion:   len(c.Fields) > 0,
-		Severity:    ValidationSeverityError,
-	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All fields have name set",
