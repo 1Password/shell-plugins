@@ -42,29 +42,29 @@ type ValidationReportPrinter struct {
 	Format  PrintFormat
 }
 
-func (p ValidationReportPrinter) Print() {
+func (p *ValidationReportPrinter) Print() {
 	if p.Reports == nil || len(p.Reports) == 0 {
 		color.Cyan("No reports to print")
 		return
 	}
 
 	for _, report := range p.Reports {
-		p.PrintSectionReport(report)
+		p.PrintReport(report)
 	}
 }
 
-func (p ValidationReportPrinter) PrintSectionReport(report schema.ValidationReport) {
+func (p *ValidationReportPrinter) PrintReport(report schema.ValidationReport) {
 	p.printHeading(report.Heading)
-	p.printChecks(&report.Checks)
+	p.printChecks(report.Checks)
 }
 
 // sortChecks in the order ["success", "warning", "error"]
-func (p ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) {
+func (p *ValidationReportPrinter) sortChecks(checks []schema.ValidationCheck) []schema.ValidationCheck {
 	var successChecks []schema.ValidationCheck
 	var warningChecks []schema.ValidationCheck
 	var errorChecks []schema.ValidationCheck
 
-	for _, c := range *checks {
+	for _, c := range checks {
 		if c.Assertion {
 			successChecks = append(successChecks, c)
 			continue
@@ -78,23 +78,24 @@ func (p ValidationReportPrinter) sortChecks(checks *[]schema.ValidationCheck) {
 		errorChecks = append(errorChecks, c)
 	}
 
-	*checks = append(successChecks, warningChecks...)
-	*checks = append(*checks, errorChecks...)
+	result := append(successChecks, warningChecks...)
+	result = append(result, errorChecks...)
+
+	return result
 }
 
-func (p ValidationReportPrinter) printChecks(checks *[]schema.ValidationCheck) {
-	p.sortChecks(checks)
-	for _, c := range *checks {
+func (p *ValidationReportPrinter) printChecks(checks []schema.ValidationCheck) {
+	for _, c := range p.sortChecks(checks) {
 		p.printCheck(c)
 	}
 	fmt.Println()
 }
 
-func (p ValidationReportPrinter) printHeading(heading string) {
+func (p *ValidationReportPrinter) printHeading(heading string) {
 	p.Format.Heading.Printf("# %s\n\n", heading)
 }
 
-func (p ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
+func (p *ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 	if check.Assertion {
 		p.Format.Success.Printf("✔ %s\n", check.Description)
 		return

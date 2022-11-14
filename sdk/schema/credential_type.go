@@ -82,6 +82,9 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Checks:  []ValidationCheck{},
 	}
 
+	isNameSet := c.Name != ""
+	isDocUrlSet := c.DocsURL != nil
+	isManagementUrlSet := c.ManagementURL != nil
 	areAllFieldsHasNameSet := true
 	areAllFieldsHasDescriptionSet := true
 	areAllFieldsInTitleCase := true
@@ -111,7 +114,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has name set",
-		Assertion:   c.Name != "",
+		Assertion:   isNameSet,
 		Severity:    ValidationSeverityError,
 	})
 
@@ -123,13 +126,13 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has documentation URL set",
-		Assertion:   c.DocsURL != nil,
+		Assertion:   isDocUrlSet,
 		Severity:    ValidationSeverityWarning,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has management URL set",
-		Assertion:   c.ManagementURL != nil,
+		Assertion:   isManagementUrlSet,
 		Severity:    ValidationSeverityWarning,
 	})
 
