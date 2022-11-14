@@ -1,7 +1,6 @@
 package plugintest
 
 import (
-	"fmt"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -9,14 +8,13 @@ import (
 
 func TestValidationReportPrinter_printFields(t *testing.T) {
 	printer := &ValidationReportPrinter{}
-	fields := []schema.ValidationCheck{
+	checks := []schema.ValidationCheck{
 		{Description: "error", Assertion: false, Severity: schema.ValidationSeverityError},
 		{Description: "success", Assertion: true},
 		{Description: "warning", Assertion: false, Severity: schema.ValidationSeverityWarning},
 	}
-	printer.sortChecks(&fields)
-
-	assert.Equal(t, "success", fields[0].Description, fmt.Sprint("first filed should be success"))
-	assert.Equal(t, "warning", fields[1].Description, fmt.Sprint("second filed should be warning"))
-	assert.Equal(t, "error", fields[2].Description, fmt.Sprint("third filed should be error"))
+	checks = printer.sortChecks(checks)
+	assert.Equal(t, "success", checks[0].Description, "first check should be success")
+	assert.Equal(t, "warning", checks[1].Description, "second check should be warning")
+	assert.Equal(t, "error", checks[2].Description, "third check should be error")
 }
