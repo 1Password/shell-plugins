@@ -16,7 +16,8 @@ type FileProvisioner struct {
 	fileContents            ItemToFileContents
 	outpathFixed            string
 	outpathEnvVar           string
-	outpathArgs             []string
+	setOutpathAsArg         bool
+	outpathPrefixedArgs     []string
 	onlyAllowCurrentProcess bool
 }
 
@@ -65,10 +66,12 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 }
 
 // SetPathAsArg can be used to provision the temporary file path as an arg that will be appended to
-// the executable's command.
-func SetPathAsArg(args ...string) FileOption {
+// the executable's command. The file path can be prefixed with the specified `prefixedArgs`. For example:
+// `SetPathAsArg("--config-file")` will result in `--config-file /path/to/tempfile`.
+func SetPathAsArg(prefixedArgs ...string) FileOption {
 	return func(p *FileProvisioner) {
-		p.outpathArgs = args
+		p.setOutpathAsArg = true
+		p.outpathPrefixedArgs = prefixedArgs
 	}
 }
 
@@ -101,9 +104,10 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		out.AddEnvVar(p.outpathEnvVar, outpath)
 	}
 
-	if len(p.outpathArgs) > 0 {
+	if p.setOutpathAsArg {
 		// Add args to specify the output path.
-		out.AddArgs(p.outpathArgs...)
+		out.AddArgs(p.outpathPrefixedArgs...)
+		out.AddArgs(outpath)
 	}
 }
 
