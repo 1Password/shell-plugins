@@ -119,19 +119,19 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	hasSecretField := false
 	for _, f := range c.Fields {
 		if f.Name == "" {
-			areAllFieldsHasNameSet = false
+			allFieldsHaveNameSet = false
 		}
 		if f.MarkdownDescription == "" {
-			areAllFieldsHasDescriptionSet = false
+			allFieldsHaveDescriptionSet = false
 		}
 		if !IsTitleCaseString(f.Name) {
-			areAllFieldsInTitleCase = false
+			allFieldsInTitleCase = false
 		}
 		comp := f.Composition
 		if comp != nil {
 			cs := comp.Charset
 			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
-				areAllCompositionsValid = false
+				allCompositionsValid = false
 			}
 		}
 		if f.Secret {
@@ -141,25 +141,25 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "All fields have name set",
-		Assertion:   areAllFieldsHasNameSet,
+		Assertion:   allFieldsHaveNameSet,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All field names are using title case",
-		Assertion:   areAllFieldsInTitleCase,
+		Assertion:   allFieldsInTitleCase,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All fields have a description set",
-		Assertion:   areAllFieldsHasDescriptionSet,
+		Assertion:   allFieldsHaveDescriptionSet,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "All specified value compositions are valid",
-		Assertion:   areAllCompositionsValid,
+		Assertion:   allCompositionsValid,
 		Severity:    ValidationSeverityError,
 	})
 
