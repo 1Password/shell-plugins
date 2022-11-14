@@ -10,6 +10,7 @@ import (
 	"github.com/1Password/shell-plugins/plugins/digitalocean"
 	"github.com/1Password/shell-plugins/plugins/gitlab"
 	"github.com/1Password/shell-plugins/plugins/heroku"
+	"github.com/1Password/shell-plugins/plugins/mysql"
 	"github.com/1Password/shell-plugins/plugins/okta"
 	"github.com/1Password/shell-plugins/plugins/postgresql"
 	"github.com/1Password/shell-plugins/plugins/sentry"
@@ -63,6 +64,7 @@ func init() {
 	Register(github.New())
 	Register(gitlab.New())
 	Register(heroku.New())
+	Register(mysql.New())
 	Register(okta.New())
 	Register(postgresql.New())
 	Register(sentry.New())
