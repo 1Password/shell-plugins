@@ -2,8 +2,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/provision"
 )
@@ -30,5 +28,5 @@ func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 }
 
 func (p awsProvisioner) Description() string {
-	return fmt.Sprintf("%s, and, if MFA is present, %s", p.envVarProvisioner.Description(), p.stsProvisioner.Description())
+	return p.envVarProvisioner.Description()
 }
