@@ -1,14 +1,12 @@
 package mysql
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
-	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"strings"
 )
 
 func DatabaseCredentials() schema.CredentialType {
@@ -18,48 +16,56 @@ func DatabaseCredentials() schema.CredentialType {
 		ManagementURL: sdk.URL("https://dev.mysql.com/doc/refman/8.0/en/mysql-config-editor.html"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Credentials,
-				MarkdownDescription: "Credentials used to authenticate to MySQL.",
+				Name:                fieldname.Host,
+				MarkdownDescription: "MySQL host to connect to.",
+				Optional:            true,
+			},
+			{
+				Name:                fieldname.Port,
+				MarkdownDescription: "Port used to connect to MySQL.",
+				Optional:            true,
+			},
+			{
+				Name:                fieldname.User,
+				MarkdownDescription: "MySQL user to authenticate as.",
+				Optional:            true,
+			},
+			{
+				Name:                fieldname.Password,
+				MarkdownDescription: "Password used to authenticate to MySQL.",
 				Secret:              true,
 			},
+			{
+				Name:                fieldname.Database,
+				MarkdownDescription: "Database name to connect to. Defaults to the name of the authenticated user.",
+				Optional:            true,
+			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryMySQLConfigFile(),
-		)}
+		Provisioner: provision.TempFile(mysqlConfig, provision.SetPathAsArg("--defaults-file")),
+	}
 }
 
-var defaultEnvVarMapping = map[string]string{
-	fieldname.Credentials: "MYSQL_DATABASE_CREDENTIALS", // TODO: Check if this is correct
+func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
+	content := "[client]" + "\n"
+	configSchema := map[string]string{
+		fieldname.User:     "",
+		fieldname.Password: "",
+		fieldname.Host:     "127.0.0.1", // Default host
+		fieldname.Port:     "3306",      // Default port
+		fieldname.Database: "",
+	}
+
+	for key, defaultValue := range configSchema {
+		configEntryVal := in.ItemFields[key]
+		if configEntryVal == "" {
+			configEntryVal = defaultValue
+		}
+
+		if configEntryVal != "" {
+			configEntry := []string{strings.ToLower(key), "=", configEntryVal, "\n"}
+			content += strings.Join(configEntry, "")
+		}
+	}
+
+	return []byte(content), nil
 }
-
-// TODO: Check if the platform stores the Database Credentials in a local config file, and if so,
-// implement the function below to add support for importing it.
-func TryMySQLConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
-
-		// if config.Credentials == "" {
-		// 	return
-		// }
-
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: []sdk.ImportCandidateField{
-		// 		{
-		// 			Field: fieldname.Credentials,
-		// 			Value: config.Credentials,
-		// 		},
-		// 	},
-		// })
-	})
-}
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	Credentials string
-// }
