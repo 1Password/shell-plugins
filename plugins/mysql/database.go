@@ -37,7 +37,7 @@ func DatabaseCredentials() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.Database,
-				MarkdownDescription: "Database name to connect to. Defaults to the name of the authenticated user.",
+				MarkdownDescription: "Database name to connect to.",
 				Optional:            true,
 			},
 		},
