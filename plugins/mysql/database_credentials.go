@@ -14,7 +14,7 @@ import (
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.DatabaseCredentials,
-		DocsURL: sdk.URL("https://dev.mysql.com/doc/refman/8.0/en/connecting.html"),
+		DocsURL: sdk.URL("https://dev.mysql.com/doc/refman/en/connecting.html"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
