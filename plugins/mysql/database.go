@@ -1,8 +1,10 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
@@ -41,23 +43,14 @@ func DatabaseCredentials() schema.CredentialType {
 			},
 		},
 		Provisioner: provision.TempFile(mysqlConfig, provision.SetPathAsArg("--defaults-file")),
+		Importer: importer.TryAll(
+			TryMySQLConfigFile("/etc/my.cnf"),
+			TryMySQLConfigFile("/etc/mysql/my.cnf"),
+			TryMySQLConfigFile("~/.my.cnf"),
+			TryMySQLConfigFile("~/.mylogin.cnf"),
+		),
 	}
 }
-
-type configValue struct {
-	value        string
-	defaultValue string
-}
-
-type configKey string
-
-const (
-	host     configKey = "host"
-	port     configKey = "port"
-	user     configKey = "user"
-	password configKey = "password"
-	database configKey = "database"
-)
 
 func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := map[string]string{
@@ -92,4 +85,47 @@ func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
 	}
 
 	return []byte(content), nil
+}
+
+func TryMySQLConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		credentialsFile, err := contents.ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
+		}
+
+		credentials := map[string]string{
+			"user":     "",
+			"password": "",
+			"host":     "127.0.0.1", // Default host
+			"port":     "3306",      // Default port
+			"database": "",
+		}
+
+		for _, section := range credentialsFile.Sections() {
+			for targetKey, _ := range credentials {
+				if section.HasKey(targetKey) {
+					value := section.Key(targetKey).Value()
+					if value != "" {
+						credentials[targetKey] = value
+					}
+				}
+			}
+		}
+
+		var fields []sdk.ImportCandidateField
+		for key, val := range credentials {
+			if val != "" {
+				fields = append(fields, sdk.ImportCandidateField{
+					Field: key,
+					Value: val,
+				})
+			}
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: fields,
+		})
+	})
 }

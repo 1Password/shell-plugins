@@ -1,10 +1,12 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"strings"
 	"testing"
 )
@@ -39,20 +41,20 @@ func TestMysqlConfigHasPopulatedValues(t *testing.T) {
 	cases := map[string]struct {
 		entryKey string
 	}{
-		"has Host value": {
-			entryKey: strings.ToLower(fieldname.Host),
+		"has host value": {
+			entryKey: "host",
 		},
-		"has Port value": {
-			entryKey: strings.ToLower(fieldname.Port),
+		"has port value": {
+			entryKey: "port",
 		},
-		"has User value": {
-			entryKey: strings.ToLower(fieldname.User),
+		"has user value": {
+			entryKey: "user",
 		},
-		"has Password value": {
-			entryKey: strings.ToLower(fieldname.Password),
+		"has password value": {
+			entryKey: "password",
 		},
-		"has Database value": {
-			entryKey: strings.ToLower(fieldname.Database),
+		"has database value": {
+			entryKey: "database",
 		},
 	}
 
@@ -77,4 +79,61 @@ func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "should not throw error if no ItemFields")
 	}
+}
+
+func TestTryCredentialsFile(t *testing.T) {
+	config, _ := mysqlConfig(sdk.ProvisionInput{
+		ItemFields: map[string]string{
+			fieldname.Host:     "localhost",
+			fieldname.Port:     "3306",
+			fieldname.User:     "root",
+			fieldname.Password: "root",
+			fieldname.Database: "db",
+		},
+	})
+	path, _ := os.Getwd()
+	configFilePath := fmt.Sprintf("%s/mysql-cred.cnf", path)
+	os.WriteFile(configFilePath, config, 0644)
+
+	res := TryMySQLConfigFile(configFilePath)
+	out := &sdk.ImportOutput{}
+	res(context.TODO(), sdk.ImportInput{}, out)
+
+	candidates := out.AllCandidates()
+	assert.True(t, len(candidates) == 1)
+
+	cases := map[string]struct {
+		entryKey string
+	}{
+		"ImportCandidate has host value": {
+			entryKey: "host",
+		},
+		"ImportCandidate has port value": {
+			entryKey: "port",
+		},
+		"ImportCandidate has user value": {
+			entryKey: "user",
+		},
+		"ImportCandidate has password value": {
+			entryKey: "password",
+		},
+		"ImportCandidate has database value": {
+			entryKey: "database",
+		},
+	}
+
+	candidate := candidates[0]
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			hasPopulatedValue := false
+			for _, f := range candidate.Fields {
+				if strings.Contains(f.Field, tc.entryKey) {
+					hasPopulatedValue = true
+				}
+			}
+			assert.True(t, hasPopulatedValue)
+		})
+	}
+
+	os.Remove(configFilePath)
 }
