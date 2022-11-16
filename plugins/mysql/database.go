@@ -1,19 +1,18 @@
 package mysql
 
 import (
+	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"strings"
 )
 
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.DatabaseCredentials,
-		DocsURL:       sdk.URL("https://dev.mysql.com/doc/refman/8.0/en/connecting.html"),
-		ManagementURL: sdk.URL("https://dev.mysql.com/doc/refman/8.0/en/mysql-config-editor.html"),
+		Name:    credname.DatabaseCredentials,
+		DocsURL: sdk.URL("https://dev.mysql.com/doc/refman/8.0/en/connecting.html"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
@@ -45,26 +44,51 @@ func DatabaseCredentials() schema.CredentialType {
 	}
 }
 
+type configValue struct {
+	value        string
+	defaultValue string
+}
+
+type configKey string
+
+const (
+	host     configKey = "host"
+	port     configKey = "port"
+	user     configKey = "user"
+	password configKey = "password"
+	database configKey = "database"
+)
+
 func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
-	content := "[client]" + "\n"
-	configSchema := map[string]string{
-		fieldname.User:     "",
-		fieldname.Password: "",
-		fieldname.Host:     "127.0.0.1", // Default host
-		fieldname.Port:     "3306",      // Default port
-		fieldname.Database: "",
+	config := map[string]string{
+		"host": "127.0.0.1", // Default host
+		"port": "3306",      // Default port
 	}
 
-	for key, defaultValue := range configSchema {
-		configEntryVal := in.ItemFields[key]
-		if configEntryVal == "" {
-			configEntryVal = defaultValue
-		}
+	if user, ok := in.ItemFields[fieldname.User]; ok {
+		config["user"] = user
+	}
 
-		if configEntryVal != "" {
-			configEntry := []string{strings.ToLower(key), "=", configEntryVal, "\n"}
-			content += strings.Join(configEntry, "")
-		}
+	if password, ok := in.ItemFields[fieldname.Password]; ok {
+		config["password"] = password
+	}
+
+	if host, ok := in.ItemFields[fieldname.Host]; ok {
+		config["host"] = host
+	}
+
+	if port, ok := in.ItemFields[fieldname.Port]; ok {
+		config["port"] = port
+	}
+
+	if database, ok := in.ItemFields[fieldname.Database]; ok {
+		config["database"] = database
+	}
+
+	content := "[client]\n"
+	for key, value := range config {
+		configLine := fmt.Sprintf("%s=%s\n", key, value)
+		content += configLine
 	}
 
 	return []byte(content), nil
