@@ -2,8 +2,10 @@ package sdk
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // Provisioner provides hooks before and after the plugin's executable runs to provision
@@ -33,6 +35,9 @@ type ProvisionInput struct {
 	// DryRun can be used to opt out
 	DryRun bool
 
+	// Cache can contain data that got added in the provision step from previous runs for this credential.
+	Cache CacheState
+
 	// ItemFields contains the field names and their corresponding (sensitive) values.
 	ItemFields map[string]string
 }
@@ -58,6 +63,10 @@ type ProvisionOutput struct {
 	// exits. The expected mapping is: absolute file path to (possibly sensitive) file contents.
 	Files map[string]OutputFile
 
+	// Cache can be used to make data generated in this provision step available to the provision step of consecutive runs for this credential.
+	// To access the cached values from previous runs, you can use Cache on ProvisionInput.
+	Cache CacheOperations
+
 	// Diagnostics can be used to report errors.
 	Diagnostics Diagnostics
 }
@@ -71,6 +80,19 @@ type OutputFile struct {
 	OnlyAllowCurrentProcess bool
 	Contents                []byte
 	FileMode                os.FileMode
+}
+
+type CacheState map[string]CacheEntry
+
+type CacheOperations struct {
+	Puts    map[string]CacheEntry
+	Removes []string
+}
+
+// CacheEntry contains data persisted between consecutive provision runs
+type CacheEntry struct {
+	Data      []byte
+	ExpiresAt time.Time
 }
 
 // AddEnvVar adds an environment variable to the provision output.
@@ -120,4 +142,55 @@ func (in *ProvisionInput) FromHomeDir(path ...string) string {
 // FromTempDir returns a path with the current execution's temp directory prepended.
 func (in *ProvisionInput) FromTempDir(path ...string) string {
 	return filepath.Join(append([]string{in.TempDir}, path...)...)
+}
+
+// Get returns the cached value at the specified key if it exists. The data can be returned either as a []byte
+// or unmarshaled as JSON.
+func (c CacheState) Get(key string, out interface{}) (ok bool) {
+	entry, ok := c[key]
+	if !ok {
+		return false
+	}
+
+	data := entry.Data
+	switch out.(type) {
+	case []byte:
+		out = data
+	default:
+		err := json.Unmarshal(data, out)
+		if err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Put puts data into the cache at the specified key and with the specified TTL, which will be applied to the provision step of
+// all consecutive runs, until the TTL is met or Remove is called. The data will be stored as a []byte or marshaled as JSON.
+func (c *CacheOperations) Put(key string, data interface{}, expiresAt time.Time) error {
+	var marshaled []byte
+	var err error
+
+	switch data.(type) {
+	case []byte:
+		marshaled = data.([]byte)
+	default:
+		marshaled, err = json.Marshal(data)
+		if err != nil {
+			return err
+		}
+	}
+
+	c.Puts[key] = CacheEntry{
+		ExpiresAt: expiresAt,
+		Data:      marshaled,
+	}
+
+	return nil
+}
+
+// Remove removes data from the cache at the specified key, which will be applied to the provision step of all consecutive runs.
+func (c *CacheOperations) Remove(key string) {
+	c.Removes = append(c.Removes, key)
 }
