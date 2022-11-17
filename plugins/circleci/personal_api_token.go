@@ -59,11 +59,8 @@ func TryCircleCIConfigFile() sdk.Importer {
 		}
 
 		out.AddCandidate(sdk.ImportCandidate{
-			Fields: []sdk.ImportCandidateField{
-				{
-					Field: fieldname.Token,
-					Value: config.Token,
-				},
+			Fields: map[string]string{
+				fieldname.Token: config.Token,
 			},
 		})
 	})
