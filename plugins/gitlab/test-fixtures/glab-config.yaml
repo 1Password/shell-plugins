@@ -1,0 +1,8 @@
+git_protocol: ssh
+check_update: false
+display_hyperlinks: false
+hosts:
+    gitlab.com:
+        api_protocol: https
+        api_host: gitlab.com
+        token: glpat-sJy3L26ZNW7A3EXAMPLE
