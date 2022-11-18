@@ -47,9 +47,18 @@ func main() {
 		return
 	}
 
-	err := newPlugin()
-	if err != nil {
-		log.Fatal(err)
+	if len(os.Args) == 2 && os.Args[1] == "registry" {
+		err := generatePluginRegistry()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if len(os.Args) == 2 && os.Args[1] == "new-plugin" {
+		err := newPlugin()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -413,3 +422,56 @@ func generateSecretsExample(plugin schema.Plugin) string {
 
 	return example
 }
+
+func generatePluginRegistry() error {
+	var plugins []string
+
+	err := filepath.Walk("plugins", func(path string, info os.FileInfo, err error) error {
+		if filepath.Base(path) == "plugin.go" {
+			parent := filepath.Dir(path)
+
+			if filepath.Base(filepath.Dir(parent)) == "plugins" {
+				plugins = append(plugins, filepath.Base(parent))
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	tmpl, err := template.New("registry").Parse(pluginRegistryTemplate)
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, plugins)
+	if err != nil {
+		return err
+	}
+	outfile := buf.Bytes()
+
+	err = os.WriteFile(filepath.Join("plugins", "plugins.go"), outfile, 0600)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const pluginRegistryTemplate = `package plugins
+
+import (
+{{- range $plugin := . }}
+	"github.com/1Password/shell-plugins/plugins/{{ $plugin }}"
+{{- end }}
+)
+
+func init() {
+{{- range $plugin := . }}
+	Register({{ $plugin }}.New())
+{{- end }}
+}
+`
