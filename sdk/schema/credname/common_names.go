@@ -18,3 +18,21 @@ const (
 	Credential          = "Credential"
 	SecretKey           = "Secret Key"
 )
+
+var CredentialTypes = []string{
+	AccessToken,
+	APIKey,
+	APIToken,
+	PersonalAccessToken,
+	PersonalAPIToken,
+	CLIToken,
+	AuthToken,
+	AppToken,
+	AppPassword,
+	AccessKey,
+	Credentials,
+	DatabaseCredentials,
+	RegistryCredentials,
+	Credential,
+	SecretKey,
+}

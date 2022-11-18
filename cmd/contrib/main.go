@@ -14,6 +14,7 @@ import (
 	"github.com/1Password/shell-plugins/plugins"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -70,8 +71,12 @@ func newPlugin() error {
 			Prompt: &survey.Input{Message: `Executable name (e.g. "aws" or "gh")`},
 		},
 		{
-			Name:   "CredentialName",
-			Prompt: &survey.Input{Message: `Name of the credential type (e.g. "Access Key" or "Personal Access Token")`},
+			Name: "CredentialName",
+			Prompt: &survey.Select{
+				Message:  `Name of the credential type`,
+				Options:  credname.CredentialTypes,
+				PageSize: len(credname.CredentialTypes),
+			},
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
 					hasUpper := false
@@ -112,6 +117,7 @@ func newPlugin() error {
 	}{}
 
 	err := survey.Ask(questionnaire, &result)
+
 	if err != nil {
 		return err
 	}
@@ -122,25 +128,34 @@ func newPlugin() error {
 
 	result.PlatformNameUpperCamelCase = strings.ReplaceAll(result.PlatformName, " ", "")
 
+	// remove spaces in credential name to get variable name, e.g. App Password => AppPassword
+	result.CredentialName = strings.ReplaceAll(result.CredentialName, " ", "")
+
 	credNameSplit := strings.Split(result.CredentialName, " ")
 
 	result.CredentialNameUpperCamelCase = strings.Join(credNameSplit, "")
+
 	result.CredentialNameSnakeCase = strings.ToLower(strings.Join(credNameSplit, "_"))
+
 	result.CredentialEnvVarName = strings.ToUpper(result.Name + "_" + result.CredentialNameSnakeCase)
 
 	// As a placeholder, assume the field name is the last word of the credential name, e.g. "Token"
 	result.FieldName = credNameSplit[len(credNameSplit)-1]
 
 	relativeDirPath := filepath.Join("plugins", result.Name)
+
 	err = os.MkdirAll(relativeDirPath, 0777)
+
 	if err != nil {
 		return err
 	}
 
 	templates := []Template{pluginTemplate}
+
 	if result.CredentialName != "" {
 		templates = append(templates, credentialTemplate)
 	}
+
 	if result.Executable != "" {
 		templates = append(templates, executableTemplate)
 	}
@@ -177,6 +192,7 @@ func newPlugin() error {
 	}
 
 	return nil
+
 }
 
 func getValueComposition(value string) schema.ValueComposition {
