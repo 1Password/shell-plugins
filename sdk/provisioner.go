@@ -63,8 +63,9 @@ type ProvisionOutput struct {
 	// exits. The expected mapping is: absolute file path to (possibly sensitive) file contents.
 	Files map[string]OutputFile
 
-	// Cache can be used to make data generated in this provision step available to the provision step of consecutive runs for this credential.
-	// To access the cached values from previous runs, you can use Cache on ProvisionInput.
+	// Cache can be used to make data generated in this provision step available to the provision step of consecutive runs for this credential. This can
+	// The data added to the cache will be encrypted and stored locally on disk, so it can be used to store sensitive data. To access the cached data
+	// from previous runs, use Cache on ProvisionInput.
 	Cache CacheOperations
 
 	// Diagnostics can be used to report errors.
