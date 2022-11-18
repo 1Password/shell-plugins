@@ -15,47 +15,50 @@ import (
 // setting the environment variables, and configuring the home path using the temp dir.
 func TestImporter(t *testing.T, importer sdk.Importer, cases map[string]ImportCase) {
 	t.Helper()
-	for description, c := range cases {
-		if c.ExpectedOutput != nil && len(c.ExpectedCandidates) > 0 {
-			t.Fatal("ExpectedOutput and ExpectedCandidates can't both be set in the same test case")
-		}
-
-		for envVarName, value := range c.Environment {
-			t.Setenv(envVarName, value)
-		}
-
-		fsRoot := t.TempDir()
-		in := sdk.ImportInput{
-			HomeDir: filepath.Join(fsRoot, "~"),
-		}
-
-		for path, contents := range c.Files {
-			path = filepath.Join(fsRoot, path)
-			err := os.MkdirAll(filepath.Dir(path), 0700)
-			if err != nil {
-				t.Fatal(err)
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			if c.ExpectedOutput != nil && len(c.ExpectedCandidates) > 0 {
+				t.Fatal("ExpectedOutput and ExpectedCandidates can't both be set in the same test case")
 			}
 
-			err = os.WriteFile(path, []byte(contents), 0600)
-			if err != nil {
-				t.Fatal(err)
+			for envVarName, value := range c.Environment {
+				t.Setenv(envVarName, value)
 			}
-		}
 
-		ctx := context.Background()
-		out := sdk.ImportOutput{}
-		importer(ctx, in, &out)
+			fsRoot := t.TempDir()
+			in := sdk.ImportInput{
+				HomeDir: filepath.Join(fsRoot, "~"),
+			}
 
-		description = fmt.Sprintf("Import: %s", description)
-		if c.ExpectedOutput != nil {
-			assert.Equal(t, *c.ExpectedOutput, out, description)
-		} else {
-			assert.ElementsMatch(t, c.ExpectedCandidates, out.AllCandidates(), description)
-		}
+			for path, contents := range c.Files {
+				path = filepath.Join(fsRoot, path)
+				err := os.MkdirAll(filepath.Dir(path), 0700)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-		for envVarName := range c.Environment {
-			t.Setenv(envVarName, "")
-		}
+				err = os.WriteFile(path, []byte(contents), 0600)
+				if err != nil {
+					t.Fatal(err)
+				}
+			}
+
+			ctx := context.Background()
+			out := sdk.ImportOutput{}
+			importer(ctx, in, &out)
+
+			description := fmt.Sprintf("Import: %s", name)
+
+			if c.ExpectedOutput != nil {
+				assert.Equal(t, *c.ExpectedOutput, out, description)
+			} else {
+				assert.ElementsMatch(t, c.ExpectedCandidates, out.AllCandidates(), description)
+			}
+
+			for envVarName := range c.Environment {
+				t.Setenv(envVarName, "")
+			}
+		})
 	}
 }
 

@@ -14,33 +14,35 @@ import (
 func TestProvisioner(t *testing.T, provisioner sdk.Provisioner, cases map[string]ProvisionCase) {
 	t.Helper()
 
-	for description, c := range cases {
-		if c.ExpectedOutput.Environment == nil {
-			c.ExpectedOutput.Environment = make(map[string]string)
-		}
+	for name, c := range cases {
+		t.Run(name, func(t *testing.T) {
+			if c.ExpectedOutput.Environment == nil {
+				c.ExpectedOutput.Environment = make(map[string]string)
+			}
 
-		if c.ExpectedOutput.Files == nil {
-			c.ExpectedOutput.Files = make(map[string]sdk.OutputFile)
-		}
+			if c.ExpectedOutput.Files == nil {
+				c.ExpectedOutput.Files = make(map[string]sdk.OutputFile)
+			}
 
-		ctx := context.Background()
+			ctx := context.Background()
 
-		in := sdk.ProvisionInput{
-			ItemFields: c.ItemFields,
-			HomeDir:    "~",
-			TempDir:    "tmp",
-		}
+			in := sdk.ProvisionInput{
+				ItemFields: c.ItemFields,
+				HomeDir:    "~",
+				TempDir:    "tmp",
+			}
 
-		out := sdk.ProvisionOutput{
-			Environment: make(map[string]string),
-			Files:       make(map[string]sdk.OutputFile),
-			CommandLine: c.CommandLine,
-		}
+			out := sdk.ProvisionOutput{
+				Environment: make(map[string]string),
+				Files:       make(map[string]sdk.OutputFile),
+				CommandLine: c.CommandLine,
+			}
 
-		provisioner.Provision(ctx, in, &out)
+			provisioner.Provision(ctx, in, &out)
 
-		description = fmt.Sprintf("Provision: %s", description)
-		assert.Equal(t, c.ExpectedOutput, out, description)
+			description := fmt.Sprintf("Provision: %s", name)
+			assert.Equal(t, c.ExpectedOutput, out, description)
+		})
 	}
 }
 
