@@ -9,9 +9,7 @@ import (
 )
 
 func TestAPIKeyImporter(t *testing.T) {
-	importer := APIKey().Importer
-
-	plugintest.TestImporter(t, importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"HEROKU_API_KEY": "dh7k7m662pqglxaybr1p0gpg1cu33example",
@@ -48,6 +46,21 @@ func TestAPIKeyImporter(t *testing.T) {
 				"~/.netrc": plugintest.LoadFixture(t, "netrc-non-heroku"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{},
+		},
+	})
+}
+
+func TestAPIKeyProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, APIKey().Provisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[string]string{
+				fieldname.APIKey: "dh7k7m662pqglxaybr1p0gpg1cu33example",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"HEROKU_API_KEY": "dh7k7m662pqglxaybr1p0gpg1cu33example",
+				},
+			},
 		},
 	})
 }

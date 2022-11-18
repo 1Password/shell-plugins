@@ -9,9 +9,7 @@ import (
 )
 
 func TestPersonalAccessTokenImporter(t *testing.T) {
-	importer := PersonalAccessToken().Importer
-
-	plugintest.TestImporter(t, importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, PersonalAccessToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"GITLAB_TOKEN": "glpat-sJy3L26ZNW7A3EXAMPLE",
@@ -48,6 +46,35 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 						fieldname.Host:    "gitlab.acme.com",
 						fieldname.APIHost: "api.gitlab.acme.com",
 					},
+				},
+			},
+		},
+	})
+}
+
+func TestPersonalAccessTokenProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, PersonalAccessToken().Provisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[string]string{
+				fieldname.Token: "glpat-sJy3L26ZNW7A3EXAMPLE",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"GITLAB_TOKEN": "glpat-sJy3L26ZNW7A3EXAMPLE",
+				},
+			},
+		},
+		"self-hosted instance": {
+			ItemFields: map[string]string{
+				fieldname.Token:   "glpat-sJy3L26ZNW7A3EXAMPLE",
+				fieldname.Host:    "gitlab.acme.com",
+				fieldname.APIHost: "api.gitlab.acme.com",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"GITLAB_TOKEN":    "glpat-sJy3L26ZNW7A3EXAMPLE",
+					"GITLAB_HOST":     "gitlab.acme.com",
+					"GITLAB_API_HOST": "api.gitlab.acme.com",
 				},
 			},
 		},

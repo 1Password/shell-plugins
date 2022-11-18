@@ -9,9 +9,7 @@ import (
 )
 
 func TestAPITokenImporter(t *testing.T) {
-	importer := APIToken().Importer
-
-	plugintest.TestImporter(t, importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"OKTA_CLIENT_TOKEN":  "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
@@ -36,6 +34,23 @@ func TestAPITokenImporter(t *testing.T) {
 						fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
 						FieldNameOrgURL: "https://acme.okta.com",
 					},
+				},
+			},
+		},
+	})
+}
+
+func TestAPITokenProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, APIToken().Provisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[string]string{
+				fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
+				FieldNameOrgURL: "https://acme.okta.com",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"OKTA_CLIENT_TOKEN":  "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
+					"OKTA_CLIENT_ORGURL": "https://acme.okta.com",
 				},
 			},
 		},
