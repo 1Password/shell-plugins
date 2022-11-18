@@ -95,31 +95,40 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 			return
 		}
 
-		credentials := map[string]string{
-			"user":     "",
-			"password": "",
-			"host":     "127.0.0.1", // Default host
-			"port":     "3306",      // Default port
-			"database": "",
-		}
-
-		for _, section := range credentialsFile.Sections() {
-			for targetKey, _ := range credentials {
-				if section.HasKey(targetKey) {
-					value := section.Key(targetKey).Value()
-					if value != "" {
-						credentials[targetKey] = value
-					}
-				}
-			}
-		}
-
 		var fields []sdk.ImportCandidateField
-		for key, val := range credentials {
-			if val != "" {
+		for _, section := range credentialsFile.Sections() {
+			if section.HasKey("user") && section.Key("user").Value() != "" {
 				fields = append(fields, sdk.ImportCandidateField{
-					Field: key,
-					Value: val,
+					Field: "user",
+					Value: section.Key("user").Value(),
+				})
+			}
+
+			if section.HasKey("password") && section.Key("password").Value() != "" {
+				fields = append(fields, sdk.ImportCandidateField{
+					Field: "password",
+					Value: section.Key("password").Value(),
+				})
+			}
+
+			if section.HasKey("database") && section.Key("database").Value() != "" {
+				fields = append(fields, sdk.ImportCandidateField{
+					Field: "database",
+					Value: section.Key("database").Value(),
+				})
+			}
+
+			if section.HasKey("host") && section.Key("host").Value() != "" {
+				fields = append(fields, sdk.ImportCandidateField{
+					Field: "host",
+					Value: section.Key("host").Value(),
+				})
+			}
+
+			if section.HasKey("port") && section.Key("port").Value() != "" {
+				fields = append(fields, sdk.ImportCandidateField{
+					Field: "port",
+					Value: section.Key("port").Value(),
 				})
 			}
 		}
