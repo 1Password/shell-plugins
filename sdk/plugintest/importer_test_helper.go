@@ -42,8 +42,9 @@ func TestImporter(t *testing.T, importer sdk.Importer, cases map[string]ImportCa
 			}
 		}
 
+		ctx := context.Background()
 		out := sdk.ImportOutput{}
-		importer(context.TODO(), in, &out)
+		importer(ctx, in, &out)
 
 		description = fmt.Sprintf("Import: %s", description)
 		if c.ExpectedOutput != nil {
