@@ -4,7 +4,7 @@ new-plugin:
 	go run cmd/contrib/main.go $@
 
 registry:
-	@rm plugins/plugins.go
+	@rm -f plugins/plugins.go
 	go run cmd/contrib/main.go $@
 
 %/example-secrets: registry
