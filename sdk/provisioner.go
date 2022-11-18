@@ -3,7 +3,6 @@ package sdk
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"time"
 )
@@ -78,9 +77,7 @@ type DeprovisionOutput struct {
 
 // OutputFile contains the sensitive file info and contents that the provisioner outputs.
 type OutputFile struct {
-	OnlyAllowCurrentProcess bool
-	Contents                []byte
-	FileMode                os.FileMode
+	Contents []byte
 }
 
 type CacheState map[string]CacheEntry
@@ -109,18 +106,14 @@ func (out *ProvisionOutput) AddArgs(args ...string) {
 // AddSecretFile can be used to add a file containing secrets to the provision output.
 func (out *ProvisionOutput) AddSecretFile(path string, contents []byte) {
 	out.AddFile(path, OutputFile{
-		Contents:                contents,
-		OnlyAllowCurrentProcess: true,
-		FileMode:                0600,
+		Contents: contents,
 	})
 }
 
 // AddNonSecretFile can be used to add a file that does not contain secrets to the provision output.
 func (out *ProvisionOutput) AddNonSecretFile(path string, contents []byte) {
 	out.AddFile(path, OutputFile{
-		Contents:                contents,
-		OnlyAllowCurrentProcess: false,
-		FileMode:                0600,
+		Contents: contents,
 	})
 }
 
