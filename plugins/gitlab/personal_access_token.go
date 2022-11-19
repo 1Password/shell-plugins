@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -55,6 +57,45 @@ var defaultEnvVarMapping = map[string]string{
 }
 
 func TryGlabConfigFile() sdk.Importer {
-	// TODO: Try importing token from ~/.config/glab-cli/config.yml
-	return importer.NoOp()
+	return importer.TryFile("~/.config/glab-cli/config.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config GlabConfig
+		if err := contents.ToYAML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		for hostname, hostConfig := range config.Hosts {
+			if hostConfig.Token == "" {
+				continue
+			}
+
+			fields := map[string]string{
+				fieldname.Token: hostConfig.Token,
+			}
+
+			nameHint := ""
+			if hostname != "gitlab.com" {
+				fields[fieldname.Host] = hostname
+				nameHint = hostname
+			}
+
+			if hostConfig.APIHost != "" && hostConfig.APIHost != "gitlab.com" {
+				fields[fieldname.APIHost] = hostConfig.APIHost
+			}
+
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields:   fields,
+				NameHint: nameHint,
+			})
+		}
+	})
+}
+
+type GlabConfig struct {
+	Hosts map[string]GlabHost `yaml:"hosts"`
+}
+
+type GlabHost struct {
+	Token   string `yaml:"token"`
+	APIHost string `yaml:"api_host"`
 }
