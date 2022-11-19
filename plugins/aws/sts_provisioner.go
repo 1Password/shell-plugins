@@ -2,14 +2,12 @@ package aws
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type STSProvisioner struct {
@@ -18,30 +16,19 @@ type STSProvisioner struct {
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	sess, err := session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], ""),
-	})
-	if err != nil {
-		out.AddError(fmt.Errorf("could not start aws STS session: %s", err))
-		return
-	}
-	stsProvider := sts.New(sess)
+	config := aws.NewConfig()
+	config.Credentials = credentials.NewStaticCredentialsProvider(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], "")
+
+	stsProvider := sts.NewFromConfig(*config)
 	input := &sts.GetSessionTokenInput{
-		DurationSeconds: aws.Int64(900), // minimum expiration time - 15 minutes
+		DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
 		SerialNumber:    aws.String(p.MFASerial),
 		TokenCode:       aws.String(p.TOTPCode),
 	}
 
-	result, err := stsProvider.GetSessionToken(input)
+	result, err := stsProvider.GetSessionToken(ctx, input)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			if aerr.Code() == sts.ErrCodeRegionDisabledException {
-				out.AddError(fmt.Errorf(sts.ErrCodeRegionDisabledException+": %s", aerr.Error()))
-			}
-		} else {
-			out.AddError(aerr)
-		}
-
+		out.AddError(err)
 		return
 	}
 	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
@@ -58,5 +45,5 @@ func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 }
 
 func (p STSProvisioner) Description() string {
-	return fmt.Sprintf("Provision environment variables with the temporary credentials AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID")
+	return "Provision environment variables with the temporary credentials AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID"
 }
