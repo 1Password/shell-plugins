@@ -27,25 +27,22 @@ func (e errFunctionFieldNotSet) Error() string {
 type RPCServer struct {
 	p schema.Plugin
 
-	importers          map[proto.CredentialID]sdk.Importer
-	provisioners       map[proto.ProvisionerID]sdk.Provisioner
-	needsAuth          map[proto.ExecutableID]sdk.NeedsAuthentication
-	credentialIDByName map[string]proto.CredentialID
+	importers    map[proto.CredentialID]sdk.Importer
+	provisioners map[proto.ProvisionerID]sdk.Provisioner
+	needsAuth    map[proto.ExecutableID]sdk.NeedsAuthentication
 }
 
 func newServer(p schema.Plugin) *RPCServer {
 	s := &RPCServer{
-		importers:          map[proto.CredentialID]sdk.Importer{},
-		provisioners:       map[proto.ProvisionerID]sdk.Provisioner{},
-		needsAuth:          map[proto.ExecutableID]sdk.NeedsAuthentication{},
-		credentialIDByName: map[string]proto.CredentialID{},
+		importers:    map[proto.CredentialID]sdk.Importer{},
+		provisioners: map[proto.ProvisionerID]sdk.Provisioner{},
+		needsAuth:    map[proto.ExecutableID]sdk.NeedsAuthentication{},
 	}
 
 	// Remove all functions and interfaces from schema.Plugin and store them in the respective maps.
 	credentials := map[proto.CredentialID]*schema.CredentialType{}
-	for i, c := range p.Credentials {
+	for i := range p.Credentials {
 		credentials[proto.CredentialID(i)] = &p.Credentials[i]
-		s.credentialIDByName[c.Name] = proto.CredentialID(i)
 	}
 	for i := range p.Executables {
 		s.needsAuth[proto.ExecutableID(i)] = p.Executables[i].NeedsAuth
@@ -53,7 +50,8 @@ func newServer(p schema.Plugin) *RPCServer {
 		for _, credentialUse := range p.Executables[i].UsesCredentials {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
-				Credential: s.credentialIDByName[credentialUse.Name],
+				Plugin:     credentialUse.Plugin,
+				Credential: credentialUse.Name,
 				Executable: &executableID,
 			}] = credentialUse.Provisioner
 		}
@@ -64,7 +62,8 @@ func newServer(p schema.Plugin) *RPCServer {
 		c.Importer = nil
 
 		s.provisioners[proto.ProvisionerID{
-			Credential: id,
+			Plugin:     p.Name,
+			Credential: c.Name,
 			Executable: nil,
 		}] = c.DefaultProvisioner
 		c.DefaultProvisioner = nil
@@ -81,7 +80,6 @@ func (t *RPCServer) GetPlugin(_ int, resp *proto.GetPluginResponse) error {
 	*resp = proto.GetPluginResponse{
 		CredentialHasImporter: map[proto.CredentialID]bool{},
 		ExecutableHasNeedAuth: map[proto.ExecutableID]bool{},
-		CredentialIDByName:    map[string]proto.CredentialID{},
 		Plugin:                t.p,
 	}
 	for executableID, needsAuth := range t.needsAuth {
@@ -89,9 +87,6 @@ func (t *RPCServer) GetPlugin(_ int, resp *proto.GetPluginResponse) error {
 	}
 	for credentialID, importer := range t.importers {
 		resp.CredentialHasImporter[credentialID] = importer != nil
-	}
-	for credentialName, credentialId := range t.credentialIDByName {
-		resp.CredentialIDByName[credentialName] = credentialId
 	}
 
 	return nil
@@ -170,11 +165,11 @@ func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCreden
 	return nil
 }
 
-func (t *RPCServer) getProvisioner(credentialID proto.ProvisionerID) (sdk.Provisioner, error) {
-	provisioner, ok := t.provisioners[credentialID]
+func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provisioner, error) {
+	provisioner, ok := t.provisioners[provisionerID]
 	if !ok || provisioner == nil {
 		return nil, &errFunctionFieldNotSet{
-			objName:  credentialID.String(),
+			objName:  provisionerID.String(),
 			funcName: "Provisioner",
 		}
 	}

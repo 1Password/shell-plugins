@@ -29,15 +29,16 @@ func (c CredentialID) String() string {
 
 // ProvisionerID uniquely identifies a provisioner within a plugin.
 type ProvisionerID struct {
-	Credential CredentialID
+	Plugin     string
+	Credential string
 	Executable *ExecutableID
 }
 
 func (p ProvisionerID) String() string {
 	if p.Executable == nil {
-		return fmt.Sprintf("plugin.Credentials[%d].DefaultProvisioner", p.Credential)
+		return fmt.Sprintf("plugin.Credentials[%s].DefaultProvisioner", p.Credential)
 	}
-	return fmt.Sprintf("plugin.Credentials[%d].Provisioner[%d]", p.Credential, *p.Executable)
+	return fmt.Sprintf("plugin.Credentials[%s].Provisioner[%d]", p.Credential, *p.Executable)
 }
 
 // GetPluginResponse augments schema.Plugin with information about which credentials have the (optional) Importer set
@@ -49,8 +50,6 @@ type GetPluginResponse struct {
 	CredentialHasImporter map[CredentialID]bool
 	// ExecutableHasNeedAuth contains a true value for all executables that have their NeedsAuth field set.
 	ExecutableHasNeedAuth map[ExecutableID]bool
-	// CredentialIDByName maps credential names to IDs.
-	CredentialIDByName map[string]CredentialID
 }
 
 // ImportCredentialRequest augments sdk.ImportInput with a CredentialID so Import() can be called over RPC.
