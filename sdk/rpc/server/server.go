@@ -28,42 +28,46 @@ type RPCServer struct {
 	p schema.Plugin
 
 	importers    map[proto.CredentialID]sdk.Importer
-	provisioners map[proto.CredentialID]sdk.Provisioner
+	provisioners map[proto.ProvisionerID]sdk.Provisioner
 	needsAuth    map[proto.ExecutableID]sdk.NeedsAuthentication
 }
 
 func newServer(p schema.Plugin) *RPCServer {
 	s := &RPCServer{
 		importers:    map[proto.CredentialID]sdk.Importer{},
-		provisioners: map[proto.CredentialID]sdk.Provisioner{},
+		provisioners: map[proto.ProvisionerID]sdk.Provisioner{},
 		needsAuth:    map[proto.ExecutableID]sdk.NeedsAuthentication{},
 	}
 
+	credentialIDByName := make(map[string]proto.CredentialID)
+
 	// Remove all functions and interfaces from schema.Plugin and store them in the respective maps.
 	credentials := map[proto.CredentialID]*schema.CredentialType{}
-	for i := range p.Credentials {
-		credentials[proto.CredentialID{
-			NoExecutable: true,
-			Credential:   i,
-		}] = &p.Credentials[i]
+	for i, c := range p.Credentials {
+		credentials[proto.CredentialID(i)] = &p.Credentials[i]
+		credentialIDByName[c.Name] = proto.CredentialID(i)
 	}
 	for i := range p.Executables {
-		for j := range p.Executables[i].Credentials {
-			credentials[proto.CredentialID{
-				Executable: proto.ExecutableID(i),
-				Credential: j,
-			}] = &p.Executables[i].Credentials[j]
-		}
 		s.needsAuth[proto.ExecutableID(i)] = p.Executables[i].NeedsAuth
 		p.Executables[i].NeedsAuth = nil
+		for _, credentialUse := range p.Executables[i].UsesCredentials {
+			executableID := proto.ExecutableID(i)
+			s.provisioners[proto.ProvisionerID{
+				Credential: credentialIDByName[credentialUse.Name],
+				Executable: &executableID,
+			}] = credentialUse.Provisioner
+		}
 	}
 
 	for id, c := range credentials {
 		s.importers[id] = c.Importer
 		c.Importer = nil
 
-		s.provisioners[id] = c.Provisioner
-		c.Provisioner = nil
+		s.provisioners[proto.ProvisionerID{
+			Credential: id,
+			Executable: nil,
+		}] = c.DefaultProvisioner
+		c.DefaultProvisioner = nil
 	}
 
 	s.p = p
@@ -120,7 +124,7 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 // CredentialProvisionerDescription is a remote version of the the Description() method of the sdk.Provisioner
 // interface. The call is forwarded to the Description() function of the Provisioner of the credential identified by
 // req.CredentialID.
-func (t *RPCServer) CredentialProvisionerDescription(req proto.CredentialID, resp *string) error {
+func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, resp *string) error {
 	provisioner, err := t.getProvisioner(req)
 	if err != nil {
 		return err
@@ -133,7 +137,7 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.CredentialID, res
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
-	provisioner, err := t.getProvisioner(req.CredentialID)
+	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
@@ -151,7 +155,7 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 // interface. The call is forwarded to the Deprovision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
-	provisioner, err := t.getProvisioner(req.CredentialID)
+	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
@@ -162,7 +166,7 @@ func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCreden
 	return nil
 }
 
-func (t *RPCServer) getProvisioner(credentialID proto.CredentialID) (sdk.Provisioner, error) {
+func (t *RPCServer) getProvisioner(credentialID proto.ProvisionerID) (sdk.Provisioner, error) {
 	provisioner, ok := t.provisioners[credentialID]
 	if !ok || provisioner == nil {
 		return nil, &errFunctionFieldNotSet{

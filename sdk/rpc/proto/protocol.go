@@ -21,20 +21,23 @@ func (e ExecutableID) String() string {
 }
 
 // CredentialID uniquely identifies a credential within a plugin.
-type CredentialID struct {
-	// NoExecutable is set to true if the credential does not belong to an executable.
-	NoExecutable bool
-	// If NoExecutable is false, Executable is the slice index of the executable in schema.Plugin
-	Executable ExecutableID
-	// Credential is the slice index of the credential in schema.Plugin or schema.Executable.
-	Credential int
-}
+type CredentialID int
 
 func (c CredentialID) String() string {
-	if c.NoExecutable {
-		return fmt.Sprintf("plugin.Credentials[%d]", c.Credential)
+	return fmt.Sprintf("plugin.Credentials[%d]", c)
+}
+
+// ProvisionerID uniquely identifies a provisioner within a plugin.
+type ProvisionerID struct {
+	Credential CredentialID
+	Executable *ExecutableID
+}
+
+func (p ProvisionerID) String() string {
+	if p.Executable == nil {
+		return fmt.Sprintf("plugin.Credentials[%d].DefaultProvisioner", p.Credential)
 	}
-	return fmt.Sprintf("%s.Credentials[%d]", c.Executable, c.Credential)
+	return fmt.Sprintf("plugin.Credentials[%d].Provisioner[%d]", p.Credential, *p.Executable)
 }
 
 // GetPluginResponse augments schema.Plugin with information about which credentials have the (optional) Importer set
@@ -56,13 +59,13 @@ type ImportCredentialRequest struct {
 
 // ProvisionCredentialRequest augments sdk.ProvisionInput with a CredentialID so Provision() can be called over RPC.
 type ProvisionCredentialRequest struct {
-	CredentialID
+	ProvisionerID
 	sdk.ProvisionInput
 }
 
 // DeprovisionCredentialRequest augments sdk.DeprovisionInput with a CredentialID so Deprovision() can be called over RPC.
 type DeprovisionCredentialRequest struct {
-	CredentialID
+	ProvisionerID
 	sdk.DeprovisionInput
 }
 
