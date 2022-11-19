@@ -11,6 +11,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"github.com/BurntSushi/toml"
 )
 
 func SecretKey() schema.CredentialType {
@@ -70,39 +71,36 @@ type ProjectConfig struct {
 
 func TryStripeConfigFile() sdk.Importer {
 	return importer.TryFile("~/.config/stripe/config.toml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		var config Config
-		if err := contents.ToTOML(&config); err != nil {
+		parsedFile := make(map[string]toml.Primitive)
+		metaData, err := toml.Decode(string(contents), &parsedFile)
+		if err != nil {
 			out.AddError(err)
 			return
 		}
 
-		for project, config := range config.Projects {
+		for project, rawConfig := range parsedFile {
+			var config ProjectConfig
+			err = metaData.PrimitiveDecode(rawConfig, &config)
+			if err != nil {
+				continue // skip sections that don't define credentials
+			}
+
+			// We only support secret keys for now.
+			// Support for publishable and restricted keys will be added later.
 			if strings.HasPrefix(config.LiveModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: []sdk.ImportCandidateField{
-						{
-							Field: fieldname.Key,
-							Value: config.LiveModeAPIKey,
-						},
-						{
-							Field: fieldname.Mode,
-							Value: ModeLive,
-						},
+					Fields: map[string]string{
+						fieldname.Key:  config.LiveModeAPIKey,
+						fieldname.Mode: ModeLive,
 					},
 					NameHint: project,
 				})
 			}
 			if strings.HasPrefix(config.TestModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: []sdk.ImportCandidateField{
-						{
-							Field: fieldname.Key,
-							Value: config.TestModeAPIKey,
-						},
-						{
-							Field: fieldname.Mode,
-							Value: ModeTest,
-						},
+					Fields: map[string]string{
+						fieldname.Key:  config.TestModeAPIKey,
+						fieldname.Mode: ModeTest,
 					},
 					NameHint: fmt.Sprintf("%s – test", project),
 				})

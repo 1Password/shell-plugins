@@ -1,7 +1,9 @@
 package heroku
 
 import (
+	"bufio"
 	"context"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -43,14 +45,33 @@ func APIKey() schema.CredentialType {
 // TryNetrcFile tries to find Heroku API keys in the ~/.netrc file
 func TryNetrcFile() sdk.Importer {
 	return importer.TryFile("~/.netrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// TODO: Iterate over 'machine' entries to look for 'api.heroku.com' or 'git.heroku.com'
-		// Example contents:
-		//
-		// machine api.heroku.com
-		//   login me@example.com
-		//   password c4cd94da15ea0544802c2cfd5ec4ead324327430
-		// machine git.heroku.com
-		//   login me@example.com
-		//   password c4cd94da15ea0544802c2cfd5ec4ead324327430
+		s := bufio.NewScanner(strings.NewReader(string(contents)))
+		var machine, login, password string
+		for s.Scan() {
+			if words := strings.Split(strings.Trim(s.Text(), " "), " "); len(words) >= 2 {
+				switch words[0] {
+				case "machine":
+					if machine != "" {
+						login, password = "", ""
+					}
+					machine = words[1]
+				case "login":
+					login = words[1]
+				case "password":
+					password = words[1]
+				}
+				if login != "" && password != "" && machine != "" {
+					if machine == "api.heroku.com" || machine == "git.heroku.com" {
+						out.AddCandidate(sdk.ImportCandidate{
+							NameHint: login,
+							Fields: map[string]string{
+								fieldname.APIKey: password,
+							},
+						})
+					}
+					machine, login, password = "", "", ""
+				}
+			}
+		}
 	})
 }

@@ -19,6 +19,7 @@ import (
 
 const exampleSecretsCommandSuffix = "example-secrets"
 const validateCommandSuffix = "validate"
+const existsCommandSuffix = "exists"
 
 func main() {
 	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], exampleSecretsCommandSuffix) {
@@ -34,6 +35,15 @@ func main() {
 			log.Fatal(err)
 		}
 		plugintest.PrintValidationReport(plugin)
+		return
+	}
+
+	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], existsCommandSuffix) {
+		pluginName := strings.Split(os.Args[1], "/")[0]
+		_, err := plugins.Get(pluginName)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 

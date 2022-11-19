@@ -2,11 +2,8 @@ package aws
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/provision"
-	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
 type awsProvisioner struct {
@@ -23,15 +20,7 @@ func AWSProvisioner() sdk.Provisioner {
 }
 
 func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	totpCode, foundTotp := in.ItemFields[fieldname.OneTimePassword]
-	serialNumber, foundSerialNumber := in.ItemFields[FieldNameSerialNumber]
-	if foundTotp && foundSerialNumber {
-		p.stsProvisioner.TOTPCode = totpCode
-		p.stsProvisioner.MFASerial = serialNumber
-		p.stsProvisioner.Provision(ctx, in, out)
-	} else {
-		p.envVarProvisioner.Provision(ctx, in, out)
-	}
+	p.envVarProvisioner.Provision(ctx, in, out)
 }
 
 func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
@@ -39,5 +28,5 @@ func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 }
 
 func (p awsProvisioner) Description() string {
-	return fmt.Sprintf("%s, and, if MFA is present, %s", p.envVarProvisioner.Description(), p.stsProvisioner.Description())
+	return p.envVarProvisioner.Description()
 }

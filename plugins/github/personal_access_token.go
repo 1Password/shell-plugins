@@ -39,9 +39,21 @@ func PersonalAccessToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryAllEnvVars(fieldname.Token, "GH_TOKEN", "GITHUB_PAT"),
-			importer.TryEnvVarPairVariations(map[string][]string{
-				fieldname.Host:  {"GH_HOST"},
-				fieldname.Token: {"GH_ENTERPRISE_TOKEN", "GITHUB_ENTERPRISE_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"},
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.Host:  "GH_HOST",
+				fieldname.Token: "GH_ENTERPRISE_TOKEN",
+			}),
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.Host:  "GH_HOST",
+				fieldname.Token: "GITHUB_ENTERPRISE_TOKEN",
+			}),
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.Host:  "GH_HOST",
+				fieldname.Token: "GH_TOKEN",
+			}),
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.Host:  "GH_HOST",
+				fieldname.Token: "GITHUB_TOKEN",
 			}),
 		),
 	}

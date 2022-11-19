@@ -1,0 +1,6 @@
+machine api.heroku.com
+  login wendy@appleseed.com
+  password dh7k7m662pqglxaybr1p0gpg1cu33example
+machine git.heroku.com
+  login wendy@appleseed.com
+  password dh7k7m662pqglxaybr1p0gpg1cu33example

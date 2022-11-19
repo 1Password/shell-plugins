@@ -44,9 +44,15 @@ func APIToken() schema.CredentialType {
 			fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
 			fieldname.Token:     "EXAMPLE_API_TOKEN",
 		}),
-		Importer: importer.TryEnvVarPairVariations(map[string][]string{
-			fieldname.AccountID: {"EXAMPLE_ACCOUNT_ID", "EXAMPLE_API_ACCOUNT_ID", "EXAMPLE_ACCOUNT_IDENTIFIER"},
-			fieldname.Token:     {"EXAMPLE_API_TOKEN", "EXAMPLE_TOKEN"},
-		}),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
+				fieldname.Token:     "EXAMPLE_API_TOKEN",
+			}),
+			importer.TryEnvVarPair(map[string]string{
+				fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
+				fieldname.Token:     "EXAMPLE_TOKEN",
+			}),
+		),
 	}
 }

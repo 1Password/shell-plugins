@@ -13,11 +13,11 @@ import (
 type FileProvisioner struct {
 	sdk.Provisioner
 
-	fileContents            ItemToFileContents
-	outpathFixed            string
-	outpathEnvVar           string
-	outpathArgs             []string
-	onlyAllowCurrentProcess bool
+	fileContents        ItemToFileContents
+	outpathFixed        string
+	outpathEnvVar       string
+	setOutpathAsArg     bool
+	outpathPrefixedArgs []string
 }
 
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
@@ -37,8 +37,7 @@ func FieldAsFile(fieldName string) ItemToFileContents {
 // a single file.
 func TempFile(fileContents ItemToFileContents, opts ...FileOption) sdk.Provisioner {
 	p := FileProvisioner{
-		fileContents:            fileContents,
-		onlyAllowCurrentProcess: true,
+		fileContents: fileContents,
 	}
 	for _, opt := range opts {
 		opt(&p)
@@ -65,18 +64,12 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 }
 
 // SetPathAsArg can be used to provision the temporary file path as an arg that will be appended to
-// the executable's command.
-func SetPathAsArg(args ...string) FileOption {
+// the executable's command. The file path can be prefixed with the specified `prefixedArgs`. For example:
+// `SetPathAsArg("--config-file")` will result in `--config-file /path/to/tempfile`.
+func SetPathAsArg(prefixedArgs ...string) FileOption {
 	return func(p *FileProvisioner) {
-		p.outpathArgs = args
-	}
-}
-
-// OnlyAllowCurrentProcess can be used to configure whether reading the file should be restricted to the current
-// process only by using a named pipe / FIFO file. Defaults to true on macOS and Linux, ignored on Windows.
-func OnlyAllowCurrentProcess(onlyAllowCurrentProcess bool) FileOption {
-	return func(p *FileProvisioner) {
-		p.onlyAllowCurrentProcess = onlyAllowCurrentProcess
+		p.setOutpathAsArg = true
+		p.outpathPrefixedArgs = prefixedArgs
 	}
 }
 
@@ -101,9 +94,10 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		out.AddEnvVar(p.outpathEnvVar, outpath)
 	}
 
-	if len(p.outpathArgs) > 0 {
+	if p.setOutpathAsArg {
 		// Add args to specify the output path.
-		out.AddArgs(p.outpathArgs...)
+		out.AddArgs(p.outpathPrefixedArgs...)
+		out.AddArgs(outpath)
 	}
 }
 
