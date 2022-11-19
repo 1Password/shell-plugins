@@ -49,6 +49,8 @@ type GetPluginResponse struct {
 	CredentialHasImporter map[CredentialID]bool
 	// ExecutableHasNeedAuth contains a true value for all executables that have their NeedsAuth field set.
 	ExecutableHasNeedAuth map[ExecutableID]bool
+	// CredentialIDByName maps credential names to IDs.
+	CredentialIDByName map[string]CredentialID
 }
 
 // ImportCredentialRequest augments sdk.ImportInput with a CredentialID so Import() can be called over RPC.
