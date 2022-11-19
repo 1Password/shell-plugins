@@ -41,7 +41,7 @@ func TestAPITokenImporter(t *testing.T) {
 }
 
 func TestAPITokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[string]string{
 				fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
