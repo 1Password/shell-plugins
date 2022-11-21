@@ -155,6 +155,7 @@ func (printer *ErrorReportPrinter) Print() {
 	for pluginName, reports := range printer.Reports {
 		for _, report := range reports {
 			if report.HasErrors() {
+				shouldExitWithError = true
 				printer.Format.Heading.Printf("Plugin %s has errors:\n", pluginName)
 				printer.printHeading(report.Heading)
 				printer.printChecks(report.Checks)
