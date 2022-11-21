@@ -89,30 +89,18 @@ func TryStripeConfigFile() sdk.Importer {
 			// Support for publishable and restricted keys will be added later.
 			if strings.HasPrefix(config.LiveModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: []sdk.ImportCandidateField{
-						{
-							Field: fieldname.Key,
-							Value: config.LiveModeAPIKey,
-						},
-						{
-							Field: fieldname.Mode,
-							Value: ModeLive,
-						},
+					Fields: map[string]string{
+						fieldname.Key:  config.LiveModeAPIKey,
+						fieldname.Mode: ModeLive,
 					},
 					NameHint: project,
 				})
 			}
 			if strings.HasPrefix(config.TestModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: []sdk.ImportCandidateField{
-						{
-							Field: fieldname.Key,
-							Value: config.TestModeAPIKey,
-						},
-						{
-							Field: fieldname.Mode,
-							Value: ModeTest,
-						},
+					Fields: map[string]string{
+						fieldname.Key:  config.TestModeAPIKey,
+						fieldname.Mode: ModeTest,
 					},
 					NameHint: fmt.Sprintf("%s – test", project),
 				})
