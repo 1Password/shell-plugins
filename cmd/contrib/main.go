@@ -22,28 +22,35 @@ const validateCommandSuffix = "validate"
 const existsCommandSuffix = "exists"
 
 func main() {
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], exampleSecretsCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
-		printExampleSecrets(pluginName)
-		return
-	}
+	command := os.Args[1]
 
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], validateCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
+	if isPluginCommand(command) {
+		commandChunks := strings.Split(command, "/")
+		pluginName := commandChunks[0]
+		suffix := commandChunks[1]
+
 		plugin, err := plugins.Get(pluginName)
 		if err != nil {
 			log.Fatal(err)
 		}
-		plugintest.PrintValidationReport(plugin)
-		return
+
+		if strings.HasSuffix(suffix, exampleSecretsCommandSuffix) {
+			example := generateSecretsExample(plugin)
+			fmt.Printf("%s", example)
+			return
+		}
+
+		if strings.HasSuffix(suffix, validateCommandSuffix) {
+			plugintest.PrintValidationReport(plugin)
+			return
+		}
+
+		if strings.HasSuffix(suffix, existsCommandSuffix) {
+			return
+		}
 	}
 
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], existsCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
-		_, err := plugins.Get(pluginName)
-		if err != nil {
-			log.Fatal(err)
-		}
+	if command == validateCommandSuffix {
 		return
 	}
 
@@ -51,6 +58,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func isPluginCommand(command string) bool {
+	return len(strings.Split(command, "/")) > 1
 }
 
 func newPlugin() error {
@@ -386,16 +397,6 @@ func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 	}
 }
 `,
-}
-
-func printExampleSecrets(pluginName string) {
-	plugin, err := plugins.Get(pluginName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	example := generateSecretsExample(plugin)
-	fmt.Printf("%s", example)
 }
 
 func generateSecretsExample(plugin schema.Plugin) string {
