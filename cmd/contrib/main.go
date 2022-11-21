@@ -51,6 +51,8 @@ func main() {
 	}
 
 	if command == validateCommandSuffix {
+		pluginsList := plugins.List()
+		plugintest.PrintValidateAllReport(pluginsList)
 		return
 	}
 

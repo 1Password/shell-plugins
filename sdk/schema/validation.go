@@ -27,6 +27,16 @@ func (vr *ValidationReport) IsValid() bool {
 	return isValid
 }
 
+func (vr *ValidationReport) HasErrors() bool {
+	for _, check := range vr.Checks {
+		if !check.Assertion && check.Severity == ValidationSeverityError {
+			return true
+		}
+	}
+
+	return false
+}
+
 type ValidationCheck struct {
 	// Description explains what we want to validate
 	Description string

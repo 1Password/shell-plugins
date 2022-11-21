@@ -3,6 +3,7 @@ package plugintest
 import (
 	"fmt"
 	"github.com/fatih/color"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
@@ -14,6 +15,37 @@ func PrintValidationReport(plugin schema.Plugin) {
 		Format:  PrintFormat{}.ValidationReportFormat(),
 	}
 	printer.Print()
+}
+
+func PrintValidateAllReport(plugins []schema.Plugin) {
+	reports := make(map[string][]schema.ValidationReport)
+
+	for _, p := range plugins {
+		errorReports := FilterErrorReports(p.DeepValidate())
+		reports[p.Name] = errorReports
+	}
+
+	printer := &ErrorReportPrinter{
+		Reports: reports,
+		Format:  PrintFormat{}.ValidationReportFormat(),
+	}
+	printer.Print()
+}
+
+func FilterErrorReports(reports []schema.ValidationReport) []schema.ValidationReport {
+	var errorReports []schema.ValidationReport
+
+	for _, report := range reports {
+		errReport := schema.ValidationReport{Heading: report.Heading, Checks: []schema.ValidationCheck{}}
+		for _, check := range report.Checks {
+			if !check.Assertion && check.Severity == schema.ValidationSeverityError {
+				errReport.Checks = append(errReport.Checks, check)
+			}
+		}
+		errorReports = append(errorReports, errReport)
+	}
+
+	return errorReports
 }
 
 type PrintFormat struct {
@@ -107,4 +139,41 @@ func (p *ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 	}
 
 	p.Format.Error.Printf("✘ %s\n", check.Description)
+}
+
+type ErrorReportPrinter struct {
+	Reports map[string][]schema.ValidationReport
+	Format  PrintFormat
+}
+
+func (printer *ErrorReportPrinter) Print() {
+	var shouldExitWithError bool
+	if printer.Reports == nil || len(printer.Reports) == 0 {
+		return
+	}
+
+	for pluginName, reports := range printer.Reports {
+		for _, report := range reports {
+			if report.HasErrors() {
+				printer.Format.Heading.Printf("Plugin %s has errors:\n", pluginName)
+				printer.printHeading(report.Heading)
+				printer.printChecks(report.Checks)
+			}
+		}
+	}
+
+	if shouldExitWithError {
+		os.Exit(1)
+	}
+}
+
+func (printer *ErrorReportPrinter) printHeading(heading string) {
+	printer.Format.Heading.Printf("# %s\n\n", heading)
+}
+
+func (printer *ErrorReportPrinter) printChecks(checks []schema.ValidationCheck) {
+	for _, c := range checks {
+		printer.Format.Error.Printf("✘ %s\n", c.Description)
+	}
+	fmt.Println()
 }
