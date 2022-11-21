@@ -2,6 +2,8 @@ package aws
 
 import (
 	"context"
+	"errors"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -18,7 +20,16 @@ type STSProvisioner struct {
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	config := aws.NewConfig()
 	config.Credentials = credentials.NewStaticCredentialsProvider(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], "")
-	config.Region = in.ItemFields[FieldNameDefaultRegion]
+	region, ok := in.ItemFields[FieldNameDefaultRegion]
+	if !ok {
+		region = os.Getenv("AWS_DEFAULT_REGION")
+	}
+	if len(region) == 0 {
+		out.AddError(errors.New("region is required for the AWS Shell Plugin MFA workflow: set 'default region' in 1Password or set the 'AWS_DEFAULT_REGION' environment variable yourself"))
+		return
+	}
+	config.Region = region
+
 	stsProvider := sts.NewFromConfig(*config)
 	input := &sts.GetSessionTokenInput{
 		DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
