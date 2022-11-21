@@ -12,7 +12,7 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://github.com/fossas/fossa-cli#generating-an-api-key"),
+		DocsURL:       sdk.URL("https://docs.fossa.com/docs/api-reference#api-tokens"),
 		ManagementURL: sdk.URL("https://app.fossa.com/account/settings/integrations/api_tokens"),
 		Fields: []schema.CredentialField{
 			{
