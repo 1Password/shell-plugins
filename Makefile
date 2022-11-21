@@ -20,3 +20,6 @@ $(plugins_dir):
 
 test:
 	go test ./...
+
+validate:
+	go run cmd/contrib/main.go validate
