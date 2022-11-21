@@ -18,7 +18,7 @@ type STSProvisioner struct {
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	config := aws.NewConfig()
 	config.Credentials = credentials.NewStaticCredentialsProvider(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], "")
-
+	config.Region = in.ItemFields[FieldNameDefaultRegion]
 	stsProvider := sts.NewFromConfig(*config)
 	input := &sts.GetSessionTokenInput{
 		DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
