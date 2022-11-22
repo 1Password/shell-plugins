@@ -41,14 +41,20 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	}
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has name set",
+		Description: "Has plugin name set",
 		Assertion:   p.Name != "",
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Name only using lowercase characters or digits",
+		Description: "Plugin name only using lowercase characters or digits",
 		Assertion:   ContainsLowercaseLettersOrDigits(p.Name),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Plugin name not longer than 20 characters",
+		Assertion:   len(p.Name) <= 20,
 		Severity:    ValidationSeverityError,
 	})
 

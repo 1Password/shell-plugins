@@ -13,45 +13,23 @@ type Importer func(ctx context.Context, in ImportInput, out *ImportOutput)
 // ImportCandidate represents a single occurrence of a plugin's credential that was
 // detected on the system.
 type ImportCandidate struct {
-	Fields    []ImportCandidateField
+	Fields    map[string]string
 	NameHint  string
 	ExpiresAt *time.Time
-}
-
-func (c ImportCandidate) Source() ImportSource {
-	var source ImportSource
-	for _, field := range c.Fields {
-		source.Env = append(source.Env, field.Source.Env...)
-		source.Files = append(source.Files, field.Source.Files...)
-	}
-	return source
 }
 
 func (c *ImportCandidate) Equal(other ImportCandidate) bool {
 	if len(c.Fields) != len(other.Fields) {
 		return false
 	}
-outer:
-	for _, field := range c.Fields {
-		for _, otherField := range other.Fields {
-			if field.Equal(otherField) {
-				continue outer
-			}
+
+	for key, value := range c.Fields {
+		if value != other.Fields[key] {
+			return false
 		}
-		return false
 	}
+
 	return true
-}
-
-// ImportCandidateField represents a single field and value of a credential type.
-type ImportCandidateField struct {
-	Field  string
-	Value  string
-	Source ImportSource
-}
-
-func (c *ImportCandidateField) Equal(other ImportCandidateField) bool {
-	return c.Field == other.Field && c.Value == other.Value
 }
 
 type ImportSource struct {
