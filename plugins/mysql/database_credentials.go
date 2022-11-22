@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -42,7 +43,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.TempFile(mysqlConfig, provision.SetPathAsArg("--defaults-file")),
+		Provisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.SetPathAsArg("--defaults-file")),
 		Importer: importer.TryAll(
 			TryMySQLConfigFile("/etc/my.cnf"),
 			TryMySQLConfigFile("/etc/mysql/my.cnf"),
