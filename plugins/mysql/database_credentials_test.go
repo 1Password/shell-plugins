@@ -1,12 +1,11 @@
 package mysql
 
 import (
-	"context"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"strings"
 	"testing"
 )
@@ -27,11 +26,11 @@ func TestMysqlConfigStartsWithClientGroup(t *testing.T) {
 func TestMysqlConfigHasPopulatedValues(t *testing.T) {
 	p := sdk.ProvisionInput{
 		ItemFields: map[string]string{
-			fieldname.Host:     "localhost",
-			fieldname.Port:     "3306",
-			fieldname.User:     "root",
-			fieldname.Password: "root",
-			fieldname.Database: "db",
+			"host":     "localhost",
+			"port":     "3306",
+			"user":     "root",
+			"password": "root",
+			"database": "db",
 		},
 	}
 
@@ -81,59 +80,60 @@ func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
 	}
 }
 
-func TestTryCredentialsFile(t *testing.T) {
-	config, _ := mysqlConfig(sdk.ProvisionInput{
-		ItemFields: map[string]string{
-			fieldname.Host:     "localhost",
-			fieldname.Port:     "3306",
-			fieldname.User:     "root",
-			fieldname.Password: "root",
-			fieldname.Database: "db",
+func TestDatabaseCredentialsImporter(t *testing.T) {
+	expectedFields := map[string]string{
+		"user":     "root",
+		"password": "123456",
+		"database": "test",
+		"port":     "3306",
+		"host":     "localhost",
+	}
+
+	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
+		"config file ~/.mysql.cnf": {
+			Files: map[string]string{
+				"/etc/mysql.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
+				"/etc/mysql/mysql.cnf": plugintest.LoadFixture(t, "mysql.cnf"),
+				"~/.mysql.cnf":         plugintest.LoadFixture(t, "mysql.cnf"),
+				"~/.mylogin.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: expectedFields,
+				},
+				{
+					Fields: expectedFields,
+				},
+				{
+					Fields: expectedFields,
+				},
+				{
+					Fields: expectedFields,
+				},
+			},
 		},
 	})
-	path, _ := os.Getwd()
-	configFilePath := fmt.Sprintf("%s/mysql-cred.cnf", path)
-	os.WriteFile(configFilePath, config, 0644)
+}
 
-	res := TryMySQLConfigFile(configFilePath)
-	out := &sdk.ImportOutput{}
-	res(context.TODO(), sdk.ImportInput{}, out)
-
-	candidates := out.AllCandidates()
-	assert.True(t, len(candidates) == 1)
-
-	cases := map[string]struct {
-		entryKey string
-	}{
-		"ImportCandidate has host value": {
-			entryKey: "host",
+func TestDatabaseCredentialsProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, DatabaseCredentials().Provisioner, map[string]plugintest.ProvisionCase{
+		"temp file": {
+			ItemFields: map[string]string{
+				"user":     "user",
+				"password": "123456",
+				"database": "test",
+				"host":     "localhost",
+				"port":     "3306",
+			},
+			CommandLine: []string{"mysql"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				CommandLine: []string{"mysql", "--defaults-file", "tmp/my.cnf"},
+				Files: map[string]sdk.OutputFile{
+					"tmp/my.cnf": {
+						Contents: []byte("[client]\nhost=localhost\nport=3306\nuser=user\npassword=123456\ndatabase=test\n"),
+					},
+				},
+			},
 		},
-		"ImportCandidate has port value": {
-			entryKey: "port",
-		},
-		"ImportCandidate has user value": {
-			entryKey: "user",
-		},
-		"ImportCandidate has password value": {
-			entryKey: "password",
-		},
-		"ImportCandidate has database value": {
-			entryKey: "database",
-		},
-	}
-
-	candidate := candidates[0]
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			hasPopulatedValue := false
-			for _, f := range candidate.Fields {
-				if strings.Contains(f.Field, tc.entryKey) {
-					hasPopulatedValue = true
-				}
-			}
-			assert.True(t, hasPopulatedValue)
-		})
-	}
-
-	os.Remove(configFilePath)
+	})
 }
