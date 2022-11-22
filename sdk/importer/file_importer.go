@@ -19,6 +19,8 @@ func TryFile(path string, result func(ctx context.Context, contents FileContents
 		abspath := path
 		if strings.HasPrefix(path, "~/") {
 			abspath = filepath.Join(in.HomeDir, strings.TrimPrefix(path, "~/"))
+		} else if strings.HasPrefix(path, "/") {
+			abspath = filepath.Join(in.RootDir, path)
 		}
 
 		attempt := out.NewAttempt(SourceFile(path))
