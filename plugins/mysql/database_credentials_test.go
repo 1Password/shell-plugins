@@ -92,24 +92,16 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
 		"config file ~/.mysql.cnf": {
 			Files: map[string]string{
-				"/etc/mysql.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
-				"/etc/mysql/mysql.cnf": plugintest.LoadFixture(t, "mysql.cnf"),
-				"~/.mysql.cnf":         plugintest.LoadFixture(t, "mysql.cnf"),
-				"~/.mylogin.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
+				"/etc/my.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
+				"/etc/mysql/my.cnf": plugintest.LoadFixture(t, "mysql.cnf"),
+				"~/.my.cnf":         plugintest.LoadFixture(t, "mysql.cnf"),
+				"~/.mylogin.cnf":    plugintest.LoadFixture(t, "mysql.cnf"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: expectedFields,
-				},
-				{
-					Fields: expectedFields,
-				},
-				{
-					Fields: expectedFields,
-				},
-				{
-					Fields: expectedFields,
-				},
+				{Fields: expectedFields},
+				{Fields: expectedFields},
+				{Fields: expectedFields},
+				{Fields: expectedFields},
 			},
 		},
 	})
@@ -130,7 +122,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				CommandLine: []string{"mysql", "--defaults-file", "tmp/my.cnf"},
 				Files: map[string]sdk.OutputFile{
 					"tmp/my.cnf": {
-						Contents: []byte("[client]\nhost=localhost\nport=3306\nuser=user\npassword=123456\ndatabase=test\n"),
+						Contents: []byte("[client]\nuser=user\npassword=123456\nhost=localhost\nport=3306\ndatabase=test\n"),
 					},
 				},
 			},

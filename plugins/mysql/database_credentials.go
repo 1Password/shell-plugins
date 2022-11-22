@@ -54,35 +54,26 @@ func DatabaseCredentials() schema.CredentialType {
 }
 
 func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := map[string]string{
-		"host": "127.0.0.1", // Default host
-		"port": "3306",      // Default port
-	}
+	content := "[client]\n"
 
 	if user, ok := in.ItemFields["user"]; ok {
-		config["user"] = user
+		content += configFileEntry("user", user)
 	}
 
 	if password, ok := in.ItemFields["password"]; ok {
-		config["password"] = password
+		content += configFileEntry("password", password)
 	}
 
 	if host, ok := in.ItemFields["host"]; ok {
-		config["host"] = host
+		content += configFileEntry("host", host)
 	}
 
 	if port, ok := in.ItemFields["port"]; ok {
-		config["port"] = port
+		content += configFileEntry("port", port)
 	}
 
 	if database, ok := in.ItemFields["database"]; ok {
-		config["database"] = database
-	}
-
-	content := "[client]\n"
-	for key, value := range config {
-		configLine := fmt.Sprintf("%s=%s\n", key, value)
-		content += configLine
+		content += configFileEntry("database", database)
 	}
 
 	return []byte(content), nil
@@ -123,4 +114,8 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 			Fields: fields,
 		})
 	})
+}
+
+func configFileEntry(key string, value string) string {
+	return fmt.Sprintf("%s=%s\n", key, value)
 }
