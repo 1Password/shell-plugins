@@ -23,29 +23,25 @@ const existsCommandSuffix = "exists"
 
 func main() {
 	command := os.Args[1]
-
-	if isPluginCommand(command) {
-		commandChunks := strings.Split(command, "/")
-		pluginName := commandChunks[0]
-		suffix := commandChunks[1]
-
+	isPlugin, pluginName, pluginCommand := isPluginCommand(command)
+	if isPlugin {
 		plugin, err := plugins.Get(pluginName)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if strings.HasSuffix(suffix, exampleSecretsCommandSuffix) {
+		if strings.HasSuffix(pluginCommand, exampleSecretsCommandSuffix) {
 			example := generateSecretsExample(plugin)
 			fmt.Printf("%s", example)
 			return
 		}
 
-		if strings.HasSuffix(suffix, validateCommandSuffix) {
+		if strings.HasSuffix(pluginCommand, validateCommandSuffix) {
 			plugintest.PrintValidationReport(plugin)
 			return
 		}
 
-		if strings.HasSuffix(suffix, existsCommandSuffix) {
+		if strings.HasSuffix(pluginCommand, existsCommandSuffix) {
 			return
 		}
 	}
@@ -62,8 +58,12 @@ func main() {
 	}
 }
 
-func isPluginCommand(command string) bool {
-	return len(strings.Split(command, "/")) > 1
+func isPluginCommand(command string) (isPluginCommand bool, pluginName string, pluginCommand string) {
+	chunks := strings.Split(command, "/")
+	if len(chunks) < 2 {
+		return false, "", ""
+	}
+	return true, chunks[0], chunks[1]
 }
 
 func newPlugin() error {
