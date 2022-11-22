@@ -9,6 +9,9 @@ new-plugin:
 %/validate:
 	go run cmd/contrib/main.go $@
 
+validate:
+	go run cmd/contrib/main.go validate
+
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)
@@ -20,6 +23,3 @@ $(plugins_dir):
 
 test:
 	go test ./...
-
-validate:
-	go run cmd/contrib/main.go validate
