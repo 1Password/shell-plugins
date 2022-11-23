@@ -28,6 +28,7 @@ func TestImporter(t *testing.T, importer sdk.Importer, cases map[string]ImportCa
 			fsRoot := t.TempDir()
 			in := sdk.ImportInput{
 				HomeDir: filepath.Join(fsRoot, "~"),
+				RootDir: fsRoot,
 			}
 
 			for path, contents := range c.Files {

@@ -39,6 +39,7 @@ type ImportSource struct {
 
 type ImportInput struct {
 	HomeDir string
+	RootDir string
 }
 
 type ImportOutput struct {

@@ -29,7 +29,7 @@ func TestProvisioner(t *testing.T, provisioner sdk.Provisioner, cases map[string
 			in := sdk.ProvisionInput{
 				ItemFields: c.ItemFields,
 				HomeDir:    "~",
-				TempDir:    "tmp",
+				TempDir:    "/tmp",
 			}
 
 			out := sdk.ProvisionOutput{
