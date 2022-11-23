@@ -3,6 +3,7 @@ package mysql
 import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
+	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -19,11 +20,11 @@ func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
 	expectedFields := map[string]string{
-		"user":     "root",
-		"password": "123456",
-		"database": "test",
-		"port":     "3306",
-		"host":     "localhost",
+		fieldname.User:     "root",
+		fieldname.Password: "123456",
+		fieldname.Database: "test",
+		fieldname.Port:     "3306",
+		fieldname.Host:     "localhost",
 	}
 
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
@@ -48,11 +49,11 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, DatabaseCredentials().Provisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[string]string{
-				"user":     "user",
-				"password": "123456",
-				"database": "test",
-				"host":     "localhost",
-				"port":     "3306",
+				fieldname.User:     "user",
+				fieldname.Password: "123456",
+				fieldname.Database: "test",
+				fieldname.Host:     "localhost",
+				fieldname.Port:     "3306",
 			},
 			CommandLine: []string{"mysql"},
 			ExpectedOutput: sdk.ProvisionOutput{

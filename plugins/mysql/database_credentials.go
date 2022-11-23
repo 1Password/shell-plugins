@@ -56,23 +56,23 @@ func DatabaseCredentials() schema.CredentialType {
 func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
 	content := "[client]\n"
 
-	if user, ok := in.ItemFields["user"]; ok {
+	if user, ok := in.ItemFields[fieldname.User]; ok {
 		content += configFileEntry("user", user)
 	}
 
-	if password, ok := in.ItemFields["password"]; ok {
+	if password, ok := in.ItemFields[fieldname.Password]; ok {
 		content += configFileEntry("password", password)
 	}
 
-	if host, ok := in.ItemFields["host"]; ok {
+	if host, ok := in.ItemFields[fieldname.Host]; ok {
 		content += configFileEntry("host", host)
 	}
 
-	if port, ok := in.ItemFields["port"]; ok {
+	if port, ok := in.ItemFields[fieldname.Port]; ok {
 		content += configFileEntry("port", port)
 	}
 
-	if database, ok := in.ItemFields["database"]; ok {
+	if database, ok := in.ItemFields[fieldname.Database]; ok {
 		content += configFileEntry("database", database)
 	}
 
@@ -90,23 +90,23 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 		fields := make(map[string]string)
 		for _, section := range credentialsFile.Sections() {
 			if section.HasKey("user") && section.Key("user").Value() != "" {
-				fields["user"] = section.Key("user").Value()
+				fields[fieldname.User] = section.Key("user").Value()
 			}
 
 			if section.HasKey("password") && section.Key("password").Value() != "" {
-				fields["password"] = section.Key("password").Value()
+				fields[fieldname.Password] = section.Key("password").Value()
 			}
 
 			if section.HasKey("database") && section.Key("database").Value() != "" {
-				fields["database"] = section.Key("database").Value()
+				fields[fieldname.Database] = section.Key("database").Value()
 			}
 
 			if section.HasKey("host") && section.Key("host").Value() != "" {
-				fields["host"] = section.Key("host").Value()
+				fields[fieldname.Host] = section.Key("host").Value()
 			}
 
 			if section.HasKey("port") && section.Key("port").Value() != "" {
-				fields["port"] = section.Key("port").Value()
+				fields[fieldname.Port] = section.Key("port").Value()
 			}
 		}
 
