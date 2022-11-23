@@ -18,34 +18,36 @@ func PrintValidationReport(plugin schema.Plugin) {
 }
 
 func PrintValidateAllReport(plugins []schema.Plugin) {
-	reports := make(map[string][]schema.ValidationReport)
+	printer := &ValidationReportPrinter{
+		Format: PrintFormat{}.ValidationReportFormat(),
+	}
 
+	var shouldExitWithError bool
 	for _, p := range plugins {
-		errorReports := FilterErrorReports(p.DeepValidate())
-		reports[p.Name] = errorReports
-	}
-
-	printer := &ErrorReportPrinter{
-		Reports: reports,
-		Format:  PrintFormat{}.ValidationReportFormat(),
-	}
-	printer.Print()
-}
-
-func FilterErrorReports(reports []schema.ValidationReport) []schema.ValidationReport {
-	var errorReports []schema.ValidationReport
-
-	for _, report := range reports {
-		errReport := schema.ValidationReport{Heading: report.Heading, Checks: []schema.ValidationCheck{}}
-		for _, check := range report.Checks {
-			if !check.Assertion && check.Severity == schema.ValidationSeverityError {
-				errReport.Checks = append(errReport.Checks, check)
+		for _, report := range p.DeepValidate() {
+			if report.HasErrors() {
+				printer.Format.Heading.Printf("Plugin %s has errors:\n", p.Name)
+				FilterErrorChecks(report)
+				printer.Reports = []schema.ValidationReport{report}
+				printer.Print()
+				shouldExitWithError = true
 			}
 		}
-		errorReports = append(errorReports, errReport)
 	}
 
-	return errorReports
+	if shouldExitWithError {
+		os.Exit(1)
+	}
+}
+
+func FilterErrorChecks(report schema.ValidationReport) schema.ValidationReport {
+	for _, check := range report.Checks {
+		if !check.Assertion && check.Severity == schema.ValidationSeverityError {
+			report.Checks = append(report.Checks, check)
+		}
+	}
+
+	return report
 }
 
 type PrintFormat struct {
@@ -139,42 +141,4 @@ func (p *ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 	}
 
 	p.Format.Error.Printf("✘ %s\n", check.Description)
-}
-
-type ErrorReportPrinter struct {
-	Reports map[string][]schema.ValidationReport
-	Format  PrintFormat
-}
-
-func (printer *ErrorReportPrinter) Print() {
-	var shouldExitWithError bool
-	if printer.Reports == nil || len(printer.Reports) == 0 {
-		return
-	}
-
-	for pluginName, reports := range printer.Reports {
-		for _, report := range reports {
-			if report.HasErrors() {
-				shouldExitWithError = true
-				printer.Format.Heading.Printf("Plugin %s has errors:\n", pluginName)
-				printer.printHeading(report.Heading)
-				printer.printChecks(report.Checks)
-			}
-		}
-	}
-
-	if shouldExitWithError {
-		os.Exit(1)
-	}
-}
-
-func (printer *ErrorReportPrinter) printHeading(heading string) {
-	printer.Format.Heading.Printf("# %s\n\n", heading)
-}
-
-func (printer *ErrorReportPrinter) printChecks(checks []schema.ValidationCheck) {
-	for _, c := range checks {
-		printer.Format.Error.Printf("✘ %s\n", c.Description)
-	}
-	fmt.Println()
 }
