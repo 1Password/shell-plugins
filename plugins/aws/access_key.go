@@ -27,6 +27,7 @@ func AccessKey() schema.CredentialType {
 				MarkdownDescription: "The ID of the access key used to authenticate to AWS.",
 				Composition: &schema.ValueComposition{
 					Length: 20,
+					Prefix: "AKIA",
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
