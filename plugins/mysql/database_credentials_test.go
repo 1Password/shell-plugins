@@ -49,7 +49,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, DatabaseCredentials().Provisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[string]string{
-				fieldname.User:     "user",
+				fieldname.User:     "root",
 				fieldname.Password: "123456",
 				fieldname.Database: "test",
 				fieldname.Host:     "localhost",
@@ -60,7 +60,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				CommandLine: []string{"mysql", "--defaults-file", "/tmp/my.cnf"},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/my.cnf": {
-						Contents: []byte("[client]\nuser=user\npassword=123456\nhost=localhost\nport=3306\ndatabase=test\n"),
+						Contents: []byte(plugintest.LoadFixture(t, "mysql.cnf")),
 					},
 				},
 			},
