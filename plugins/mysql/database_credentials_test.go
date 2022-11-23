@@ -8,16 +8,6 @@ import (
 	"testing"
 )
 
-func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
-	p := sdk.ProvisionInput{
-		ItemFields: map[string]string{},
-	}
-	_, err := mysqlConfig(p)
-	if err != nil {
-		assert.Fail(t, "should not throw error if no ItemFields")
-	}
-}
-
 func TestDatabaseCredentialsImporter(t *testing.T) {
 	expectedFields := map[string]string{
 		fieldname.User:     "root",
@@ -28,7 +18,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 	}
 
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
-		"config file ~/.mysql.cnf": {
+		"MySQL config file": {
 			Files: map[string]string{
 				"/etc/my.cnf":       plugintest.LoadFixture(t, "mysql.cnf"),
 				"/etc/mysql/my.cnf": plugintest.LoadFixture(t, "mysql.cnf"),
@@ -66,4 +56,14 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
+	p := sdk.ProvisionInput{
+		ItemFields: map[string]string{},
+	}
+	_, err := mysqlConfig(p)
+	if err != nil {
+		assert.Fail(t, "should not throw error if no ItemFields")
+	}
 }
