@@ -47,8 +47,17 @@ func main() {
 	}
 
 	if command == validateCommandSuffix {
-		pluginsList := plugins.List()
-		plugintest.PrintValidateAllReport(pluginsList)
+		var shouldExitWithError bool
+		for _, plugin := range plugins.List() {
+			isReportPrinted := plugintest.PrintErrorsReport(plugin)
+			if isReportPrinted {
+				shouldExitWithError = true
+			}
+		}
+
+		if shouldExitWithError {
+			os.Exit(1)
+		}
 		return
 	}
 

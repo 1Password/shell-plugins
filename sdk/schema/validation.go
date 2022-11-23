@@ -37,6 +37,18 @@ func (vr *ValidationReport) HasErrors() bool {
 	return false
 }
 
+func (vr *ValidationReport) FilterErrorChecks() {
+	var errorChecks []ValidationCheck
+
+	for _, check := range vr.Checks {
+		if !check.Assertion && check.Severity == ValidationSeverityError {
+			errorChecks = append(errorChecks, check)
+		}
+	}
+
+	vr.Checks = errorChecks
+}
+
 type ValidationCheck struct {
 	// Description explains what we want to validate
 	Description string

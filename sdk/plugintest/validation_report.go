@@ -2,52 +2,31 @@ package plugintest
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"os"
-
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/fatih/color"
 )
 
+var printer = &ValidationReportPrinter{
+	Format: PrintFormat{}.ValidationReportFormat(),
+}
+
 func PrintValidationReport(plugin schema.Plugin) {
-	reports := plugin.DeepValidate()
-	printer := &ValidationReportPrinter{
-		Reports: reports,
-		Format:  PrintFormat{}.ValidationReportFormat(),
-	}
+	printer.Reports = plugin.DeepValidate()
 	printer.Print()
 }
 
-func PrintValidateAllReport(plugins []schema.Plugin) {
-	printer := &ValidationReportPrinter{
-		Format: PrintFormat{}.ValidationReportFormat(),
-	}
-
-	var shouldExitWithError bool
-	for _, p := range plugins {
-		for _, report := range p.DeepValidate() {
-			if report.HasErrors() {
-				printer.Format.Heading.Printf("Plugin %s has errors:\n", p.Name)
-				FilterErrorChecks(report)
-				printer.Reports = []schema.ValidationReport{report}
-				printer.Print()
-				shouldExitWithError = true
-			}
+func PrintErrorsReport(plugin schema.Plugin) (printedErrors bool) {
+	for _, report := range plugin.DeepValidate() {
+		if report.HasErrors() {
+			printer.Format.Heading.Printf("Plugin %s has errors:\n", plugin.Name)
+			report.FilterErrorChecks()
+			printer.Reports = []schema.ValidationReport{report}
+			printer.Print()
+			printedErrors = true
 		}
 	}
 
-	if shouldExitWithError {
-		os.Exit(1)
-	}
-}
-
-func FilterErrorChecks(report schema.ValidationReport) schema.ValidationReport {
-	for _, check := range report.Checks {
-		if !check.Assertion && check.Severity == schema.ValidationSeverityError {
-			report.Checks = append(report.Checks, check)
-		}
-	}
-
-	return report
+	return printedErrors
 }
 
 type PrintFormat struct {
