@@ -6,16 +6,17 @@ import (
 	"github.com/fatih/color"
 )
 
-var printer = &ValidationReportPrinter{
-	Format: PrintFormat{}.ValidationReportFormat(),
-}
-
 func PrintValidationReport(plugin schema.Plugin) {
-	printer.Reports = plugin.DeepValidate()
+	reports := plugin.DeepValidate()
+	printer := &ValidationReportPrinter{
+		Reports: reports,
+		Format:  PrintFormat{}.ValidationReportFormat(),
+	}
 	printer.Print()
 }
 
 func PrintReportIfErrors(plugin schema.Plugin) (hasErrors bool) {
+	printer := &ValidationReportPrinter{Format: PrintFormat{}.ValidationReportFormat()}
 	pluginReports := plugin.DeepValidate()
 	for _, report := range pluginReports {
 		if report.HasErrors() {
