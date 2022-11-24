@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"gopkg.in/ini.v1"
 	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -102,9 +103,12 @@ func TryCredentialsFile() sdk.Importer {
 		}
 
 		// Read config file ~/.aws/config
+		var configFile *ini.File
 		configPath := in.FromHomeDir(".aws", "config")
 		configContent, _ := os.ReadFile(configPath)
-		configFile, _ := importer.FileContents(configContent).ToINI()
+		if configContent != nil {
+			configFile, _ = importer.FileContents(configContent).ToINI()
+		}
 
 		for _, section := range credentialsFile.Sections() {
 			profileName := section.Name()
