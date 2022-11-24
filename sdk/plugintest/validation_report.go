@@ -16,11 +16,13 @@ func PrintValidationReport(plugin schema.Plugin) {
 }
 
 func PrintReportIfErrors(plugin schema.Plugin) (hasErrors bool) {
-	printer := &ValidationReportPrinter{Format: PrintFormat{}.ValidationReportFormat()}
 	pluginReports := plugin.DeepValidate()
 	for _, report := range pluginReports {
 		if report.HasErrors() {
-			printer.Reports = pluginReports
+			printer := &ValidationReportPrinter{
+				Format:  PrintFormat{}.ValidationReportFormat(),
+				Reports: pluginReports,
+			}
 			printer.Print()
 			return true
 		}
