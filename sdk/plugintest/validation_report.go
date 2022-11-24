@@ -15,18 +15,21 @@ func PrintValidationReport(plugin schema.Plugin) {
 	printer.Print()
 }
 
-func PrintErrorsReport(plugin schema.Plugin) (printedErrors bool) {
-	for _, report := range plugin.DeepValidate() {
+func PrintReportIfErrors(plugin schema.Plugin) (shouldPrintReport bool) {
+	pluginReports := plugin.DeepValidate()
+	for _, report := range pluginReports {
 		if report.HasErrors() {
-			printer.Format.Heading.Printf("Plugin %s has errors:\n", plugin.Name)
-			report.FilterErrorChecks()
-			printer.Reports = []schema.ValidationReport{report}
-			printer.Print()
-			printedErrors = true
+			shouldPrintReport = true
+			break
 		}
 	}
 
-	return printedErrors
+	if shouldPrintReport {
+		printer.Reports = pluginReports
+		printer.Print()
+	}
+
+	return shouldPrintReport
 }
 
 type PrintFormat struct {
