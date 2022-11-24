@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -100,7 +101,13 @@ func TryCredentialsFile() sdk.Importer {
 			return
 		}
 
+		// Read config file ~/.aws/config
+		configPath := in.FromHomeDir(".aws", "config")
+		configContent, _ := os.ReadFile(configPath)
+		configFile, _ := importer.FileContents(configContent).ToINI()
+
 		for _, section := range credentialsFile.Sections() {
+			profileName := section.Name()
 			fields := make(map[string]string)
 			if section.HasKey("aws_access_key_id") && section.Key("aws_access_key_id").Value() != "" {
 				fields[fieldname.AccessKeyID] = section.Key("aws_access_key_id").Value()
@@ -110,10 +117,21 @@ func TryCredentialsFile() sdk.Importer {
 				fields[fieldname.SecretAccessKey] = section.Key("aws_secret_access_key").Value()
 			}
 
+			// read profile configuration from config file
+			if configFile != nil {
+				configSection := getConfigSectionByProfile(configFile, profileName)
+				if configSection != nil {
+					if configSection.HasKey("region") && configSection.Key("region").Value() != "" {
+						fields[FieldNameDefaultRegion] = configSection.Key("region").Value()
+					}
+				}
+			}
+
+			// add only candidates with required credential fields
 			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields:   fields,
-					NameHint: section.Name(),
+					NameHint: profileName,
 				})
 			}
 		}

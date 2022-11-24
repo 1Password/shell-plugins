@@ -12,6 +12,7 @@ func TestAccessKeyImporter(t *testing.T) {
 		"AWS CLI credentials file": {
 			Files: map[string]string{
 				"~/.aws/credentials": plugintest.LoadFixture(t, "credentials"),
+				"~/.aws/config":      plugintest.LoadFixture(t, "config"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
@@ -19,6 +20,7 @@ func TestAccessKeyImporter(t *testing.T) {
 					Fields: map[string]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+						FieldNameDefaultRegion:    "eu-central-1",
 					},
 				},
 				{
@@ -26,6 +28,7 @@ func TestAccessKeyImporter(t *testing.T) {
 					Fields: map[string]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+						FieldNameDefaultRegion:    "us-east-1",
 					},
 				},
 			},
