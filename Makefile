@@ -13,8 +13,8 @@ registry:
 %/validate: registry
 	go run cmd/contrib/main.go $@
 
-validate:
-	go run cmd/contrib/main.go validate
+validate: registry
+	go run cmd/contrib/main.go $@
 
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
