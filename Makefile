@@ -13,6 +13,9 @@ registry:
 %/validate: registry
 	go run cmd/contrib/main.go $@
 
+validate:
+	go run cmd/contrib/main.go validate
+
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)

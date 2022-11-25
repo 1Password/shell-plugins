@@ -1,6 +1,8 @@
 package okta
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -49,6 +51,40 @@ var defaultEnvVarMapping = map[string]string{
 const FieldNameOrgURL = "Org URL"
 
 func TryOktaConfigFile() sdk.Importer {
-	// TODO: Try importing from ~/.okta/okta.yaml
-	return importer.NoOp()
+	return importer.TryFile("~/.okta/okta.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToYAML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		fields := make(map[string]string)
+
+		if token := config.Okta.Client.Token; token != "" {
+			fields[fieldname.Token] = token
+		}
+
+		if orgURL := config.Okta.Client.OrgURL; orgURL != "" {
+			fields[FieldNameOrgURL] = orgURL
+		}
+
+		if len(fields) > 0 {
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields: fields,
+			})
+		}
+	})
+}
+
+type Config struct {
+	Okta OktaConfig `yaml:"okta"`
+}
+
+type OktaConfig struct {
+	Client ClientConfig `yaml:"client"`
+}
+
+type ClientConfig struct {
+	OrgURL string `yaml:"orgUrl"`
+	Token  string `yaml:"token"`
 }

@@ -27,6 +27,7 @@ func AccessKey() schema.CredentialType {
 				MarkdownDescription: "The ID of the access key used to authenticate to AWS.",
 				Composition: &schema.ValueComposition{
 					Length: 20,
+					Prefix: "AKIA",
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
@@ -118,22 +119,13 @@ func TryCredentialsFile() sdk.Importer {
 				continue
 			}
 
-			fields := []sdk.ImportCandidateField{
-				{
-					Field: fieldname.AccessKeyID,
-					Value: cfg.Credentials.AccessKeyID,
-				},
-				{
-					Field: fieldname.SecretAccessKey,
-					Value: cfg.Credentials.SecretAccessKey,
-				},
+			fields := map[string]string{
+				fieldname.AccessKeyID:     cfg.Credentials.AccessKeyID,
+				fieldname.SecretAccessKey: cfg.Credentials.SecretAccessKey,
 			}
 
 			if cfg.Region != "" {
-				fields = append(fields, sdk.ImportCandidateField{
-					Field: FieldNameDefaultRegion,
-					Value: cfg.Region,
-				})
+				fields[FieldNameDefaultRegion] = cfg.Region
 			}
 
 			out.AddCandidate(sdk.ImportCandidate{

@@ -2,9 +2,8 @@ package plugintest
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/fatih/color"
 )
 
 func PrintValidationReport(plugin schema.Plugin) {
@@ -14,6 +13,22 @@ func PrintValidationReport(plugin schema.Plugin) {
 		Format:  PrintFormat{}.ValidationReportFormat(),
 	}
 	printer.Print()
+}
+
+func PrintReportIfErrors(plugin schema.Plugin) (hasErrors bool) {
+	pluginReports := plugin.DeepValidate()
+	for _, report := range pluginReports {
+		if report.HasErrors() {
+			printer := &ValidationReportPrinter{
+				Format:  PrintFormat{}.ValidationReportFormat(),
+				Reports: pluginReports,
+			}
+			printer.Print()
+			return true
+		}
+	}
+
+	return false
 }
 
 type PrintFormat struct {

@@ -22,27 +22,41 @@ const validateCommandSuffix = "validate"
 const existsCommandSuffix = "exists"
 
 func main() {
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], exampleSecretsCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
-		printExampleSecrets(pluginName)
-		return
-	}
-
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], validateCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
+	command := os.Args[1]
+	isPlugin, pluginName, pluginCommand := isPluginCommand(command)
+	if isPlugin {
 		plugin, err := plugins.Get(pluginName)
 		if err != nil {
 			log.Fatal(err)
 		}
-		plugintest.PrintValidationReport(plugin)
-		return
+
+		if strings.HasSuffix(pluginCommand, exampleSecretsCommandSuffix) {
+			example := generateSecretsExample(plugin)
+			fmt.Printf("%s", example)
+			return
+		}
+
+		if strings.HasSuffix(pluginCommand, validateCommandSuffix) {
+			plugintest.PrintValidationReport(plugin)
+			return
+		}
+
+		if strings.HasSuffix(pluginCommand, existsCommandSuffix) {
+			return
+		}
 	}
 
-	if len(os.Args) == 2 && strings.HasSuffix(os.Args[1], existsCommandSuffix) {
-		pluginName := strings.Split(os.Args[1], "/")[0]
-		_, err := plugins.Get(pluginName)
-		if err != nil {
-			log.Fatal(err)
+	if command == validateCommandSuffix {
+		var shouldExitWithError bool
+		for _, plugin := range plugins.List() {
+			isReportPrinted := plugintest.PrintReportIfErrors(plugin)
+			if isReportPrinted {
+				shouldExitWithError = true
+			}
+		}
+
+		if shouldExitWithError {
+			os.Exit(1)
 		}
 		return
 	}
@@ -60,6 +74,14 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
+
+func isPluginCommand(command string) (isPluginCommand bool, pluginName string, pluginCommand string) {
+	chunks := strings.Split(command, "/")
+	if len(chunks) < 2 {
+		return false, "", ""
+	}
+	return true, chunks[0], chunks[1]
 }
 
 func newPlugin() error {
@@ -395,16 +417,6 @@ func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 	}
 }
 `,
-}
-
-func printExampleSecrets(pluginName string) {
-	plugin, err := plugins.Get(pluginName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	example := generateSecretsExample(plugin)
-	fmt.Printf("%s", example)
 }
 
 func generateSecretsExample(plugin schema.Plugin) string {
