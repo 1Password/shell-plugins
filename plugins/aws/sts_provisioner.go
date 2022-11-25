@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
+	"github.com/aws/aws-sdk-go-v2/service/sts/types"
 )
 
 type STSProvisioner struct {
@@ -18,8 +19,22 @@ type STSProvisioner struct {
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	var cached types.Credentials
+	if ok := in.Cache.Get("sts", &cached); ok {
+		out.AddEnvVar("AWS_ACCESS_KEY_ID", *cached.AccessKeyId)
+		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *cached.SecretAccessKey)
+		out.AddEnvVar("AWS_SESSION_TOKEN", *cached.SessionToken)
+
+		if region, ok := in.ItemFields[FieldNameDefaultRegion]; ok {
+			out.AddEnvVar("AWS_DEFAULT_REGION", region)
+		}
+
+		return
+	}
+
 	config := aws.NewConfig()
 	config.Credentials = credentials.NewStaticCredentialsProvider(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], "")
+
 	region, ok := in.ItemFields[FieldNameDefaultRegion]
 	if !ok {
 		region = os.Getenv("AWS_DEFAULT_REGION")
@@ -42,13 +57,13 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		out.AddError(err)
 		return
 	}
+
 	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
 	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.SecretAccessKey)
 	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
-	if region, ok := in.ItemFields[FieldNameDefaultRegion]; ok {
-		out.AddEnvVar("AWS_DEFAULT_REGION", region)
-	}
+	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
+	out.Cache.Put("sts", *result.Credentials, *result.Credentials.Expiration)
 }
 
 func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
@@ -56,5 +71,5 @@ func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 }
 
 func (p STSProvisioner) Description() string {
-	return "Provision environment variables with the temporary credentials AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_ID"
+	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
