@@ -61,6 +61,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
 	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.SecretAccessKey)
 	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
+	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
 	out.Cache.Put("sts", *result.Credentials, *result.Credentials.Expiration)
 }
