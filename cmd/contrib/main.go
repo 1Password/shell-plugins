@@ -61,18 +61,20 @@ func main() {
 		return
 	}
 
-	if len(os.Args) == 2 && os.Args[1] == "registry" {
+	if command == "registry" {
 		err := generatePluginRegistry()
 		if err != nil {
 			log.Fatal(err)
 		}
+		return
 	}
 
-	if len(os.Args) == 2 && os.Args[1] == "new-plugin" {
+	if command == "new-plugin" {
 		err := newPlugin()
 		if err != nil {
 			log.Fatal(err)
 		}
+		return
 	}
 }
 
