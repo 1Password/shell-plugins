@@ -13,7 +13,7 @@ import (
 
 const (
 	FieldNameDefaultRegion = "Default Region"
-	FieldNameSerialNumber  = "MFA Serial"
+	FieldNameMFASerial     = "MFA Serial"
 )
 
 func AccessKey() schema.CredentialType {
@@ -57,7 +57,7 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                FieldNameSerialNumber,
+				Name:                FieldNameMFASerial,
 				MarkdownDescription: "The identification number of the MFA device that is associated with the user who is making the GetSessionToken call, usually an Amazon Resource Name (ARN) for a virtual device (such as arn:aws:iam::123456789012:mfa/user).",
 				Optional:            true,
 			},
