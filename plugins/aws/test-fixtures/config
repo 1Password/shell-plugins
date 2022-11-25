@@ -1,0 +1,7 @@
+[default]
+region = eu-central-1
+output = None
+
+[profile user1]
+region = us-east-1
+output = None

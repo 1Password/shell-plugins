@@ -2,13 +2,14 @@ package aws
 
 import (
 	"context"
+	"gopkg.in/ini.v1"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"github.com/aws/aws-sdk-go-v2/config"
 )
 
 const (
@@ -101,37 +102,42 @@ func TryCredentialsFile() sdk.Importer {
 			return
 		}
 
-		var profiles []string
-		for _, v := range credentialsFile.Sections() {
-			if len(v.Keys()) != 0 {
-				profiles = append(profiles, v.Name())
-			}
+		// Read config file ~/.aws/config
+		var configFile *ini.File
+		configPath := in.FromHomeDir(".aws", "config")
+		configContent, _ := os.ReadFile(configPath)
+		if configContent != nil {
+			configFile, _ = importer.FileContents(configContent).ToINI()
 		}
 
-		for _, profile := range profiles {
-			cfg, err := config.LoadSharedConfigProfile(ctx, profile)
-			if err != nil {
-				out.AddError(err)
-				return
+		for _, section := range credentialsFile.Sections() {
+			profileName := section.Name()
+			fields := make(map[string]string)
+			if section.HasKey("aws_access_key_id") && section.Key("aws_access_key_id").Value() != "" {
+				fields[fieldname.AccessKeyID] = section.Key("aws_access_key_id").Value()
 			}
 
-			if cfg.Credentials.AccessKeyID == "" || cfg.Credentials.SecretAccessKey == "" {
-				continue
+			if section.HasKey("aws_secret_access_key") && section.Key("aws_secret_access_key").Value() != "" {
+				fields[fieldname.SecretAccessKey] = section.Key("aws_secret_access_key").Value()
 			}
 
-			fields := map[string]string{
-				fieldname.AccessKeyID:     cfg.Credentials.AccessKeyID,
-				fieldname.SecretAccessKey: cfg.Credentials.SecretAccessKey,
+			// read profile configuration from config file
+			if configFile != nil {
+				configSection := getConfigSectionByProfile(configFile, profileName)
+				if configSection != nil {
+					if configSection.HasKey("region") && configSection.Key("region").Value() != "" {
+						fields[FieldNameDefaultRegion] = configSection.Key("region").Value()
+					}
+				}
 			}
 
-			if cfg.Region != "" {
-				fields[FieldNameDefaultRegion] = cfg.Region
+			// add only candidates with required credential fields
+			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields:   fields,
+					NameHint: profileName,
+				})
 			}
-
-			out.AddCandidate(sdk.ImportCandidate{
-				Fields:   fields,
-				NameHint: profile,
-			})
 		}
 	})
 }
