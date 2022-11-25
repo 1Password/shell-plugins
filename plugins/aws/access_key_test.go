@@ -33,5 +33,90 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 			},
 		},
+		"default env vars": {
+			Environment: map[string]string{
+				"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+				"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				"AWS_DEFAULT_REGION":    "us-central-1",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+						FieldNameDefaultRegion:    "us-central-1",
+					},
+				},
+				{
+					Fields: map[string]string{
+						FieldNameDefaultRegion: "us-central-1",
+					},
+				},
+				{
+					Fields: map[string]string{
+						FieldNameDefaultRegion: "us-central-1",
+					},
+				},
+				{
+					Fields: map[string]string{
+						FieldNameDefaultRegion: "us-central-1",
+					},
+				},
+			},
+		},
+		"env vars with AMAZON_ prefix": {
+			Environment: map[string]string{
+				"AMAZON_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+				"AMAZON_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					},
+				},
+			},
+		},
+		"env vars with AWS_ prefix (not official)": {
+			Environment: map[string]string{
+				"AWS_ACCESS_KEY":    "AKIAHPIZFMD5EEXAMPLE",
+				"AWS_SECRET_KEY":    "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				"AWS_ACCESS_SECRET": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					},
+				},
+				{
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					},
+				},
+			},
+		},
+	})
+}
+
+func TestAccessKeyProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, AccessKey().Provisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[string]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				FieldNameDefaultRegion:    "us-central-1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
 	})
 }
