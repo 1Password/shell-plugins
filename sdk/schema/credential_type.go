@@ -27,6 +27,7 @@ type CredentialType struct {
 	// The provisioner to use provision and deprovision this credential to an exectuble.
 	Provisioner sdk.Provisioner
 
+	// The keys used for locally caching encrypted values
 	CacheKeys []string
 }
 
