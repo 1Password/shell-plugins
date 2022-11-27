@@ -26,6 +26,8 @@ type CredentialType struct {
 
 	// The provisioner to use provision and deprovision this credential to an exectuble.
 	Provisioner sdk.Provisioner
+
+	CacheKeys []string
 }
 
 // CredentialField provides the schema of a single field on a credential type.
