@@ -1,16 +1,20 @@
 plugins_dir := ~/.op/plugins/local
 
 new-plugin:
-	go run cmd/contrib/main.go plugin
-
-%/example-secrets:
 	go run cmd/contrib/main.go $@
 
-%/validate:
+registry:
+	@rm -f plugins/plugins.go
 	go run cmd/contrib/main.go $@
 
-validate:
-	go run cmd/contrib/main.go validate
+%/example-secrets: registry
+	go run cmd/contrib/main.go $@
+
+%/validate: registry
+	go run cmd/contrib/main.go $@
+
+validate: registry
+	go run cmd/contrib/main.go $@
 
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
