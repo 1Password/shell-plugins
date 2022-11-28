@@ -11,7 +11,6 @@ func New() schema.Plugin {
 		Platform: schema.PlatformInfo{
 			Name:     "Example",
 			Homepage: sdk.URL("https://example.com"),
-			Logo:     sdk.URL("https://example.com/static/logo.svg"),
 		},
 		Credentials: []schema.CredentialType{
 			APIToken(),
