@@ -3,7 +3,6 @@ package schema
 import (
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 // Plugin provides the schema for a single shell plugin. A plugin focuses on a single platform
@@ -29,9 +28,6 @@ type PlatformInfo struct {
 
 	// The full URL of the homepage of the platform.
 	Homepage *url.URL
-
-	// (Optional) The full URL to the logo of the platform, in SVG or PNG format.
-	Logo *url.URL
 }
 
 func (p Plugin) Validate() (bool, ValidationReport) {
@@ -71,12 +67,6 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has platform logo in SVG or PNG format",
-		Assertion:   checkPlatformLogoFormat(p),
-		Severity:    ValidationSeverityWarning,
-	})
-
-	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type or executable defined",
 		Assertion:   len(p.Credentials) > 0 && len(p.Executables) > 0,
 		Severity:    ValidationSeverityError,
@@ -108,17 +98,4 @@ func (p Plugin) DeepValidate() []ValidationReport {
 	}
 
 	return reports
-}
-
-func checkPlatformLogoFormat(p Plugin) bool {
-	if p.Platform.Logo == nil {
-		return false
-	}
-
-	logoUrl := p.Platform.Logo.String()
-	if strings.HasSuffix(logoUrl, ".png") || strings.HasSuffix(logoUrl, ".svg") {
-		return true
-	}
-
-	return false
 }

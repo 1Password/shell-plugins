@@ -13,7 +13,7 @@ import (
 
 const (
 	FieldNameDefaultRegion = "Default Region"
-	FieldNameSerialNumber  = "MFA Serial"
+	FieldNameMFASerial     = "MFA Serial"
 )
 
 func AccessKey() schema.CredentialType {
@@ -27,6 +27,7 @@ func AccessKey() schema.CredentialType {
 				MarkdownDescription: "The ID of the access key used to authenticate to AWS.",
 				Composition: &schema.ValueComposition{
 					Length: 20,
+					Prefix: "AKIA",
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
@@ -57,8 +58,8 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                FieldNameSerialNumber,
-				MarkdownDescription: "The identification number of the MFA device that is associated with the user who is making the GetSessionToken call, usually an Amazon Resource Name (ARN) for a virtual device (such as arn:aws:iam::123456789012:mfa/user).",
+				Name:                FieldNameMFASerial,
+				MarkdownDescription: "ARN of the MFA serial number to use to generate temporary STS credentials if the item contains a TOTP setup.",
 				Optional:            true,
 			},
 		},

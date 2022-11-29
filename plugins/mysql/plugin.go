@@ -1,4 +1,4 @@
-package example
+package mysql
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,16 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "example",
+		Name: "mysql",
 		Platform: schema.PlatformInfo{
-			Name:     "Example",
-			Homepage: sdk.URL("https://example.com"),
+			Name:     "MySQL",
+			Homepage: sdk.URL("https://mysql.com"),
 		},
 		Credentials: []schema.CredentialType{
-			APIToken(),
+			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
-			ExampleCLI(),
+			Mysql(),
 		},
 	}
 }
