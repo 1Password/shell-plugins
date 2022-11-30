@@ -1,11 +1,12 @@
 package mysql
 
 import (
+	"testing"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
@@ -36,7 +37,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 }
 
 func TestDatabaseCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, DatabaseCredentials().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[string]string{
 				fieldname.User:     "root",

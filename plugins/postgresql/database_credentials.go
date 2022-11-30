@@ -38,8 +38,8 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer:    importer.TryEnvVarPair(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }
 

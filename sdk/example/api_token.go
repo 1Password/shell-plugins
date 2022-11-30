@@ -40,7 +40,7 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[string]string{
 			fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
 			fieldname.Token:     "EXAMPLE_API_TOKEN",
 		}),

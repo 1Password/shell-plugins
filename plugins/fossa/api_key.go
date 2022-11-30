@@ -28,7 +28,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer:    importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }

@@ -4,16 +4,19 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func GitHubCLI() schema.Executable {
 	return schema.Executable{
-		Runs:    []string{"gh"},
-		Name:    "GitHub CLI",
-		DocsURL: sdk.URL("https://cli.github.com"),
-		Credentials: []schema.CredentialType{
-			PersonalAccessToken(),
-		},
+		Name:      "GitHub CLI",
+		Runs:      []string{"gh"},
+		DocsURL:   sdk.URL("https://cli.github.com"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Uses: []schema.CredentialUsage{
+			{
+				Name: credname.PersonalAccessToken,
+			},
+		},
 	}
 }

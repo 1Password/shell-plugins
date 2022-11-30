@@ -40,7 +40,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryDogrcFile(),

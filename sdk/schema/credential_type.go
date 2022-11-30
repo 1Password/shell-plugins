@@ -24,8 +24,8 @@ type CredentialType struct {
 	// (Optional) A function to scan the system for occurences of this credential type.
 	Importer sdk.Importer
 
-	// The provisioner to use provision and deprovision this credential to an exectuble.
-	Provisioner sdk.Provisioner
+	// The default provisioner to use for this credential if the executable doesn't override it.
+	DefaultProvisioner sdk.Provisioner
 }
 
 // CredentialField provides the schema of a single field on a credential type.
@@ -171,7 +171,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a provisioner set",
-		Assertion:   c.Provisioner != nil,
+		Assertion:   c.DefaultProvisioner != nil,
 		Severity:    ValidationSeverityError,
 	})
 

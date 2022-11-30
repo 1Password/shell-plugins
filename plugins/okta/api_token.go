@@ -35,7 +35,7 @@ func APIToken() schema.CredentialType {
 				MarkdownDescription: "URL of the Okta organization to authenticate to.",
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryOktaConfigFile(),

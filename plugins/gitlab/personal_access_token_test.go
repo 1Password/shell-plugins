@@ -53,7 +53,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 }
 
 func TestPersonalAccessTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, PersonalAccessToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[string]string{
 				fieldname.Token: "glpat-sJy3L26ZNW7A3EXAMPLE",
