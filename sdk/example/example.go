@@ -9,8 +9,8 @@ import (
 
 func ExampleCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"example"},
 		Name:      "Example CLI",
+		Runs:      []string{"example"},
 		DocsURL:   sdk.URL("http://example.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

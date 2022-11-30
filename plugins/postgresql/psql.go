@@ -9,8 +9,8 @@ import (
 
 func Psql() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"psql"},
 		Name:      "psql",
+		Runs:      []string{"psql"},
 		DocsURL:   sdk.URL("https://www.postgresql.org/docs/current/app-psql.html"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

@@ -9,8 +9,8 @@ import (
 
 func StripeCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"stripe"},
 		Name:      "Stripe CLI",
+		Runs:      []string{"stripe"},
 		DocsURL:   sdk.URL("https://stripe.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

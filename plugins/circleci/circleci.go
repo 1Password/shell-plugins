@@ -9,8 +9,8 @@ import (
 
 func CircleCICLI() schema.Executable {
 	return schema.Executable{
-		Runs:    []string{"circleci"},
 		Name:    "CircleCI CLI",
+		Runs:    []string{"circleci"},
 		DocsURL: sdk.URL("https://circleci.com/docs/local-cli/"),
 		NeedsAuth: needsauth.For(
 			needsauth.NotForHelpOrVersion(),

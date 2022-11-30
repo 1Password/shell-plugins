@@ -9,8 +9,8 @@ import (
 
 func SnykCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"snyk"},
 		Name:      "Snyk CLI",
+		Runs:      []string{"snyk"},
 		DocsURL:   sdk.URL("https://docs.snyk.io/snyk-cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

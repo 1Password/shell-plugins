@@ -9,8 +9,8 @@ import (
 
 func VaultCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"vault"},
 		Name:      "Vault CLI",
+		Runs:      []string{"vault"},
 		DocsURL:   sdk.URL("https://developer.hashicorp.com/vault/docs/commands"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

@@ -9,14 +9,14 @@ import (
 
 func OktaCLI() schema.Executable {
 	return schema.Executable{
-		Runs:    []string{"okta"},
-		Name:    "Okta CLI",
-		DocsURL: sdk.URL("https://cli.okta.com"),
+		Name:      "Okta CLI",
+		Runs:      []string{"okta"},
+		DocsURL:   sdk.URL("https://cli.okta.com"),
+		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIToken,
 			},
 		},
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
 	}
 }

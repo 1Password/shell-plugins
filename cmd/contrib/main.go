@@ -408,8 +408,8 @@ import (
 
 func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"{{ .Executable }}"},
 		Name:      "{{ .PlatformName }} CLI", // TODO: Check if this is correct
+		Runs:      []string{"{{ .Executable }}"},
 		DocsURL:   sdk.URL("https://{{ .Name }}.com/docs/cli"), // TODO: Replace with actual URL
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		{{- if .CredentialName }}

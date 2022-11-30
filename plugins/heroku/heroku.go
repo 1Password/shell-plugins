@@ -9,8 +9,8 @@ import (
 
 func HerokuCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"heroku"},
 		Name:      "Heroku CLI",
+		Runs:      []string{"heroku"},
 		DocsURL:   sdk.URL("https://devcenter.heroku.com/articles/heroku-cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

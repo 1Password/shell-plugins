@@ -9,12 +9,14 @@ import (
 
 func FOSSACLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"fossa"},
 		Name:      "FOSSA CLI",
+		Runs:      []string{"fossa"},
 		DocsURL:   sdk.URL("https://github.com/fossas/fossa-cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Uses: []schema.CredentialUsage{{
-			Name: credname.APIKey,
-		}},
+		Uses: []schema.CredentialUsage{
+			{
+				Name: credname.APIKey,
+			},
+		},
 	}
 }

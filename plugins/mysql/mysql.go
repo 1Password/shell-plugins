@@ -9,12 +9,14 @@ import (
 
 func Mysql() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"mysql"},
 		Name:      "mysql",
+		Runs:      []string{"mysql"},
 		DocsURL:   sdk.URL("https://dev.mysql.com/doc/refman/en/mysql.html"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Uses: []schema.CredentialUsage{{
-			Name: credname.DatabaseCredentials,
-		}},
+		Uses: []schema.CredentialUsage{
+			{
+				Name: credname.DatabaseCredentials,
+			},
+		},
 	}
 }

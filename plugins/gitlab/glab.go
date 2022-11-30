@@ -9,8 +9,8 @@ import (
 
 func GitLabCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"glab"},
 		Name:      "GitLab CLI",
+		Runs:      []string{"glab"},
 		DocsURL:   sdk.URL("https://glab.readthedocs.io"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

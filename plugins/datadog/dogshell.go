@@ -9,8 +9,8 @@ import (
 
 func Dogshell() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"dog"},
 		Name:      "Dogshell",
+		Runs:      []string{"dog"},
 		DocsURL:   sdk.URL("https://docs.datadoghq.com/developers/guide/dogshell-quickly-use-datadog-s-api-from-terminal-shell/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

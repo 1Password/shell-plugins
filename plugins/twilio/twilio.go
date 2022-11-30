@@ -9,8 +9,8 @@ import (
 
 func TwilioCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"twilio"},
 		Name:      "Twilio CLI",
+		Runs:      []string{"twilio"},
 		DocsURL:   sdk.URL("https://twilio.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{

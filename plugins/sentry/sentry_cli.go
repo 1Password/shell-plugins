@@ -9,8 +9,8 @@ import (
 
 func SentryCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"sentry-cli"},
 		Name:      "Sentry CLI",
+		Runs:      []string{"sentry-cli"},
 		DocsURL:   sdk.URL("https://docs.sentry.io/product/cli/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
