@@ -202,11 +202,10 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 			},
 		},
-		"env vars with AWS_ prefix (not official)": {
+		"AWS_SECRET_KEY": {
 			Environment: map[string]string{
-				"AWS_ACCESS_KEY":    "AKIAHPIZFMD5EEXAMPLE",
-				"AWS_SECRET_KEY":    "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
-				"AWS_ACCESS_SECRET": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				"AWS_ACCESS_KEY": "AKIAHPIZFMD5EEXAMPLE",
+				"AWS_SECRET_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
@@ -217,8 +216,26 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 				{
 					Fields: map[string]string{
+						fieldname.AccessKeyID: "AKIAHPIZFMD5EEXAMPLE",
+					},
+				},
+			},
+		},
+		"AWS_ACCESS_SECRET": {
+			Environment: map[string]string{
+				"AWS_ACCESS_KEY":    "AKIAHPIZFMD5EEXAMPLE",
+				"AWS_ACCESS_SECRET": "RnnHD6qgcZ0OpYB3chaK73TcobH1YY7yEEXAMPLE",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[string]string{
+						fieldname.AccessKeyID: "AKIAHPIZFMD5EEXAMPLE",
+					},
+				},
+				{
+					Fields: map[string]string{
 						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
-						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+						fieldname.SecretAccessKey: "RnnHD6qgcZ0OpYB3chaK73TcobH1YY7yEEXAMPLE",
 					},
 				},
 			},
