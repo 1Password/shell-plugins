@@ -87,7 +87,7 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 			return
 		}
 
-		fields := make(map[string]string)
+		fields := make(map[sdk.FieldName]string)
 		for _, section := range credentialsFile.Sections() {
 			if section.HasKey("user") && section.Key("user").Value() != "" {
 				fields[fieldname.User] = section.Key("user").Value()

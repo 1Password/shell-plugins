@@ -1,40 +1,42 @@
 package fieldname
 
-// Commonly used field names.
+import "github.com/1Password/shell-plugins/sdk"
+
+// Credential field names.
 const (
-	Token           = "Token"
-	Key             = "Key"
-	Username        = "Username"
-	User            = "User"
-	Password        = "Password"
-	AuthToken       = "Auth Token"
-	Credential      = "Credential"
-	Credentials     = "Credentials"
-	AccountSID      = "Account SID"
-	AccountID       = "Account ID"
-	Account         = "Account"
-	AccessKeyID     = "Access Key ID"
-	SecretAccessKey = "Secret Access Key"
-	Secret          = "Secret"
-	AppToken        = "App Token"
-	AppKey          = "App Key"
-	AppSecret       = "App Secret"
-	APIKey          = "API Key"
-	APISecret       = "API Secret"
-	APIHost         = "API Host"
-	PrivateKey      = "Private Key"
-	Cert            = "Cert"
-	Certificate     = "Certificate"
-	Host            = "Host"
-	HostAddress     = "Host Address"
-	Port            = "Port"
-	URL             = "URL"
-	Website         = "Website"
-	Database        = "Database"
-	Address         = "Address"
-	Namespace       = "Namespace"
-	Region          = "Region"
-	Organization    = "Organization"
-	Mode            = "Mode"
-	OneTimePassword = "One-Time Password"
+	Token           = sdk.FieldName("Token")
+	Key             = sdk.FieldName("Key")
+	Username        = sdk.FieldName("Username")
+	User            = sdk.FieldName("User")
+	Password        = sdk.FieldName("Password")
+	AuthToken       = sdk.FieldName("Auth Token")
+	Credential      = sdk.FieldName("Credential")
+	Credentials     = sdk.FieldName("Credentials")
+	AccountSID      = sdk.FieldName("Account SID")
+	AccountID       = sdk.FieldName("Account ID")
+	Account         = sdk.FieldName("Account")
+	AccessKeyID     = sdk.FieldName("Access Key ID")
+	SecretAccessKey = sdk.FieldName("Secret Access Key")
+	Secret          = sdk.FieldName("Secret")
+	AppToken        = sdk.FieldName("App Token")
+	AppKey          = sdk.FieldName("App Key")
+	AppSecret       = sdk.FieldName("App Secret")
+	APIKey          = sdk.FieldName("API Key")
+	APISecret       = sdk.FieldName("API Secret")
+	APIHost         = sdk.FieldName("API Host")
+	PrivateKey      = sdk.FieldName("Private Key")
+	Cert            = sdk.FieldName("Cert")
+	Certificate     = sdk.FieldName("Certificate")
+	Host            = sdk.FieldName("Host")
+	HostAddress     = sdk.FieldName("Host Address")
+	Port            = sdk.FieldName("Port")
+	URL             = sdk.FieldName("URL")
+	Website         = sdk.FieldName("Website")
+	Database        = sdk.FieldName("Database")
+	Address         = sdk.FieldName("Address")
+	Namespace       = sdk.FieldName("Namespace")
+	Region          = sdk.FieldName("Region")
+	Organization    = sdk.FieldName("Organization")
+	Mode            = sdk.FieldName("Mode")
+	OneTimePassword = sdk.FieldName("One-Time Password")
 )

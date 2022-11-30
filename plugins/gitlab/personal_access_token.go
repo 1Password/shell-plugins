@@ -50,7 +50,7 @@ func PersonalAccessToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Token:   "GITLAB_TOKEN",
 	fieldname.Host:    "GITLAB_HOST",
 	fieldname.APIHost: "GITLAB_API_HOST",
@@ -69,7 +69,7 @@ func TryGlabConfigFile() sdk.Importer {
 				continue
 			}
 
-			fields := map[string]string{
+			fields := map[sdk.FieldName]string{
 				fieldname.Token: hostConfig.Token,
 			}
 

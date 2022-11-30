@@ -17,7 +17,7 @@ func TestAPITokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
 						FieldNameOrgURL: "https://acme.okta.com",
 					},
@@ -30,7 +30,7 @@ func TestAPITokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
 						FieldNameOrgURL: "https://acme.okta.com",
 					},
@@ -43,7 +43,7 @@ func TestAPITokenImporter(t *testing.T) {
 func TestAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "dIzt9kbedfNLtBNvWaprp39MaffIVjWxkZBEXAMPLE",
 				FieldNameOrgURL: "https://acme.okta.com",
 			},

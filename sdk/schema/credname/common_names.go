@@ -1,20 +1,22 @@
 package credname
 
-// Commonly used credential type names.
+import "github.com/1Password/shell-plugins/sdk"
+
+// Credential type names.
 const (
-	AccessToken         = "Access Token"
-	APIKey              = "API Key"
-	APIToken            = "API Token"
-	PersonalAccessToken = "Personal Access Token"
-	PersonalAPIToken    = "Personal API Token"
-	CLIToken            = "CLI Token"
-	AuthToken           = "Auth Token"
-	AppToken            = "App Token"
-	AppPassword         = "App Password"
-	AccessKey           = "Access Key"
-	Credentials         = "Credentials"
-	DatabaseCredentials = "Database Credentials"
-	RegistryCredentials = "Registry Credentials"
-	Credential          = "Credential"
-	SecretKey           = "Secret Key"
+	AccessToken         = sdk.CredentialName("Access Token")
+	APIKey              = sdk.CredentialName("API Key")
+	APIToken            = sdk.CredentialName("API Token")
+	PersonalAccessToken = sdk.CredentialName("Personal Access Token")
+	PersonalAPIToken    = sdk.CredentialName("Personal API Token")
+	CLIToken            = sdk.CredentialName("CLI Token")
+	AuthToken           = sdk.CredentialName("Auth Token")
+	AppToken            = sdk.CredentialName("App Token")
+	AppPassword         = sdk.CredentialName("App Password")
+	AccessKey           = sdk.CredentialName("Access Key")
+	Credentials         = sdk.CredentialName("Credentials")
+	DatabaseCredentials = sdk.CredentialName("Database Credentials")
+	RegistryCredentials = sdk.CredentialName("Registry Credentials")
+	Credential          = sdk.CredentialName("Credential")
+	SecretKey           = sdk.CredentialName("Secret Key")
 )

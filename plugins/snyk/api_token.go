@@ -35,7 +35,7 @@ func APIToken() schema.CredentialType {
 		)}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Token: "SNYK_TOKEN",
 }
 

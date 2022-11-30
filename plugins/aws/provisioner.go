@@ -16,7 +16,7 @@ type awsProvisioner struct {
 func AWSProvisioner() sdk.Provisioner {
 	return awsProvisioner{
 		envVarProvisioner: provision.EnvVarProvisioner{
-			Schema: officialEnvVarMapping,
+			Schema: defaultEnvVarMapping,
 		},
 	}
 }
