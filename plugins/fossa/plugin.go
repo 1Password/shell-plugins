@@ -1,4 +1,4 @@
-package example
+package fossa
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,16 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "example",
+		Name: "fossa",
 		Platform: schema.PlatformInfo{
-			Name:     "Example",
-			Homepage: sdk.URL("https://example.com"),
+			Name:     "FOSSA",
+			Homepage: sdk.URL("https://fossa.com"),
 		},
 		Credentials: []schema.CredentialType{
-			APIToken(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
-			ExampleCLI(),
+			FOSSACLI(),
 		},
 	}
 }
