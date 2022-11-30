@@ -102,9 +102,12 @@ func TryCredentialsFile() sdk.Importer {
 			return
 		}
 
-		// Read config file ~/.aws/config
+		// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+		configPath := os.Getenv("AWS_CONFIG_FILE")
+		if configPath == "" {
+			configPath = in.FromHomeDir(".aws", "config")
+		}
 		var configFile *ini.File
-		configPath := in.FromHomeDir(".aws", "config")
 		configContent, _ := os.ReadFile(configPath)
 		if configContent != nil {
 			configFile, _ = importer.FileContents(configContent).ToINI()
