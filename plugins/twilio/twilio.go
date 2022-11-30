@@ -13,7 +13,7 @@ func TwilioCLI() schema.Executable {
 		Name:      "Twilio CLI",
 		DocsURL:   sdk.URL("https://twilio.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
 			},

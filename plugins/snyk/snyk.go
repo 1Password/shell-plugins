@@ -13,7 +13,7 @@ func SnykCLI() schema.Executable {
 		Name:      "Snyk CLI",
 		DocsURL:   sdk.URL("https://docs.snyk.io/snyk-cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIToken,
 			},

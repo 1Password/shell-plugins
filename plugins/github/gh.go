@@ -9,14 +9,14 @@ import (
 
 func GitHubCLI() schema.Executable {
 	return schema.Executable{
-		Runs:    []string{"gh"},
-		Name:    "GitHub CLI",
-		DocsURL: sdk.URL("https://cli.github.com"),
-		UsesCredentials: []schema.CredentialUsage{
+		Runs:      []string{"gh"},
+		Name:      "GitHub CLI",
+		DocsURL:   sdk.URL("https://cli.github.com"),
+		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAccessToken,
 			},
 		},
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
 	}
 }

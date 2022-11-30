@@ -13,7 +13,7 @@ func Dogshell() schema.Executable {
 		Name:      "Dogshell",
 		DocsURL:   sdk.URL("https://docs.datadoghq.com/developers/guide/dogshell-quickly-use-datadog-s-api-from-terminal-shell/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
 			},

@@ -13,7 +13,7 @@ func Mysql() schema.Executable {
 		Name:      "mysql",
 		DocsURL:   sdk.URL("https://dev.mysql.com/doc/refman/en/mysql.html"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{{
+		Uses: []schema.CredentialUsage{{
 			Name: credname.DatabaseCredentials,
 		}},
 	}

@@ -13,7 +13,7 @@ func StripeCLI() schema.Executable {
 		Name:      "Stripe CLI",
 		DocsURL:   sdk.URL("https://stripe.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.SecretKey,
 			},

@@ -13,7 +13,7 @@ func VaultCLI() schema.Executable {
 		Name:      "Vault CLI",
 		DocsURL:   sdk.URL("https://developer.hashicorp.com/vault/docs/commands"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.AuthToken,
 			},

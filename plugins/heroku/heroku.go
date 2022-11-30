@@ -13,7 +13,7 @@ func HerokuCLI() schema.Executable {
 		Name:      "Heroku CLI",
 		DocsURL:   sdk.URL("https://devcenter.heroku.com/articles/heroku-cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
 			},

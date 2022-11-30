@@ -12,7 +12,7 @@ func OktaCLI() schema.Executable {
 		Runs:    []string{"okta"},
 		Name:    "Okta CLI",
 		DocsURL: sdk.URL("https://cli.okta.com"),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIToken,
 			},

@@ -16,7 +16,7 @@ type Executable struct {
 	Name string
 
 	// Which credentials the executable requires to run and how these should be provisioned.
-	UsesCredentials []CredentialUsage
+	Uses []CredentialUsage
 
 	// (Optional) A URL to the documentation about this executable.
 	DocsURL *url.URL
@@ -71,7 +71,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type defined",
-		Assertion:   len(e.UsesCredentials) > 0,
+		Assertion:   len(e.Uses) > 0,
 		Severity:    ValidationSeverityError,
 	})
 

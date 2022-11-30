@@ -13,7 +13,7 @@ func Psql() schema.Executable {
 		Name:      "psql",
 		DocsURL:   sdk.URL("https://www.postgresql.org/docs/current/app-psql.html"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.DatabaseCredentials,
 			},

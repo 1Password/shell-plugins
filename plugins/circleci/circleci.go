@@ -16,7 +16,7 @@ func CircleCICLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotForArgs("config"),
 		),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAPIToken,
 			},

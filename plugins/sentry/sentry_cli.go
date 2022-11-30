@@ -13,7 +13,7 @@ func SentryCLI() schema.Executable {
 		Name:      "Sentry CLI",
 		DocsURL:   sdk.URL("https://docs.sentry.io/product/cli/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.AuthToken,
 			},

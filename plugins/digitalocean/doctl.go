@@ -13,7 +13,7 @@ func DigitalOceanCLI() schema.Executable {
 		Name:      "DigitalOcean CLI",
 		DocsURL:   sdk.URL("https://docs.digitalocean.com/reference/doctl"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAccessToken,
 			},

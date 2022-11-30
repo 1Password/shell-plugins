@@ -13,7 +13,7 @@ func ExampleCLI() schema.Executable {
 		Name:      "Example CLI",
 		DocsURL:   sdk.URL("http://example.com/docs/cli"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIToken,
 			},

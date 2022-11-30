@@ -13,7 +13,7 @@ func GitLabCLI() schema.Executable {
 		Name:      "GitLab CLI",
 		DocsURL:   sdk.URL("https://glab.readthedocs.io"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		UsesCredentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAccessToken,
 			},
