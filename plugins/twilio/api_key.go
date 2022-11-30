@@ -63,7 +63,7 @@ func APIKey() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.AccountSID: "TWILIO_ACCOUNT_SID",
 	fieldname.APIKey:     "TWILIO_API_KEY",
 	fieldname.APISecret:  "TWILIO_API_SECRET",

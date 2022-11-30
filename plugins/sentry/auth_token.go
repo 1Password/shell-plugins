@@ -41,7 +41,7 @@ func AuthToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Token:        "SENTRY_AUTH_TOKEN",
 	fieldname.Organization: "SENTRY_ORG",
 }

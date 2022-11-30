@@ -32,7 +32,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[sdk.FieldName]string{
 			fieldname.APIKey: "HEROKU_API_KEY",
 		}),
 		Importer: importer.TryAll(
@@ -64,7 +64,7 @@ func TryNetrcFile() sdk.Importer {
 					if machine == "api.heroku.com" || machine == "git.heroku.com" {
 						out.AddCandidate(sdk.ImportCandidate{
 							NameHint: login,
-							Fields: map[string]string{
+							Fields: map[sdk.FieldName]string{
 								fieldname.APIKey: password,
 							},
 						})

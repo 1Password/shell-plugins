@@ -11,11 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 )
 
-const (
-	FieldNameDefaultRegion = "Default Region"
-	FieldNameMFASerial     = "MFA Serial"
-)
-
 func AccessKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AccessKey,
@@ -48,7 +43,7 @@ func AccessKey() schema.CredentialType {
 				},
 			},
 			{
-				Name:                FieldNameDefaultRegion,
+				Name:                fieldname.DefaultRegion,
 				MarkdownDescription: "The default region to use for this access key.",
 				Optional:            true,
 			},
@@ -58,38 +53,38 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                FieldNameMFASerial,
+				Name:                fieldname.MFASerial,
 				MarkdownDescription: "ARN of the MFA serial number to use to generate temporary STS credentials if the item contains a TOTP setup.",
 				Optional:            true,
 			},
 		},
 		DefaultProvisioner: AWSProvisioner(),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(officialEnvVarMapping),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AMAZON_ACCESS_KEY_ID",
 				fieldname.SecretAccessKey: "AMAZON_SECRET_ACCESS_KEY",
-				FieldNameDefaultRegion:    "AWS_DEFAULT_REGION",
+				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AWS_ACCESS_KEY",
 				fieldname.SecretAccessKey: "AWS_SECRET_KEY",
-				FieldNameDefaultRegion:    "AWS_DEFAULT_REGION",
+				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AWS_ACCESS_KEY",
 				fieldname.SecretAccessKey: "AWS_ACCESS_SECRET",
-				FieldNameDefaultRegion:    "AWS_DEFAULT_REGION",
+				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
 			}),
 			TryCredentialsFile(),
 		),
 	}
 }
 
-var officialEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.AccessKeyID:     "AWS_ACCESS_KEY_ID",
 	fieldname.SecretAccessKey: "AWS_SECRET_ACCESS_KEY",
-	FieldNameDefaultRegion:    "AWS_DEFAULT_REGION",
+	fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
 }
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
@@ -119,13 +114,13 @@ func TryCredentialsFile() sdk.Importer {
 				continue
 			}
 
-			fields := map[string]string{
+			fields := map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     cfg.Credentials.AccessKeyID,
 				fieldname.SecretAccessKey: cfg.Credentials.SecretAccessKey,
 			}
 
 			if cfg.Region != "" {
-				fields[FieldNameDefaultRegion] = cfg.Region
+				fields[fieldname.DefaultRegion] = cfg.Region
 			}
 
 			out.AddCandidate(sdk.ImportCandidate{

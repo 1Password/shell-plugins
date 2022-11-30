@@ -30,7 +30,7 @@ func (c CredentialID) String() string {
 // ProvisionerID uniquely identifies a provisioner within a plugin.
 type ProvisionerID struct {
 	Plugin     string
-	Credential string
+	Credential sdk.CredentialName
 	Executable *ExecutableID
 }
 

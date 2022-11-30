@@ -54,7 +54,7 @@ const (
 	ModeTest = "test"
 )
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Key: "STRIPE_API_KEY",
 }
 
@@ -89,7 +89,7 @@ func TryStripeConfigFile() sdk.Importer {
 			// Support for publishable and restricted keys will be added later.
 			if strings.HasPrefix(config.LiveModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  config.LiveModeAPIKey,
 						fieldname.Mode: ModeLive,
 					},
@@ -98,7 +98,7 @@ func TryStripeConfigFile() sdk.Importer {
 			}
 			if strings.HasPrefix(config.TestModeAPIKey, "sk_") {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  config.TestModeAPIKey,
 						fieldname.Mode: ModeTest,
 					},

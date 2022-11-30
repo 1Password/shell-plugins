@@ -16,14 +16,14 @@ type awsProvisioner struct {
 func AWSProvisioner() sdk.Provisioner {
 	return awsProvisioner{
 		envVarProvisioner: provision.EnvVarProvisioner{
-			Schema: officialEnvVarMapping,
+			Schema: defaultEnvVarMapping,
 		},
 	}
 }
 
 func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	totp, hasTotp := in.ItemFields[fieldname.OneTimePassword]
-	mfaSerial, hasMFASerial := in.ItemFields[FieldNameMFASerial]
+	mfaSerial, hasMFASerial := in.ItemFields[fieldname.MFASerial]
 
 	if hasTotp && hasMFASerial {
 		p.stsProvisioner.MFASerial = mfaSerial

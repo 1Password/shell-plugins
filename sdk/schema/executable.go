@@ -27,7 +27,7 @@ type Executable struct {
 
 type CredentialUsage struct {
 	// The name of the credential to use in the executable.
-	Name string
+	Name sdk.CredentialName
 
 	// (Optional) The plugin name that contains the credential. Defaults to the current package. This can be used to
 	// include credentials from other plugins.

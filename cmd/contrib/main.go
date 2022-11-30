@@ -359,7 +359,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 		)}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.{{ .FieldName }}: "{{ .CredentialEnvVarName }}", // TODO: Check if this is correct
 }
 
@@ -428,7 +428,7 @@ func generateSecretsExample(plugin schema.Plugin) string {
 	var example string
 
 	for _, credential := range plugin.Credentials {
-		example += credential.Name + ":\n"
+		example += credential.Name.String() + ":\n"
 		for _, field := range credential.Fields {
 			if field.Composition != nil {
 				valueExample := plugintest.ExampleSecretFromComposition(*field.Composition)

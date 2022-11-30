@@ -43,7 +43,7 @@ func DatabaseCredentials() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Host:     "PGHOST",
 	fieldname.Port:     "PGPORT",
 	fieldname.User:     "PGUSER",

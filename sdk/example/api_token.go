@@ -40,16 +40,16 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[sdk.FieldName]string{
 			fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
 			fieldname.Token:     "EXAMPLE_API_TOKEN",
 		}),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
 				fieldname.Token:     "EXAMPLE_API_TOKEN",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.AccountID: "EXAMPLE_ACCOUNT_ID",
 				fieldname.Token:     "EXAMPLE_TOKEN",
 			}),

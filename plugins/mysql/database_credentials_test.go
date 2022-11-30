@@ -10,7 +10,7 @@ import (
 )
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
-	expectedFields := map[string]string{
+	expectedFields := map[sdk.FieldName]string{
 		fieldname.User:     "root",
 		fieldname.Password: "123456",
 		fieldname.Database: "test",
@@ -39,7 +39,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 func TestDatabaseCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.User:     "root",
 				fieldname.Password: "123456",
 				fieldname.Database: "test",
@@ -61,7 +61,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 
 func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
 	p := sdk.ProvisionInput{
-		ItemFields: map[string]string{},
+		ItemFields: map[sdk.FieldName]string{},
 	}
 	_, err := mysqlConfig(p)
 	if err != nil {
