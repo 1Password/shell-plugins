@@ -4,6 +4,7 @@ import (
 	"context"
 	"gopkg.in/ini.v1"
 	"os"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -104,8 +105,14 @@ func TryCredentialsFile() sdk.Importer {
 
 		// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
 		configPath := os.Getenv("AWS_CONFIG_FILE")
-		if configPath == "" {
-			configPath = in.FromHomeDir(".aws", "config")
+		if configPath != "" {
+			if strings.HasPrefix(configPath, "~") {
+				configPath = in.FromHomeDir(configPath[1:])
+			} else {
+				configPath = in.FromRootDir(configPath)
+			}
+		} else {
+			configPath = in.FromHomeDir(".aws", "config") // default config file location
 		}
 		var configFile *ini.File
 		configContent, _ := os.ReadFile(configPath)
