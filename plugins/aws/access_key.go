@@ -115,9 +115,17 @@ func TryCredentialsFile() sdk.Importer {
 			configPath = in.FromHomeDir(".aws", "config") // default config file location
 		}
 		var configFile *ini.File
-		configContent, _ := os.ReadFile(configPath)
+		configContent, err := os.ReadFile(configPath)
+		if err != nil {
+			out.AddError(err)
+			return
+		}
 		if configContent != nil {
-			configFile, _ = importer.FileContents(configContent).ToINI()
+			configFile, err = importer.FileContents(configContent).ToINI()
+			if err != nil {
+				out.AddError(err)
+				return
+			}
 		}
 
 		for _, section := range credentialsFile.Sections() {
