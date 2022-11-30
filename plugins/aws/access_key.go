@@ -116,14 +116,12 @@ func TryCredentialsFile() sdk.Importer {
 		}
 		var configFile *ini.File
 		configContent, err := os.ReadFile(configPath)
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			out.AddError(err)
-			return
 		}
 		configFile, err = importer.FileContents(configContent).ToINI()
 		if err != nil {
 			out.AddError(err)
-			return
 		}
 
 		for _, section := range credentialsFile.Sections() {
