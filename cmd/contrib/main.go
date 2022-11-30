@@ -412,7 +412,7 @@ func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 		DocsURL:   sdk.URL("https://{{ .Name }}.com/docs/cli"), // TODO: Replace with actual URL
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		{{- if .CredentialName }}
-		Credentials: []schema.CredentialUsage{
+		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.{{ .CredentialNameUpperCamelCase }},
 			},
