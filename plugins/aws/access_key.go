@@ -2,7 +2,6 @@ package aws
 
 import (
 	"context"
-	"gopkg.in/ini.v1"
 	"os"
 	"strings"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"gopkg.in/ini.v1"
 )
 
 const (
@@ -120,12 +120,10 @@ func TryCredentialsFile() sdk.Importer {
 			out.AddError(err)
 			return
 		}
-		if configContent != nil {
-			configFile, err = importer.FileContents(configContent).ToINI()
-			if err != nil {
-				out.AddError(err)
-				return
-			}
+		configFile, err = importer.FileContents(configContent).ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
 		}
 
 		for _, section := range credentialsFile.Sections() {

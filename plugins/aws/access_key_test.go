@@ -114,5 +114,27 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 			},
 		},
+		"AWS CLI empty config file": {
+			Files: map[string]string{
+				"~/.aws/credentials": plugintest.LoadFixture(t, "credentials"),
+				"~/.aws/config":      plugintest.LoadFixture(t, "empty-config"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					NameHint: "default",
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
+						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					},
+				},
+				{
+					NameHint: "user1",
+					Fields: map[string]string{
+						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
+						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					},
+				},
+			},
+		},
 	})
 }
