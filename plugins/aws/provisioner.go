@@ -23,7 +23,7 @@ func AWSProvisioner() sdk.Provisioner {
 
 func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	totp, hasTotp := in.ItemFields[fieldname.OneTimePassword]
-	mfaSerial, hasMFASerial := in.ItemFields[FieldNameMFASerial]
+	mfaSerial, hasMFASerial := in.ItemFields[fieldname.MFASerial]
 
 	if hasTotp && hasMFASerial {
 		p.stsProvisioner.MFASerial = mfaSerial
