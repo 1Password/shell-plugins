@@ -2,14 +2,15 @@ package aws
 
 import (
 	"context"
-	"gopkg.in/ini.v1"
 	"os"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"gopkg.in/ini.v1"
 )
 
 const (
@@ -102,12 +103,25 @@ func TryCredentialsFile() sdk.Importer {
 			return
 		}
 
-		// Read config file ~/.aws/config
+		// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+		configPath := os.Getenv("AWS_CONFIG_FILE")
+		if configPath != "" {
+			if strings.HasPrefix(configPath, "~") {
+				configPath = in.FromHomeDir(configPath[1:])
+			} else {
+				configPath = in.FromRootDir(configPath)
+			}
+		} else {
+			configPath = in.FromHomeDir(".aws", "config") // default config file location
+		}
 		var configFile *ini.File
-		configPath := in.FromHomeDir(".aws", "config")
-		configContent, _ := os.ReadFile(configPath)
-		if configContent != nil {
-			configFile, _ = importer.FileContents(configContent).ToINI()
+		configContent, err := os.ReadFile(configPath)
+		if err != nil && !os.IsNotExist(err) {
+			out.AddError(err)
+		}
+		configFile, err = importer.FileContents(configContent).ToINI()
+		if err != nil {
+			out.AddError(err)
 		}
 
 		for _, section := range credentialsFile.Sections() {

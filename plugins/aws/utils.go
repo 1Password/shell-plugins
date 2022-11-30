@@ -1,19 +1,18 @@
 package aws
 
 import (
+	"fmt"
 	"gopkg.in/ini.v1"
-	"strings"
 )
 
 func getConfigSectionByProfile(configFile *ini.File, profileName string) *ini.Section {
 	for _, section := range configFile.Sections() {
-		// handle [default] section
-		if profileName == "default" && strings.Contains(section.Name(), "default") {
+		if profileName == "default" && section.Name() == "default" {
 			return section
 		}
 
-		// handle [profile <profileName>] section
-		if strings.Contains(section.Name(), "profile") && strings.Contains(section.Name(), profileName) {
+		// handle profile sections
+		if section.Name() == fmt.Sprintf("profile %s", profileName) {
 			return section
 		}
 	}
