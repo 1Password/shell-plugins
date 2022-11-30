@@ -1,1 +1,10 @@
-token: "1evr6rbndnaphymaljwpulrlvws7oolrmexample"
+host: https://circleci.com
+endpoint: graphql-unstable
+token: 1evr6rbndnaphymaljwpulrlvws7oolrmexample
+rest_endpoint: api/v2
+tls_cert: ""
+tls_insecure: false
+orb_publishing:
+    default_namespace: ""
+    default_vcs_provider: ""
+    default_owner: ""
