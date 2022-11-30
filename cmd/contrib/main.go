@@ -366,7 +366,7 @@ var defaultEnvVarMapping = map[string]string{
 // TODO: Check if the platform stores the {{ .CredentialName }} in a local config file, and if so,
 // implement the function below to add support for importing it.
 func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportOutput) {
+	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		// var config Config
 		// if err := contents.ToYAML(&config); err != nil {
 		// 	out.AddError(err)
