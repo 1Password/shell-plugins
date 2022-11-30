@@ -1,11 +1,12 @@
 package mysql
 
 import (
+	"testing"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
@@ -47,7 +48,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 			},
 			CommandLine: []string{"mysql"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"mysql", "--defaults-file", "/tmp/my.cnf"},
+				CommandLine: []string{"mysql", "--defaults-file=/tmp/my.cnf"},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/my.cnf": {
 						Contents: []byte(plugintest.LoadFixture(t, "mysql.cnf")),

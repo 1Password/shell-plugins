@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -13,12 +14,12 @@ import (
 type FileProvisioner struct {
 	sdk.Provisioner
 
-	fileContents        ItemToFileContents
-	outfileName         string
-	outpathFixed        string
-	outpathEnvVar       string
-	setOutpathAsArg     bool
-	outpathPrefixedArgs []string
+	fileContents      ItemToFileContents
+	outfileName       string
+	outpathFixed      string
+	outpathEnvVar     string
+	setOutpathAsArg   bool
+	outpathArgsFormat []string
 }
 
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
@@ -73,13 +74,15 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 	}
 }
 
-// SetPathAsArg can be used to provision the temporary file path as an arg that will be appended to
-// the executable's command. The file path can be prefixed with the specified `prefixedArgs`. For example:
-// `SetPathAsArg("--config-file")` will result in `--config-file /path/to/tempfile`.
-func SetPathAsArg(prefixedArgs ...string) FileOption {
+// SetPathAsArg can be used to provision the temporary file path as args that will be appended to
+// the executable's command. The output path gets injected into every arg using `fmt.Sprintf`.
+// For example:
+// * `SetPathAsArg("--config-file", "%s")` will result in `--config-file /path/to/tempfile`.
+// * `SetPathAsArg("--config-file=%s")` will result in `--config-file=/path/to/tempfile`.
+func SetPathAsArg(argsFormat ...string) FileOption {
 	return func(p *FileProvisioner) {
 		p.setOutpathAsArg = true
-		p.outpathPrefixedArgs = prefixedArgs
+		p.outpathArgsFormat = argsFormat
 	}
 }
 
@@ -111,8 +114,20 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 
 	if p.setOutpathAsArg {
 		// Add args to specify the output path.
-		out.AddArgs(p.outpathPrefixedArgs...)
-		out.AddArgs(outpath)
+
+		// Resolve format args with the resulting output path.
+		// Example: "--config-file=%s" => "--config-file=/tmp/file"
+		argsFormatted := make([]string, len(p.outpathArgsFormat))
+		for i, format := range p.outpathArgsFormat {
+			// Add and remove an extra format specifier to avoid the "%!(EXTRA" warning
+			// being added in case there are no format specifiers in the provided string.
+			format += "%[1]s"
+			formatted := strings.TrimSuffix(fmt.Sprintf(format, outpath, ""), outpath)
+
+			argsFormatted[i] = formatted
+		}
+
+		out.AddArgs(argsFormatted...)
 	}
 }
 
