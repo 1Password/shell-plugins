@@ -75,12 +75,12 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 	}
 }
 
-// SetPathAsArg can be used to provision the temporary file path as args that will be appended to
-// the executable's command. The output path is available as "{{ .Path }}" in every arg.
+// AddArgs can be used to add args to the command line. This is useful when the output file path
+// should be passed as an arg. The output path is available as "{{ .Path }}" in each arg.
 // For example:
-// * `SetPathAsArg("--config-file", "{{ .Path }}")` will result in `--config-file /path/to/tempfile`.
-// * `SetPathAsArg("--config-file={{ .Path }}")` will result in `--config-file=/path/to/tempfile`.
-func SetPathAsArg(argTemplates ...string) FileOption {
+// * `AddArgs("--config-file", "{{ .Path }}")` will result in `--config-file /path/to/tempfile`.
+// * `AddArgs("--config-file={{ .Path }}")` will result in `--config-file=/path/to/tempfile`.
+func AddArgs(argTemplates ...string) FileOption {
 	return func(p *FileProvisioner) {
 		p.setOutpathAsArg = true
 		p.outpathArgTemplates = argTemplates
