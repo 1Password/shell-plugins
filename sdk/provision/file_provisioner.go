@@ -1,9 +1,11 @@
 package provision
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"math/rand"
+	"text/template"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -18,7 +20,7 @@ type FileProvisioner struct {
 	outpathFixed        string
 	outpathEnvVar       string
 	setOutpathAsArg     bool
-	outpathPrefixedArgs []string
+	outpathArgTemplates []string
 }
 
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
@@ -73,13 +75,15 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 	}
 }
 
-// SetPathAsArg can be used to provision the temporary file path as an arg that will be appended to
-// the executable's command. The file path can be prefixed with the specified `prefixedArgs`. For example:
-// `SetPathAsArg("--config-file")` will result in `--config-file /path/to/tempfile`.
-func SetPathAsArg(prefixedArgs ...string) FileOption {
+// AddArgs can be used to add args to the command line. This is useful when the output file path
+// should be passed as an arg. The output path is available as "{{ .Path }}" in each arg.
+// For example:
+// * `AddArgs("--config-file", "{{ .Path }}")` will result in `--config-file /path/to/tempfile`.
+// * `AddArgs("--config-file={{ .Path }}")` will result in `--config-file=/path/to/tempfile`.
+func AddArgs(argTemplates ...string) FileOption {
 	return func(p *FileProvisioner) {
 		p.setOutpathAsArg = true
-		p.outpathPrefixedArgs = prefixedArgs
+		p.outpathArgTemplates = argTemplates
 	}
 }
 
@@ -109,10 +113,33 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		out.AddEnvVar(p.outpathEnvVar, outpath)
 	}
 
+	// Add args to specify the output path.
 	if p.setOutpathAsArg {
-		// Add args to specify the output path.
-		out.AddArgs(p.outpathPrefixedArgs...)
-		out.AddArgs(outpath)
+		tmplData := struct{ Path string }{
+			Path: outpath,
+		}
+
+		// Resolve arg templates with the resulting output path injected.
+		// Example: "--config-file={{ .Path }}" => "--config-file=/tmp/file"
+		argsResolved := make([]string, len(p.outpathArgTemplates))
+		for i, tmplStr := range p.outpathArgTemplates {
+			tmpl, err := template.New("arg").Parse(tmplStr)
+			if err != nil {
+				out.AddError(err)
+				return
+			}
+
+			var result bytes.Buffer
+			err = tmpl.Execute(&result, tmplData)
+			if err != nil {
+				out.AddError(err)
+				return
+			}
+
+			argsResolved[i] = result.String()
+		}
+
+		out.AddArgs(argsResolved...)
 	}
 }
 
