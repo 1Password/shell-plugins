@@ -47,6 +47,20 @@ func TestSecretKeyImporter(t *testing.T) {
 						fieldname.Mode: ModeLive,
 					},
 				},
+				{
+					NameHint: "custom – test",
+					Fields: map[string]string{
+						fieldname.Key:  "sk_9Q9YiSK3uWDqSiNYLakhI6s3f6uHQekczqqdfpRsOI0Zwc6ozOMNAzNfVSNlhnA6IipOakrnF8gdhJ5sC97acFy9d0UbhKe2WEXAMPLE",
+						fieldname.Mode: ModeTest,
+					},
+				},
+				{
+					NameHint: "custom",
+					Fields: map[string]string{
+						fieldname.Key:  "sk_UYmt7xpmCZhXgJQypQer6twgdE9pxJsdUWeHcwcce9PKQQPIw1uEMvnWc03GxNOl96mX98Jz9a5Xf9urKYG1Ni2LDk425S2LWEXAMPLE",
+						fieldname.Mode: ModeLive,
+					},
+				},
 			},
 		},
 	})

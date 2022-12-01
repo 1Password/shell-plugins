@@ -1,3 +1,22 @@
+color = ''
+project-name = 'default'
+
 [default]
-live_mode_api_key = "sk_TEm8TYekzqaEKmSIDRb4PXJQAoq94iL6PZx4C1RQlr1Ls5kn67RVRJjhBfmejEX8OS4T7GxCWBnqBuIG20SzdEwopINxyEL05EXAMPLE"
-test_mode_api_key = "sk_uKVoEC2LqU1aXSbKM1ptxFB3QxWiSTMTnbr0CGvkEBMFOs2vetsHc148WMhtrVRAAsP4fcRd35Fz7ykqbhLoa04ZoA7AcRKvUEXAMPLE"
+account_id = 'demo_account'
+device_name = 'RedmiNote4-Liya.localdomain'
+live_mode_api_key = 'sk_TEm8TYekzqaEKmSIDRb4PXJQAoq94iL6PZx4C1RQlr1Ls5kn67RVRJjhBfmejEX8OS4T7GxCWBnqBuIG20SzdEwopINxyEL05EXAMPLE'
+live_mode_key_expires_at = '2023-02-28'
+live_mode_pub_key = 'sk_KvcVqtvQCMTqOAxc1I7a52UBdHAsftBwywZkY6N7HOoYWyR9auvU27iBFp9Dd6URanVRXOfVYw3QZqIr9FmOkKX032675zLZwEXAMPLE'
+test_mode_api_key = 'sk_uKVoEC2LqU1aXSbKM1ptxFB3QxWiSTMTnbr0CGvkEBMFOs2vetsHc148WMhtrVRAAsP4fcRd35Fz7ykqbhLoa04ZoA7AcRKvUEXAMPLE'
+test_mode_key_expires_at = '2023-02-28'
+test_mode_pub_key = 'sk_BSszinJYHnVbzn49LL6XvSoB0HYxvAlo8iPi3MxEgBSwXE7vz1lk0gTACYw7lIL2J96YYewG8VoGzO5ZJ0IZQJu43oY48k695EXAMPLE'
+
+[custom]
+account_id = 'demo_account'
+device_name = 'MacBookPro'
+live_mode_api_key = 'sk_UYmt7xpmCZhXgJQypQer6twgdE9pxJsdUWeHcwcce9PKQQPIw1uEMvnWc03GxNOl96mX98Jz9a5Xf9urKYG1Ni2LDk425S2LWEXAMPLE'
+live_mode_key_expires_at = '2023-02-28'
+live_mode_pub_key = 'sk_fH7FdMNzaz6BWO6PBLlY0SWUa82C4Tjhdcbob8wthMDS9V2e2PKEAATTirQy7QHJp4SBNNWjgJpfaIXDOvm4utcYqmc8G3cjPEXAMPLE'
+test_mode_api_key = 'sk_9Q9YiSK3uWDqSiNYLakhI6s3f6uHQekczqqdfpRsOI0Zwc6ozOMNAzNfVSNlhnA6IipOakrnF8gdhJ5sC97acFy9d0UbhKe2WEXAMPLE'
+test_mode_key_expires_at = '2023-02-28'
+test_mode_pub_key = 'sk_uvEYZtPFy9P43SeSNjUwbiQ1hafj5AaDn5IQBvIoV6LvTJgCK6x0NxakJtGspsc3Ir6gQEBgJ5ve6BYePllRHMRLsZ62DjryFEXAMPLE'
