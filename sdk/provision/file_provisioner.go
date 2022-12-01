@@ -1,10 +1,11 @@
 package provision
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"math/rand"
-	"strings"
+	"text/template"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -14,12 +15,12 @@ import (
 type FileProvisioner struct {
 	sdk.Provisioner
 
-	fileContents      ItemToFileContents
-	outfileName       string
-	outpathFixed      string
-	outpathEnvVar     string
-	setOutpathAsArg   bool
-	outpathArgsFormat []string
+	fileContents        ItemToFileContents
+	outfileName         string
+	outpathFixed        string
+	outpathEnvVar       string
+	setOutpathAsArg     bool
+	outpathArgTemplates []string
 }
 
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
@@ -75,14 +76,14 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 }
 
 // SetPathAsArg can be used to provision the temporary file path as args that will be appended to
-// the executable's command. The output path gets injected into every arg using `fmt.Sprintf`.
+// the executable's command. The output path is available as "{{ .Path }}" in every arg.
 // For example:
-// * `SetPathAsArg("--config-file", "%s")` will result in `--config-file /path/to/tempfile`.
-// * `SetPathAsArg("--config-file=%s")` will result in `--config-file=/path/to/tempfile`.
-func SetPathAsArg(argsFormat ...string) FileOption {
+// * `SetPathAsArg("--config-file", "{{ .Path }}")` will result in `--config-file /path/to/tempfile`.
+// * `SetPathAsArg("--config-file={{ .Path }}")` will result in `--config-file=/path/to/tempfile`.
+func SetPathAsArg(argTemplates ...string) FileOption {
 	return func(p *FileProvisioner) {
 		p.setOutpathAsArg = true
-		p.outpathArgsFormat = argsFormat
+		p.outpathArgTemplates = argTemplates
 	}
 }
 
@@ -112,22 +113,33 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		out.AddEnvVar(p.outpathEnvVar, outpath)
 	}
 
+	// Add args to specify the output path.
 	if p.setOutpathAsArg {
-		// Add args to specify the output path.
-
-		// Resolve format args with the resulting output path.
-		// Example: "--config-file=%s" => "--config-file=/tmp/file"
-		argsFormatted := make([]string, len(p.outpathArgsFormat))
-		for i, format := range p.outpathArgsFormat {
-			// Add and remove an extra format specifier to avoid the "%!(EXTRA" warning
-			// being added in case there are no format specifiers in the provided string.
-			format += "%[1]s"
-			formatted := strings.TrimSuffix(fmt.Sprintf(format, outpath, ""), outpath)
-
-			argsFormatted[i] = formatted
+		tmplData := struct{ Path string }{
+			Path: outpath,
 		}
 
-		out.AddArgs(argsFormatted...)
+		// Resolve arg templates with the resulting output path injected.
+		// Example: "--config-file={{ .Path }}" => "--config-file=/tmp/file"
+		argsResolved := make([]string, len(p.outpathArgTemplates))
+		for i, tmplStr := range p.outpathArgTemplates {
+			tmpl, err := template.New("arg").Parse(tmplStr)
+			if err != nil {
+				out.AddError(err)
+				return
+			}
+
+			var result bytes.Buffer
+			err = tmpl.Execute(&result, tmplData)
+			if err != nil {
+				out.AddError(err)
+				return
+			}
+
+			argsResolved[i] = result.String()
+		}
+
+		out.AddArgs(argsResolved...)
 	}
 }
 
