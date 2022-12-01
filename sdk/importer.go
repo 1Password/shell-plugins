@@ -85,3 +85,7 @@ func (out *ImportAttempt) AddError(err error) {
 func (in *ImportInput) FromHomeDir(path ...string) string {
 	return filepath.Join(append([]string{in.HomeDir}, path...)...)
 }
+
+func (in *ImportInput) FromRootDir(path ...string) string {
+	return filepath.Join(append([]string{in.RootDir}, path...)...)
+}

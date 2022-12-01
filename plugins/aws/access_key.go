@@ -2,13 +2,15 @@ package aws
 
 import (
 	"context"
+	"os"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"github.com/aws/aws-sdk-go-v2/config"
+	"gopkg.in/ini.v1"
 )
 
 func AccessKey() schema.CredentialType {
@@ -96,37 +98,55 @@ func TryCredentialsFile() sdk.Importer {
 			return
 		}
 
-		var profiles []string
-		for _, v := range credentialsFile.Sections() {
-			if len(v.Keys()) != 0 {
-				profiles = append(profiles, v.Name())
+		// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+		configPath := os.Getenv("AWS_CONFIG_FILE")
+		if configPath != "" {
+			if strings.HasPrefix(configPath, "~") {
+				configPath = in.FromHomeDir(configPath[1:])
+			} else {
+				configPath = in.FromRootDir(configPath)
 			}
+		} else {
+			configPath = in.FromHomeDir(".aws", "config") // default config file location
+		}
+		var configFile *ini.File
+		configContent, err := os.ReadFile(configPath)
+		if err != nil && !os.IsNotExist(err) {
+			out.AddError(err)
+		}
+		configFile, err = importer.FileContents(configContent).ToINI()
+		if err != nil {
+			out.AddError(err)
 		}
 
-		for _, profile := range profiles {
-			cfg, err := config.LoadSharedConfigProfile(ctx, profile)
-			if err != nil {
-				out.AddError(err)
-				return
+		for _, section := range credentialsFile.Sections() {
+			profileName := section.Name()
+			fields := make(map[sdk.FieldName]string)
+			if section.HasKey("aws_access_key_id") && section.Key("aws_access_key_id").Value() != "" {
+				fields[fieldname.AccessKeyID] = section.Key("aws_access_key_id").Value()
 			}
 
-			if cfg.Credentials.AccessKeyID == "" || cfg.Credentials.SecretAccessKey == "" {
-				continue
+			if section.HasKey("aws_secret_access_key") && section.Key("aws_secret_access_key").Value() != "" {
+				fields[fieldname.SecretAccessKey] = section.Key("aws_secret_access_key").Value()
 			}
 
-			fields := map[sdk.FieldName]string{
-				fieldname.AccessKeyID:     cfg.Credentials.AccessKeyID,
-				fieldname.SecretAccessKey: cfg.Credentials.SecretAccessKey,
+			// read profile configuration from config file
+			if configFile != nil {
+				configSection := getConfigSectionByProfile(configFile, profileName)
+				if configSection != nil {
+					if configSection.HasKey("region") && configSection.Key("region").Value() != "" {
+						fields[fieldname.DefaultRegion] = configSection.Key("region").Value()
+					}
+				}
 			}
 
-			if cfg.Region != "" {
-				fields[fieldname.DefaultRegion] = cfg.Region
+			// add only candidates with required credential fields
+			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields:   fields,
+					NameHint: profileName,
+				})
 			}
-
-			out.AddCandidate(sdk.ImportCandidate{
-				Fields:   fields,
-				NameHint: profile,
-			})
 		}
 	})
 }
