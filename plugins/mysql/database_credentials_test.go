@@ -48,7 +48,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 			},
 			CommandLine: []string{"mysql"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"mysql", "--defaults-file", "/tmp/my.cnf"},
+				CommandLine: []string{"mysql", "--defaults-file=/tmp/my.cnf"},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/my.cnf": {
 						Contents: []byte(plugintest.LoadFixture(t, "mysql.cnf")),
