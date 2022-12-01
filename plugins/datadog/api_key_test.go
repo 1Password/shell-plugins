@@ -17,7 +17,7 @@ func TestAPIKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey: "vvt4tzq3td4cb3wklna5bclv0example",
 						fieldname.AppKey: "g3jesabd5z8mm61ax7a0k8rzgju1yeps4example",
 					},
@@ -28,9 +28,9 @@ func TestAPIKeyImporter(t *testing.T) {
 }
 
 func TestAPIKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIKey().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey: "vvt4tzq3td4cb3wklna5bclv0example",
 				fieldname.AppKey: "g3jesabd5z8mm61ax7a0k8rzgju1yeps4example",
 			},
