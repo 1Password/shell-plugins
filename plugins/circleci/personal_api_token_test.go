@@ -8,7 +8,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestPersonalApiTokenImporter(t *testing.T) {
+func TestPersonalAPITokenImporter(t *testing.T) {
 	plugintest.TestImporter(t, PersonalAPIToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
@@ -37,7 +37,7 @@ func TestPersonalApiTokenImporter(t *testing.T) {
 	})
 }
 
-func TestPersonalApiTokenProvisioner(t *testing.T) {
+func TestPersonalAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, PersonalAPIToken().Provisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[string]string{
