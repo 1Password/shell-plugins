@@ -56,53 +56,31 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
-		"GH_ENTERPRISE_TOKEN": {
+		"GitHub Enterprise": {
 			Environment: map[string]string{
 				"GH_ENTERPRISE_TOKEN": "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
+				"GH_HOST":             "github.acme.com",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[string]string{
 						fieldname.Token: "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
-					},
-				},
-			},
-		},
-		"GITHUB_ENTERPRISE_TOKEN": {
-			Environment: map[string]string{
-				"GITHUB_ENTERPRISE_TOKEN": "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[string]string{
-						fieldname.Token: "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
-					},
-				},
-			},
-		},
-		"GH_HOST": {
-			Environment: map[string]string{
-				"GH_HOST": "host",
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[string]string{
-						fieldname.Host: "host",
+						fieldname.Host:  "github.acme.com",
 					},
 				},
 				{
 					Fields: map[string]string{
-						fieldname.Host: "host",
+						fieldname.Host: "github.acme.com",
 					},
 				},
 				{
 					Fields: map[string]string{
-						fieldname.Host: "host",
+						fieldname.Host: "github.acme.com",
 					},
 				},
 				{
 					Fields: map[string]string{
-						fieldname.Host: "host",
+						fieldname.Host: "github.acme.com",
 					},
 				},
 			},
