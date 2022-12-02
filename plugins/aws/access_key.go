@@ -63,30 +63,30 @@ func AccessKey() schema.CredentialType {
 		DefaultProvisioner: AWSProvisioner(),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.AccessKeyID:     "AMAZON_ACCESS_KEY_ID",
-				fieldname.SecretAccessKey: "AMAZON_SECRET_ACCESS_KEY",
-				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"AMAZON_ACCESS_KEY_ID":     fieldname.AccessKeyID,
+				"AMAZON_SECRET_ACCESS_KEY": fieldname.SecretAccessKey,
+				"AWS_DEFAULT_REGION":       fieldname.DefaultRegion,
 			}),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.AccessKeyID:     "AWS_ACCESS_KEY",
-				fieldname.SecretAccessKey: "AWS_SECRET_KEY",
-				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"AWS_ACCESS_KEY":     fieldname.AccessKeyID,
+				"AWS_SECRET_KEY":     fieldname.SecretAccessKey,
+				"AWS_DEFAULT_REGION": fieldname.DefaultRegion,
 			}),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.AccessKeyID:     "AWS_ACCESS_KEY",
-				fieldname.SecretAccessKey: "AWS_ACCESS_SECRET",
-				fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"AWS_ACCESS_KEY":     fieldname.AccessKeyID,
+				"AWS_ACCESS_SECRET":  fieldname.SecretAccessKey,
+				"AWS_DEFAULT_REGION": fieldname.DefaultRegion,
 			}),
 			TryCredentialsFile(),
 		),
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.AccessKeyID:     "AWS_ACCESS_KEY_ID",
-	fieldname.SecretAccessKey: "AWS_SECRET_ACCESS_KEY",
-	fieldname.DefaultRegion:   "AWS_DEFAULT_REGION",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"AWS_ACCESS_KEY_ID":     fieldname.AccessKeyID,
+	"AWS_SECRET_ACCESS_KEY": fieldname.SecretAccessKey,
+	"AWS_DEFAULT_REGION":    fieldname.DefaultRegion,
 }
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.

@@ -27,12 +27,12 @@ func TryAllEnvVars(fieldName sdk.FieldName, possibleEnvVarNames ...string) sdk.I
 
 // TryEnvVarPair tries the specified environment variables and adds an import candidate if at least
 // one environment variable is set.
-func TryEnvVarPair(pairPossibilities map[sdk.FieldName]string) sdk.Importer {
+func TryEnvVarPair(pairPossibilities map[string]sdk.FieldName) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
 		var envVarNames []string
 		candidateFields := make(map[sdk.FieldName]string)
 
-		for fieldName, possibleEnvVarName := range pairPossibilities {
+		for possibleEnvVarName, fieldName := range pairPossibilities {
 			if value := os.Getenv(possibleEnvVarName); value != "" {
 				candidateFields[fieldName] = value
 			}

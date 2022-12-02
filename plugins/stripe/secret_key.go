@@ -54,8 +54,8 @@ const (
 	ModeTest = "test"
 )
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.Key: "STRIPE_API_KEY",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"STRIPE_API_KEY": fieldname.Key,
 }
 
 type Config struct {

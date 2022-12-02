@@ -39,10 +39,10 @@ func AuthToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.Token:     "VAULT_TOKEN",
-	fieldname.Address:   "VAULT_ADDR",
-	fieldname.Namespace: "VAULT_NAMESPACE",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"VAULT_TOKEN":     fieldname.Token,
+	"VAULT_ADDR":      fieldname.Address,
+	"VAULT_NAMESPACE": fieldname.Namespace,
 }
 
 func TryVaultTokenFile() sdk.Importer {
