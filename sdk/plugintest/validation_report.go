@@ -2,6 +2,7 @@ package plugintest
 
 import (
 	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/fatih/color"
 )
