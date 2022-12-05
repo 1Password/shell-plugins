@@ -24,7 +24,7 @@ This repository contains the list of available plugins, as well as the SDK to cr
 
 ## 🪄 Usage
 
-![Example of 1Password Shell Plugins with AWS](https://user-images.githubusercontent.com/7430639/205337855-41604aca-0ddb-4eab-a5f0-fb9107e09d8d.gif)
+![Example of 1Password Shell Plugins with AWS: user runs an `aws` command, a Touch ID prompt shows up, and `aws` is automatically authenticated](https://user-images.githubusercontent.com/7430639/205337855-41604aca-0ddb-4eab-a5f0-fb9107e09d8d.gif)
 
 ## 🚀 Get started
 
