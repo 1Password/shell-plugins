@@ -1,5 +1,7 @@
 plugins_dir := ~/.op/plugins/local
 
+.PHONY: new-plugin registry %/example-secrets %/validate %/build test
+
 new-plugin:
 	go run cmd/contrib/main.go $@
 
