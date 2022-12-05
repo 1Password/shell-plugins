@@ -16,7 +16,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "glpat-sJy3L26ZNW7A3EXAMPLE",
 					},
 				},
@@ -28,7 +28,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "glpat-sJy3L26ZNW7A3EXAMPLE",
 					},
 				},
@@ -41,7 +41,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "gitlab.acme.com",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token:   "glpat-sJy3L26ZNW7A3EXAMPLE",
 						fieldname.Host:    "gitlab.acme.com",
 						fieldname.APIHost: "api.gitlab.acme.com",
@@ -53,9 +53,9 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 }
 
 func TestPersonalAccessTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, PersonalAccessToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "glpat-sJy3L26ZNW7A3EXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -65,7 +65,7 @@ func TestPersonalAccessTokenProvisioner(t *testing.T) {
 			},
 		},
 		"self-hosted instance": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:   "glpat-sJy3L26ZNW7A3EXAMPLE",
 				fieldname.Host:    "gitlab.acme.com",
 				fieldname.APIHost: "api.gitlab.acme.com",

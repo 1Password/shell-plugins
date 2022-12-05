@@ -16,7 +16,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "dop_v1_dk98ysntlv1045mdhneztbd4o1r3q8p0tndohkpfii5m6049a8lacaq4iexample",
 					},
 				},
@@ -26,9 +26,9 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 }
 
 func TestPersonalAccessTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, PersonalAccessToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "dop_v1_dk98ysntlv1045mdhneztbd4o1r3q8p0tndohkpfii5m6049a8lacaq4iexample",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{

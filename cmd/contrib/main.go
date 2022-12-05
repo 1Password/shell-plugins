@@ -353,14 +353,14 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 				{{- end }}
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			Try{{ .PlatformNameUpperCamelCase }}ConfigFile(),
 		)}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.{{ .FieldName }}: "{{ .CredentialEnvVarName }}", // TODO: Check if this is correct
 }
 
@@ -404,17 +404,20 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"{{ .Executable }}"},
 		Name:      "{{ .PlatformName }} CLI", // TODO: Check if this is correct
+		Runs:      []string{"{{ .Executable }}"},
 		DocsURL:   sdk.URL("https://{{ .Name }}.com/docs/cli"), // TODO: Replace with actual URL
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		{{- if .CredentialName }}
-		Credentials: []schema.CredentialType{
-			{{ .CredentialNameUpperCamelCase }}(),
+		Uses: []schema.CredentialUsage{
+			{
+				Name: credname.{{ .CredentialNameUpperCamelCase }},
+			},
 		},
 		{{- end }}
 	}
@@ -426,7 +429,7 @@ func generateSecretsExample(plugin schema.Plugin) string {
 	var example string
 
 	for _, credential := range plugin.Credentials {
-		example += credential.Name + ":\n"
+		example += credential.Name.String() + ":\n"
 		for _, field := range credential.Fields {
 			if field.Composition != nil {
 				valueExample := plugintest.ExampleSecretFromComposition(*field.Composition)

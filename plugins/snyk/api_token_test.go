@@ -16,7 +16,7 @@ func TestAPITokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "etacgrrwj86t255ckguircl3kw3ftexample",
 					},
 				},
@@ -26,9 +26,9 @@ func TestAPITokenImporter(t *testing.T) {
 }
 
 func TestAPITokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "etacgrrwj86t255ckguircl3kw3ftexample",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{

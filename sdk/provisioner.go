@@ -38,7 +38,7 @@ type ProvisionInput struct {
 	Cache CacheState
 
 	// ItemFields contains the field names and their corresponding (sensitive) values.
-	ItemFields map[string]string
+	ItemFields map[FieldName]string
 }
 
 // DeprovisionInput contains info that provisioners can use to deprovision credentials.

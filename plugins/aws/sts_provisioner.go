@@ -26,7 +26,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *cached.SecretAccessKey)
 		out.AddEnvVar("AWS_SESSION_TOKEN", *cached.SessionToken)
 
-		if region, ok := in.ItemFields[FieldNameDefaultRegion]; ok {
+		if region, ok := in.ItemFields[fieldname.DefaultRegion]; ok {
 			out.AddEnvVar("AWS_DEFAULT_REGION", region)
 		}
 
@@ -36,7 +36,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	config := aws.NewConfig()
 	config.Credentials = credentials.NewStaticCredentialsProvider(in.ItemFields[fieldname.AccessKeyID], in.ItemFields[fieldname.SecretAccessKey], "")
 
-	region, ok := in.ItemFields[FieldNameDefaultRegion]
+	region, ok := in.ItemFields[fieldname.DefaultRegion]
 	if !ok {
 		region = os.Getenv("AWS_DEFAULT_REGION")
 	}

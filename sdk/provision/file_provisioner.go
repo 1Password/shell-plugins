@@ -25,7 +25,7 @@ type FileProvisioner struct {
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
 
 // FieldAsFile can be used to store the value of a single field as a file.
-func FieldAsFile(fieldName string) ItemToFileContents {
+func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
 	return ItemToFileContents(func(in sdk.ProvisionInput) ([]byte, error) {
 		if value, ok := in.ItemFields[fieldName]; ok {
 			return []byte(value), nil

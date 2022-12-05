@@ -38,12 +38,12 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer:    importer.TryEnvVarPair(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Host:     "PGHOST",
 	fieldname.Port:     "PGPORT",
 	fieldname.User:     "PGUSER",

@@ -28,14 +28,14 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TrySnykConfigFile(),
 		)}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Token: "SNYK_TOKEN",
 }
 
