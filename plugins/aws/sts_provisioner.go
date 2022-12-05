@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -63,7 +64,10 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
 	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
-	out.Cache.Put("sts", *result.Credentials, *result.Credentials.Expiration)
+	err = out.Cache.Put("sts", *result.Credentials, *result.Credentials.Expiration)
+	if err != nil {
+		out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
+	}
 }
 
 func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
