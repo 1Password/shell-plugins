@@ -100,7 +100,7 @@ func newPlugin() error {
 		},
 		{
 			Name:     "Executable",
-			Prompt:   &survey.Input{Message: `Executable name (e.g. "aws" or "gh")`},
+			Prompt:   &survey.Input{Message: `Executable name (e.g. "aws" or "gh") [required]`},
 			Validate: survey.Required,
 		},
 		{
