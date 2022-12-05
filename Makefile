@@ -4,7 +4,7 @@ plugins_dir := ~/.op/plugins/local
 
 beta-notice:
 	@echo "# BETA NOTICE: The plugin ecosystem is in beta and is subject to change."
-	@echo "# You may have to change or recompile your local builds every now and then to keep it"
+	@echo "# You may have to update or recompile your local builds every now and then to keep them"
 	@echo "# compatible with the 1Password CLI updates."
 	@echo
 
