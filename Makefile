@@ -1,7 +1,10 @@
 plugins_dir := ~/.op/plugins/local
 
 beta-notice:
-	@echo "# BETA NOTICE: The plugin ecosystem is in beta and is subject to change"
+	@echo "# BETA NOTICE: The plugin ecosystem is in beta and is subject to change."
+	@echo "# You may have to change or recompile your local builds every now and then to keep it"
+	@echo "# compatible with the 1Password CLI updates."
+	@echo
 
 new-plugin: beta-notice
 	go run cmd/contrib/main.go $@
