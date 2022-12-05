@@ -148,8 +148,8 @@ func (c CacheState) Get(key string, out interface{}) (ok bool) {
 
 	data := entry.Data
 	switch out := out.(type) {
-	case []byte:
-		copy(out, data)
+	case *[]byte:
+		copy(*out, data)
 	default:
 		err := json.Unmarshal(data, out)
 		if err != nil {
