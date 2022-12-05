@@ -166,9 +166,9 @@ func (c *CacheOperations) Put(key string, data interface{}, expiresAt time.Time)
 	var marshaled []byte
 	var err error
 
-	switch data.(type) {
+	switch data := data.(type) {
 	case []byte:
-		marshaled = data.([]byte)
+		marshaled = data
 	default:
 		marshaled, err = json.Marshal(data)
 		if err != nil {
