@@ -3,3 +3,6 @@ plugins/plugins.go
 
 #GoLand
 .idea
+
+# VS code
+.vscode
