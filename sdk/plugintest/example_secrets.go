@@ -76,15 +76,15 @@ func stringFromCharset(length int, charset string) (string, error) {
 func charsToUse(c schema.Charset) string {
 	var chars string
 
-	if c.Uppercase == true {
+	if c.Uppercase {
 		chars += capitalCaseLetters
 	}
 
-	if c.Lowercase == true {
+	if c.Lowercase {
 		chars += lowerCaseLetters
 	}
 
-	if c.Digits == true {
+	if c.Digits {
 		chars += digits
 	}
 
