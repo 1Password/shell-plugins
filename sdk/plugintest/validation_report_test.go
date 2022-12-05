@@ -1,9 +1,10 @@
 package plugintest
 
 import (
+	"testing"
+
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestValidationReportPrinter_printFields(t *testing.T) {

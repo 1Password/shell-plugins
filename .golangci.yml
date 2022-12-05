@@ -1,0 +1,26 @@
+linters:
+  disable-all: true
+  enable:
+    # Defaults:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    # Extra:
+    - asciicheck
+    - bidichk
+    - depguard
+    - goimports
+    - gofmt
+
+linters-settings:
+  depguard:
+    list-type: blacklist
+    include-go-root: false
+    packages:
+      - math/rand
+    packages-with-error-message:
+      - math/rand: "please use the safer crypto/rand"

@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+
 	"gopkg.in/ini.v1"
 )
 

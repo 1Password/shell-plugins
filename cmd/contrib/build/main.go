@@ -4,11 +4,10 @@ import (
 	"errors"
 
 	"github.com/1Password/shell-plugins/plugins"
-	"github.com/1Password/shell-plugins/sdk/schema"
-	"github.com/hashicorp/go-plugin"
-
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
 	"github.com/1Password/shell-plugins/sdk/rpc/server"
+	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/hashicorp/go-plugin"
 )
 
 // PluginName is the name of the plugin to serve. This should be set during building using

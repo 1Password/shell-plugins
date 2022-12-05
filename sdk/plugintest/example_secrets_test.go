@@ -2,11 +2,12 @@ package plugintest
 
 import (
 	"fmt"
-	"github.com/1Password/shell-plugins/sdk/schema"
-	"github.com/stretchr/testify/assert"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSecretContainsSuffix(t *testing.T) {
