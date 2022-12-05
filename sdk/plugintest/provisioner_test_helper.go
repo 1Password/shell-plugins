@@ -48,7 +48,7 @@ func TestProvisioner(t *testing.T, provisioner sdk.Provisioner, cases map[string
 
 type ProvisionCase struct {
 	// ItemFields can be used to populate the item fields to pass to the provisioner.
-	ItemFields map[string]string
+	ItemFields map[sdk.FieldName]string
 
 	// CommandLine can be used to populate the command line to pass to the provisioner.
 	CommandLine []string

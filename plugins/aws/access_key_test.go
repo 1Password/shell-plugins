@@ -1,10 +1,11 @@
 package aws
 
 import (
+	"testing"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"testing"
 )
 
 func TestAccessKeyImporter(t *testing.T) {
@@ -17,18 +18,18 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "eu-central-1",
+						fieldname.DefaultRegion:   "eu-central-1",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-east-1",
+						fieldname.DefaultRegion:   "us-east-1",
 					},
 				},
 			},
@@ -44,18 +45,18 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 			},
@@ -71,18 +72,18 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 			},
@@ -98,18 +99,18 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-						FieldNameDefaultRegion:    "us-west-1",
+						fieldname.DefaultRegion:   "us-west-1",
 					},
 				},
 			},
@@ -122,14 +123,14 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					},
@@ -143,14 +144,14 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					NameHint: "default",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					},
 				},
 				{
 					NameHint: "user1",
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					},
@@ -165,25 +166,25 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
-						FieldNameDefaultRegion:    "us-central-1",
+						fieldname.DefaultRegion:   "us-central-1",
 					},
 				},
 				{
-					Fields: map[string]string{
-						FieldNameDefaultRegion: "us-central-1",
+					Fields: map[sdk.FieldName]string{
+						fieldname.DefaultRegion: "us-central-1",
 					},
 				},
 				{
-					Fields: map[string]string{
-						FieldNameDefaultRegion: "us-central-1",
+					Fields: map[sdk.FieldName]string{
+						fieldname.DefaultRegion: "us-central-1",
 					},
 				},
 				{
-					Fields: map[string]string{
-						FieldNameDefaultRegion: "us-central-1",
+					Fields: map[sdk.FieldName]string{
+						fieldname.DefaultRegion: "us-central-1",
 					},
 				},
 			},
@@ -195,7 +196,7 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 					},
@@ -209,13 +210,13 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 						fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 					},
 				},
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID: "AKIAHPIZFMD5EEXAMPLE",
 					},
 				},
@@ -228,12 +229,12 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID: "AKIAHPIZFMD5EEXAMPLE",
 					},
 				},
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 						fieldname.SecretAccessKey: "RnnHD6qgcZ0OpYB3chaK73TcobH1YY7yEEXAMPLE",
 					},
@@ -244,12 +245,12 @@ func TestAccessKeyImporter(t *testing.T) {
 }
 
 func TestAccessKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, AccessKey().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
-				FieldNameDefaultRegion:    "us-central-1",
+				fieldname.DefaultRegion:   "us-central-1",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{

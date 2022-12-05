@@ -12,12 +12,12 @@ import (
 type EnvVarProvisioner struct {
 	sdk.Provisioner
 
-	Schema map[string]string
+	Schema map[sdk.FieldName]string
 }
 
 // EnvVars creates an EnvVarProvisioner that provisions secrets as environment variables, based
 // on the specified schema of field name and environment variable name.
-func EnvVars(schema map[string]string) sdk.Provisioner {
+func EnvVars(schema map[sdk.FieldName]string) sdk.Provisioner {
 	return EnvVarProvisioner{
 		Schema: schema,
 	}

@@ -29,7 +29,7 @@ func PersonalAccessToken() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(map[string]string{
+		DefaultProvisioner: provision.EnvVars(map[sdk.FieldName]string{
 			fieldname.Token: "DIGITALOCEAN_ACCESS_TOKEN",
 		}),
 		Importer: importer.TryAllEnvVars(fieldname.Token, "DIGITALOCEAN_ACCESS_TOKEN"),

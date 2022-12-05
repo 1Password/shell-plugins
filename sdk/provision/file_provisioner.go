@@ -3,10 +3,9 @@ package provision
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"fmt"
-	"math/rand"
 	"text/template"
-	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 )
@@ -26,7 +25,7 @@ type FileProvisioner struct {
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
 
 // FieldAsFile can be used to store the value of a single field as a file.
-func FieldAsFile(fieldName string) ItemToFileContents {
+func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
 	return ItemToFileContents(func(in sdk.ProvisionInput) ([]byte, error) {
 		if value, ok := in.ItemFields[fieldName]; ok {
 			return []byte(value), nil
@@ -103,7 +102,13 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		outpath = in.FromTempDir(p.outfileName)
 	} else {
 		// If both are undefined, resort to generating a random filename
-		outpath = in.FromTempDir(randomFilename())
+		fileName, err := randomFilename()
+		if err != nil {
+			// This should only fail in rare circumstances
+			out.AddError(fmt.Errorf("generating random file name: %s", err))
+			return
+		}
+		outpath = in.FromTempDir(fileName)
 	}
 
 	out.AddSecretFile(outpath, contents)
@@ -151,10 +156,11 @@ func (p FileProvisioner) Description() string {
 	return "Provision secret file"
 }
 
-func randomFilename() string {
-	rand.Seed(time.Now().UnixNano())
-	length := 16
-	b := make([]byte, length)
-	rand.Read(b)
-	return fmt.Sprintf("%x", b)[:length]
+func randomFilename() (string, error) {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", b), nil
 }

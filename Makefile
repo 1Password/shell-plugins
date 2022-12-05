@@ -1,5 +1,7 @@
 plugins_dir := ~/.op/plugins/local
 
+.PHONY: new-plugin registry %/example-secrets %/validate %/build test
+
 beta-notice:
 	@echo "# BETA NOTICE: The plugin ecosystem is in beta and is subject to change."
 	@echo "# You may have to change or recompile your local builds every now and then to keep it"

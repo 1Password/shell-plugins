@@ -20,7 +20,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Host:     "localhost",
 						fieldname.Port:     "5432",
 						fieldname.User:     "root",
@@ -34,9 +34,9 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 }
 
 func TestDatabaseCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, DatabaseCredentials().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Host:     "localhost",
 				fieldname.Port:     "5432",
 				fieldname.User:     "root",

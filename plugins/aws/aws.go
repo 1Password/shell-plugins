@@ -4,16 +4,19 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func AWSCLI() schema.Executable {
 	return schema.Executable{
-		Runs:      []string{"aws"},
 		Name:      "AWS CLI",
+		Runs:      []string{"aws"},
 		DocsURL:   sdk.URL("https://aws.amazon.com/cli/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
-		Credentials: []schema.CredentialType{
-			AccessKey(),
+		Uses: []schema.CredentialUsage{
+			{
+				Name: credname.AccessKey,
+			},
 		},
 	}
 }

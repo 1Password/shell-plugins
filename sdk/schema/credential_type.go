@@ -10,7 +10,7 @@ import (
 // CredentialType provides the schema of a credential type that the plugin provides.
 type CredentialType struct {
 	// What the credential is called within the platform, e.g. "API Key" or "Personal Access Token".
-	Name string
+	Name sdk.CredentialName
 
 	// The field(s) on this credential type.
 	Fields []CredentialField
@@ -24,14 +24,14 @@ type CredentialType struct {
 	// (Optional) A function to scan the system for occurences of this credential type.
 	Importer sdk.Importer
 
-	// The provisioner to use provision and deprovision this credential to an exectuble.
-	Provisioner sdk.Provisioner
+	// The default provisioner to use for this credential if the executable doesn't override it.
+	DefaultProvisioner sdk.Provisioner
 }
 
 // CredentialField provides the schema of a single field on a credential type.
 type CredentialField struct {
 	// The name of the field, e.g. "Token", "Password", or "Username".
-	Name string
+	Name sdk.FieldName
 
 	// A description of the field.
 	MarkdownDescription string
@@ -48,7 +48,7 @@ type CredentialField struct {
 
 func (c CredentialType) Field(name string) *CredentialField {
 	for _, field := range c.Fields {
-		if field.Name == name {
+		if field.Name.String() == name {
 			return &field
 		}
 	}
@@ -90,7 +90,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Name is using title case",
-		Assertion:   IsTitleCaseString(c.Name),
+		Assertion:   IsTitleCaseString(c.Name.String()),
 		Severity:    ValidationSeverityError,
 	})
 
@@ -124,7 +124,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		if f.MarkdownDescription == "" {
 			allFieldsHaveDescriptionSet = false
 		}
-		if !IsTitleCaseString(f.Name) {
+		if !IsTitleCaseString(f.Name.String()) {
 			allFieldsInTitleCase = false
 		}
 		comp := f.Composition
@@ -171,7 +171,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a provisioner set",
-		Assertion:   c.Provisioner != nil,
+		Assertion:   c.DefaultProvisioner != nil,
 		Severity:    ValidationSeverityError,
 	})
 

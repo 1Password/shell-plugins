@@ -43,7 +43,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.AddArgs("--defaults-file={{ .Path }}")),
+		DefaultProvisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.AddArgs("--defaults-file={{ .Path }}")),
 		Importer: importer.TryAll(
 			TryMySQLConfigFile("/etc/my.cnf"),
 			TryMySQLConfigFile("/etc/mysql/my.cnf"),
@@ -87,7 +87,7 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 			return
 		}
 
-		fields := make(map[string]string)
+		fields := make(map[sdk.FieldName]string)
 		for _, section := range credentialsFile.Sections() {
 			if section.HasKey("user") && section.Key("user").Value() != "" {
 				fields[fieldname.User] = section.Key("user").Value()

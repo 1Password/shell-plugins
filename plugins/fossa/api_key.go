@@ -28,11 +28,11 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer:    importer.TryEnvVarPair(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.APIKey: "FOSSA_API_KEY",
 }

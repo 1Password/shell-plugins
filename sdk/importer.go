@@ -13,7 +13,7 @@ type Importer func(ctx context.Context, in ImportInput, out *ImportOutput)
 // ImportCandidate represents a single occurrence of a plugin's credential that was
 // detected on the system.
 type ImportCandidate struct {
-	Fields    map[string]string
+	Fields    map[FieldName]string
 	NameHint  string
 	ExpiresAt *time.Time
 }

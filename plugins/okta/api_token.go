@@ -31,11 +31,11 @@ func APIToken() schema.CredentialType {
 				},
 			},
 			{
-				Name:                FieldNameOrgURL,
+				Name:                fieldname.OrgURL,
 				MarkdownDescription: "URL of the Okta organization to authenticate to.",
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryOktaConfigFile(),
@@ -43,12 +43,10 @@ func APIToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
-	fieldname.Token: "OKTA_CLIENT_TOKEN",
-	FieldNameOrgURL: "OKTA_CLIENT_ORGURL",
+var defaultEnvVarMapping = map[sdk.FieldName]string{
+	fieldname.Token:  "OKTA_CLIENT_TOKEN",
+	fieldname.OrgURL: "OKTA_CLIENT_ORGURL",
 }
-
-const FieldNameOrgURL = "Org URL"
 
 func TryOktaConfigFile() sdk.Importer {
 	return importer.TryFile("~/.okta/okta.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
@@ -58,14 +56,14 @@ func TryOktaConfigFile() sdk.Importer {
 			return
 		}
 
-		fields := make(map[string]string)
+		fields := make(map[sdk.FieldName]string)
 
 		if token := config.Okta.Client.Token; token != "" {
 			fields[fieldname.Token] = token
 		}
 
 		if orgURL := config.Okta.Client.OrgURL; orgURL != "" {
-			fields[FieldNameOrgURL] = orgURL
+			fields[fieldname.OrgURL] = orgURL
 		}
 
 		if len(fields) > 0 {

@@ -40,7 +40,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryDogrcFile(),
@@ -48,7 +48,7 @@ func APIKey() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.APIKey: "DATADOG_API_KEY",
 	fieldname.AppKey: "DATADOG_APP_KEY",
 }

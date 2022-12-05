@@ -16,7 +16,7 @@ func TestPersonalAPITokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "1evr6rbndnaphymaljwpulrlvws7oolrmexample",
 					},
 				},
@@ -28,7 +28,7 @@ func TestPersonalAPITokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "1evr6rbndnaphymaljwpulrlvws7oolrmexample",
 					},
 				},
@@ -38,9 +38,9 @@ func TestPersonalAPITokenImporter(t *testing.T) {
 }
 
 func TestPersonalAPITokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, PersonalAPIToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PersonalAPIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "1evr6rbndnaphymaljwpulrlvws7oolrmexample",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{

@@ -17,7 +17,7 @@ func TestAuthTokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					Fields: map[string]string{
+					Fields: map[sdk.FieldName]string{
 						fieldname.Token:        "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 						fieldname.Organization: "acme",
 					},
@@ -28,9 +28,9 @@ func TestAuthTokenImporter(t *testing.T) {
 }
 
 func TestAuthTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, AuthToken().Provisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, AuthToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[string]string{
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:        "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 				fieldname.Organization: "acme",
 			},

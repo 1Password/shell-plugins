@@ -35,23 +35,23 @@ func PersonalAccessToken() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		Provisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryAllEnvVars(fieldname.Token, "GH_TOKEN", "GITHUB_PAT"),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.Host:  "GH_HOST",
 				fieldname.Token: "GH_ENTERPRISE_TOKEN",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.Host:  "GH_HOST",
 				fieldname.Token: "GITHUB_ENTERPRISE_TOKEN",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.Host:  "GH_HOST",
 				fieldname.Token: "GH_TOKEN",
 			}),
-			importer.TryEnvVarPair(map[string]string{
+			importer.TryEnvVarPair(map[sdk.FieldName]string{
 				fieldname.Host:  "GH_HOST",
 				fieldname.Token: "GITHUB_TOKEN",
 			}),
@@ -59,6 +59,6 @@ func PersonalAccessToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[string]string{
+var defaultEnvVarMapping = map[sdk.FieldName]string{
 	fieldname.Token: "GITHUB_TOKEN",
 }

@@ -38,7 +38,7 @@ type ProvisionInput struct {
 	Cache CacheState
 
 	// ItemFields contains the field names and their corresponding (sensitive) values.
-	ItemFields map[string]string
+	ItemFields map[FieldName]string
 }
 
 // DeprovisionInput contains info that provisioners can use to deprovision credentials.
@@ -147,9 +147,9 @@ func (c CacheState) Get(key string, out interface{}) (ok bool) {
 	}
 
 	data := entry.Data
-	switch out.(type) {
-	case []byte:
-		out = data
+	switch out := out.(type) {
+	case *[]byte:
+		copy(*out, data)
 	default:
 		err := json.Unmarshal(data, out)
 		if err != nil {
@@ -166,9 +166,9 @@ func (c *CacheOperations) Put(key string, data interface{}, expiresAt time.Time)
 	var marshaled []byte
 	var err error
 
-	switch data.(type) {
+	switch data := data.(type) {
 	case []byte:
-		marshaled = data.([]byte)
+		marshaled = data
 	default:
 		marshaled, err = json.Marshal(data)
 		if err != nil {
