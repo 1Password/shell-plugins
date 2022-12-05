@@ -80,8 +80,13 @@ type OutputFile struct {
 	Contents []byte
 }
 
+// CacheState represents the state of the encrypted cache for a given plugin.
 type CacheState map[string]CacheEntry
 
+// CacheOperations modify the state of the encrypted cache.
+// Puts are data that will be written to cache.
+// Removes are data that will be deleted from cache.
+// All Removes are deleted before any Puts are written.
 type CacheOperations struct {
 	Puts    map[string]CacheEntry
 	Removes []string
