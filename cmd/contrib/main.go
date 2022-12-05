@@ -106,7 +106,7 @@ func newPlugin() error {
 		{
 			Name:   "CredentialName",
 			Prompt: &survey.Input{Message: `Name of the credential type (e.g. "Access Key" or "Personal Access Token")`},
-			Validate: func(ans interface{}) error {
+			Validate: func(ans any) error {
 				if str, ok := ans.(string); ok {
 					hasUpper := false
 					for _, char := range str {
