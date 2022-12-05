@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://developer.1password.com/docs/cli/shell-plugins"><b>Available plugins</b></a> ·
   <a href="https://developer.1password.com/docs/cli/"><b>1Password CLI docs</b></a> ·
-  <a href="https://developer.1password.com/docs/cli/shell-plugins/contribute"><b>Contribution docs</b></a> ·
+  <a href="https://developer.1password.com/docs/cli/shell-plugins/contribute"><b>Contribution docs</b></a>
 </p>
 <br/>
 
