@@ -48,9 +48,9 @@ func APIKey() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.APIKey: "DATADOG_API_KEY",
-	fieldname.AppKey: "DATADOG_APP_KEY",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"DATADOG_API_KEY": fieldname.APIKey,
+	"DATADOG_APP_KEY": fieldname.AppKey,
 }
 
 func TryDogrcFile() sdk.Importer {

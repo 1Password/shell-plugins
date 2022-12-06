@@ -33,6 +33,6 @@ func APIKey() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.APIKey: "FOSSA_API_KEY",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"FOSSA_API_KEY": fieldname.APIKey,
 }

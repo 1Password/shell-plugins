@@ -39,26 +39,26 @@ func PersonalAccessToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryAllEnvVars(fieldname.Token, "GH_TOKEN", "GITHUB_PAT"),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.Host:  "GH_HOST",
-				fieldname.Token: "GH_ENTERPRISE_TOKEN",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":             fieldname.Host,
+				"GH_ENTERPRISE_TOKEN": fieldname.Token,
 			}),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.Host:  "GH_HOST",
-				fieldname.Token: "GITHUB_ENTERPRISE_TOKEN",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":                 fieldname.Host,
+				"GITHUB_ENTERPRISE_TOKEN": fieldname.Token,
 			}),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.Host:  "GH_HOST",
-				fieldname.Token: "GH_TOKEN",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":  fieldname.Host,
+				"GH_TOKEN": fieldname.Token,
 			}),
-			importer.TryEnvVarPair(map[sdk.FieldName]string{
-				fieldname.Host:  "GH_HOST",
-				fieldname.Token: "GITHUB_TOKEN",
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":      fieldname.Host,
+				"GITHUB_TOKEN": fieldname.Token,
 			}),
 		),
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.Token: "GITHUB_TOKEN",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"GITHUB_TOKEN": fieldname.Token,
 }

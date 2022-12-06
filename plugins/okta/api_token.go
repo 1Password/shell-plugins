@@ -43,9 +43,9 @@ func APIToken() schema.CredentialType {
 	}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.Token:  "OKTA_CLIENT_TOKEN",
-	fieldname.OrgURL: "OKTA_CLIENT_ORGURL",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"OKTA_CLIENT_TOKEN":  fieldname.Token,
+	"OKTA_CLIENT_ORGURL": fieldname.OrgURL,
 }
 
 func TryOktaConfigFile() sdk.Importer {

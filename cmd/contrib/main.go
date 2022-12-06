@@ -360,8 +360,8 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 		)}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.{{ .FieldName }}: "{{ .CredentialEnvVarName }}", // TODO: Check if this is correct
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"{{ .CredentialEnvVarName }}": fieldname.{{ .FieldName }}, // TODO: Check if this is correct
 }
 
 // TODO: Check if the platform stores the {{ .CredentialName }} in a local config file, and if so,

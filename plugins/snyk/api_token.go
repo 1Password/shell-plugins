@@ -35,8 +35,8 @@ func APIToken() schema.CredentialType {
 		)}
 }
 
-var defaultEnvVarMapping = map[sdk.FieldName]string{
-	fieldname.Token: "SNYK_TOKEN",
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"SNYK_TOKEN": fieldname.Token,
 }
 
 func TrySnykConfigFile() sdk.Importer {
