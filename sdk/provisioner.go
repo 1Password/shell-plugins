@@ -80,7 +80,7 @@ type OutputFile struct {
 	Contents []byte
 }
 
-// CacheState represents the state of the encrypted cache for a given plugin.
+// CacheState represents the state of the encrypted cache for a given plugin and item.
 type CacheState map[string]CacheEntry
 
 // CacheOperations can be used to modify the state of the encrypted cache, through
