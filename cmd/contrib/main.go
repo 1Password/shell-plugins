@@ -118,7 +118,7 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans any) error {
+			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
 					hasUpper := false
 					for _, char := range str {
