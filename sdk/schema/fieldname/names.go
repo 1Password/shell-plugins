@@ -43,3 +43,46 @@ const (
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
 )
+
+func ListAll() []sdk.FieldName {
+	return []sdk.FieldName{
+		APIHost,
+		APIKey,
+		APISecret,
+		AccessKeyID,
+		Account,
+		AccountID,
+		AccountSID,
+		Address,
+		AppKey,
+		AppSecret,
+		AppToken,
+		AuthToken,
+		Cert,
+		Certificate,
+		Credential,
+		Credentials,
+		Database,
+		DefaultRegion,
+		Host,
+		HostAddress,
+		Key,
+		MFASerial,
+		Mode,
+		Namespace,
+		OneTimePassword,
+		OrgURL,
+		Organization,
+		Password,
+		Port,
+		PrivateKey,
+		Region,
+		Secret,
+		SecretAccessKey,
+		Token,
+		URL,
+		User,
+		Username,
+		Website,
+	}
+}
