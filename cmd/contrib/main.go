@@ -111,7 +111,7 @@ func newPlugin() error {
 				Suggest: func(input string) []string {
 					var suggestions []string
 					for _, name := range credname.ListAll() {
-						if strings.HasPrefix(name.String(), input) {
+						if strings.Contains(strings.ToLower(name.String()), strings.ToLower(input)) {
 							suggestions = append(suggestions, name.String())
 						}
 					}
