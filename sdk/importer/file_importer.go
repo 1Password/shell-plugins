@@ -38,6 +38,10 @@ func TryFile(path string, result func(ctx context.Context, contents FileContents
 
 type FileContents []byte
 
+func (fc FileContents) ToString() string {
+	return string(fc)
+}
+
 func (fc FileContents) ToJSON(result any) error {
 	err := json.Unmarshal(fc, result)
 	if err != nil {
