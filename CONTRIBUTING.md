@@ -14,13 +14,13 @@ If you're planning to create your first plugin, we recommend you have a look at 
 <!----><a name="scope"></a>
 ## 🔭 Scope
 
-The current focus of Shell Plugins is to cover CLIs that require authentication to their platform's backend.
+The current focus of 1Password Shell Plugins is to cover CLIs that require authentication to their platform's backend.
 Examples of that are CLIs provided by SaaS platforms, cloud vendors, and databases.
 
 Unofficial CLIs are less likely to get accepted at this moment.
 
-Also, CLIs that authenticate to multiple different platforms depending on the project are also out of scope at this stage.
-Examples of such tools are like `terraform`, `ansible`, or the CLIs that come with application development frameworks (`flask run`, `spring run`, etc.).
+CLIs that authenticate to multiple different platforms depending on the project are also out of scope at this stage.
+Examples include `terraform`, `ansible`, or the CLIs that come with application development frameworks (`flask run`, `spring run`, etc.).
 
 <!----><a name="third-party-dependencies"></a>
 ## 🖇️ Third-Party Dependencies
@@ -39,10 +39,10 @@ Fortunately, this has become [very easy to set up](https://developer.1password.c
 <!----><a name="testing"></a>
 ## 🧪 Testing
 
-The plugin ecosystem allows you to [locally build](#make-plugin-build) your plugins and use them with the 1Password CLI, so you can take your plugin for a spin before submitting a PR.
+The plugin ecosystem allows you to [locally build](#make-plugin-build) your plugins and use them with 1Password CLI, so you can take your plugin for a spin before submitting a PR.
 
 You can add tests to your plugin using the SDK's [`plugintest` package](sdk/plugintest/), which provides helpers so that you only have to care about the test cases themselves.
-You can use the [`example-secrets` command](#make-plugin-example-secrets) to help you create test fixtures.
+You can use the [`example-secrets` command](#make-plugin-example-secrets) to help create test fixtures.
 
 <!----><a name="makefile-commands"></a>
 ## 👷 Makefile Commands
