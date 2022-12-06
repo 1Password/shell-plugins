@@ -379,11 +379,8 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 		// }
 
 		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: []sdk.ImportCandidateField{
-		// 		{
-		// 			Field: fieldname.{{ .FieldName }},
-		// 			Value: config.{{ .FieldName }},
-		// 		},
+		// 	Fields: map[sdk.FieldName]string{
+		// 		fieldname.{{ .FieldName }}: config.{{ .FieldName }},
 		// 	},
 		// })
 	})
