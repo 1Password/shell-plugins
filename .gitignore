@@ -14,5 +14,5 @@ plugins/plugins.go
 # MacOS finder
 .DS_Store
 
-# CLI specific
+# CLI specifics
 .op
