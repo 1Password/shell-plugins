@@ -67,8 +67,6 @@ func TestCacheStateGetBadInput(t *testing.T) {
 	cache["myKey"] = cacheEntry
 	correctOutput := make([]byte, len(cacheEntry.Data))
 
-	cache["myKey"] = cacheEntry
-
 	var structResult testStruct
 	ok := cache.Get("myKey", &structResult)
 	assert.False(t, ok)
