@@ -20,3 +20,23 @@ const (
 	RegistryCredentials = sdk.CredentialName("Registry Credentials")
 	SecretKey           = sdk.CredentialName("Secret Key")
 )
+
+func ListAll() []sdk.CredentialName {
+	return []sdk.CredentialName{
+		APIKey,
+		APIToken,
+		AccessKey,
+		AccessToken,
+		AppPassword,
+		AppToken,
+		AuthToken,
+		CLIToken,
+		Credential,
+		Credentials,
+		DatabaseCredentials,
+		PersonalAPIToken,
+		PersonalAccessToken,
+		RegistryCredentials,
+		SecretKey,
+	}
+}
