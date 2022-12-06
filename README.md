@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  Seamless authentication for every tool in your terminal. <sup><b>[BETA]</b></sup>
+  Seamless authentication for every tool in your terminal. <sup><b><a href="#-beta-notice">[BETA]</a></b></sup>
 </p>
 
 <p align="center">
