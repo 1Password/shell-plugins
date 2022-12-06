@@ -28,7 +28,6 @@ This repository contains the list of available plugins, as well as the SDK to cr
 
 ## 🚀 Get started
 
-* Get started with the [1Password CLI]()
 * Get started with [1Password Shell Plugins](https://developer.1password.com/docs/cli/shell-plugins)
 * Get started with [creating your own plugins](https://developer.1password.com/docs/cli/shell-plugins/contribute) <sup><b>[BETA]</b></sup>
 
