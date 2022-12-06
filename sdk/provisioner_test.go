@@ -60,7 +60,7 @@ func TestCacheStateGetStruct(t *testing.T) {
 
 func TestCacheStateGetBadInput(t *testing.T) {
 	cacheEntry := CacheEntry{
-		Data:      []byte("nonsense"),
+		Data:      []byte("some data"),
 		ExpiresAt: time.Now().Add(1 * time.Minute),
 	}
 	cache := CacheState{}
