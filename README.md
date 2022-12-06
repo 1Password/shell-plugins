@@ -35,7 +35,7 @@ This repository contains the list of available plugins, as well as the SDK to cr
 
 Is your favorite CLI not listed yet? Learn how to [build a shell plugin](https://developer.1password.com/docs/cli/shell-plugins/contribute) yourself and [open a PR](https://github.com/1Password/shell-plugins/pulls)!
 
-If you need help when building a plugin, create an issue on GitHub or join our [Developer Slack workspace]() to tell us about your plugin proposal and we can advise you on the most suitable approach for your use case.
+If you need help when building a plugin, create an issue on GitHub or join our [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) to tell us about your plugin proposal and we can advise you on the most suitable approach for your use case.
 
 For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
