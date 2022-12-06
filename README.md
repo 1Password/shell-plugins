@@ -18,7 +18,7 @@
 
 ---
 
-No more plaintext credentials in your home directory. Automatically authenticate every CLI you use with the [1Password CLI](https://developer.1password.com/docs/cli/) + [Shell Plugins](https://developer.1password.com/docs/cli/shell-plugins/). Approve temporary credential usage in your terminal with biometrics.
+No more plaintext credentials in your home directory. Automatically authenticate every CLI you use with [1Password CLI](https://developer.1password.com/docs/cli/) + [Shell Plugins](https://developer.1password.com/docs/cli/shell-plugins/). Approve temporary credential usage in your terminal with biometrics.
 
 This repository contains the list of available plugins, as well as the SDK to create new plugins.
 
@@ -42,4 +42,4 @@ For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 📣 Beta Notice
 
-The plugin ecosystem is still in beta. In practice that will mean that if you're locally building your own plugins, you'll likely have to recompile your plugin every now and then to keep up with the latest updates of the 1Password CLI.
+The plugin ecosystem is still in beta. In practice, this means that if you're locally building your own plugins, you'll likely have to recompile your plugin every now and then to keep up with the latest updates of the 1Password CLI.
