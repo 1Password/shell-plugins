@@ -6,3 +6,13 @@ plugins/plugins.go
 
 # VS code
 .vscode
+
+# Neovim project-specific configurations
+.nvimrc
+.exrc
+
+# MacOS finder
+.DS_Store
+
+# CLI specific
+.op
