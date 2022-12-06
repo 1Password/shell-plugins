@@ -84,7 +84,7 @@ type OutputFile struct {
 type CacheState map[string]CacheEntry
 
 // CacheOperations can be used to modify the state of the encrypted cache, through
-// put or remove operations. Good to note: remove operations are executed before 
+// put or remove operations. Good to note: remove operations are executed before
 // put operations.
 type CacheOperations struct {
 	Puts    map[string]CacheEntry
