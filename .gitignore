@@ -1,2 +1,18 @@
 # Auto-generated with `make registry`
 plugins/plugins.go
+
+# GoLand
+.idea
+
+# VS code
+.vscode
+
+# Neovim project-specific configurations
+.nvimrc
+.exrc
+
+# MacOS finder
+.DS_Store
+
+# 1Password
+.op
