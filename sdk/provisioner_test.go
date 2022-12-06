@@ -60,30 +60,23 @@ func TestCacheStateGetStruct(t *testing.T) {
 
 func TestCacheStateGetBadInput(t *testing.T) {
 	cacheEntry := CacheEntry{
-		Data:      nil,
+		Data:      []byte("nonsense"),
 		ExpiresAt: time.Now().Add(1 * time.Minute),
 	}
 	cache := CacheState{}
+	cache["myKey"] = cacheEntry
+	correctOutput := make([]byte, len(cacheEntry.Data))
+
 	cache["myKey"] = cacheEntry
 
 	var structResult testStruct
 	ok := cache.Get("myKey", &structResult)
 	assert.False(t, ok)
 
-	var res *string
-	ok = cache.Get("myKey", res)
-	assert.False(t, ok)
-
-	cacheEntry = CacheEntry{
-		Data:      []byte("nonsense"),
-		ExpiresAt: time.Now().Add(1 * time.Minute),
-	}
-	cache["myKey"] = cacheEntry
-	ok = cache.Get("myKey", &structResult)
-	assert.False(t, ok)
-
-	correctOutput := make([]byte, len(cacheEntry.Data))
 	ok = cache.Get("wrongKey", &correctOutput)
+	assert.False(t, ok)
+
+	ok = cache.Get("myKey", nil)
 	assert.False(t, ok)
 
 	ok = cache.Get("myKey", &correctOutput)
