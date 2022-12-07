@@ -38,7 +38,11 @@ func TryFile(path string, result func(ctx context.Context, contents FileContents
 
 type FileContents []byte
 
-func (fc FileContents) ToJSON(result any) error {
+func (fc FileContents) ToString() string {
+	return string(fc)
+}
+
+func (fc FileContents) ToJSON(result interface{}) error {
 	err := json.Unmarshal(fc, result)
 	if err != nil {
 		return err
@@ -47,7 +51,7 @@ func (fc FileContents) ToJSON(result any) error {
 	return nil
 }
 
-func (fc FileContents) ToYAML(result any) error {
+func (fc FileContents) ToYAML(result interface{}) error {
 	err := yaml.Unmarshal(fc, result)
 	if err != nil {
 		return err
@@ -56,7 +60,7 @@ func (fc FileContents) ToYAML(result any) error {
 	return nil
 }
 
-func (fc FileContents) ToTOML(result any) error {
+func (fc FileContents) ToTOML(result interface{}) error {
 	err := toml.Unmarshal(fc, result)
 	if err != nil {
 		return err
@@ -65,7 +69,7 @@ func (fc FileContents) ToTOML(result any) error {
 	return nil
 }
 
-func (fc FileContents) ToXML(result any) error {
+func (fc FileContents) ToXML(result interface{}) error {
 	err := xml.Unmarshal(fc, result)
 	if err != nil {
 		return err

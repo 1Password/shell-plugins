@@ -16,7 +16,7 @@ type RPCPlugin struct {
 
 // Server registers the RPC provider server with the RPC server that
 // go-plugin is setting up.
-func (p *RPCPlugin) Server(*plugin.MuxBroker) (any, error) {
+func (p *RPCPlugin) Server(*plugin.MuxBroker) (interface{}, error) {
 	pl, err := p.RPCPlugin()
 	if err != nil {
 		return nil, err
@@ -26,6 +26,6 @@ func (p *RPCPlugin) Server(*plugin.MuxBroker) (any, error) {
 }
 
 // Client always returns an error; we're only implementing a server.
-func (p *RPCPlugin) Client(*plugin.MuxBroker, *rpc.Client) (any, error) {
+func (p *RPCPlugin) Client(*plugin.MuxBroker, *rpc.Client) (interface{}, error) {
 	return nil, errors.New("only server is implemented")
 }

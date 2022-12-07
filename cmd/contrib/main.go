@@ -14,6 +14,7 @@ import (
 	"github.com/1Password/shell-plugins/plugins"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -104,9 +105,20 @@ func newPlugin() error {
 			Validate: survey.Required,
 		},
 		{
-			Name:   "CredentialName",
-			Prompt: &survey.Input{Message: `Name of the credential type (e.g. "Access Key" or "Personal Access Token")`},
-			Validate: func(ans any) error {
+			Name: "CredentialName",
+			Prompt: &survey.Input{
+				Message: `Name of the credential type (e.g. "Access Key" or "Personal Access Token")`,
+				Suggest: func(input string) []string {
+					var suggestions []string
+					for _, name := range credname.ListAll() {
+						if strings.Contains(strings.ToLower(name.String()), strings.ToLower(input)) {
+							suggestions = append(suggestions, name.String())
+						}
+					}
+					return suggestions
+				},
+			},
+			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
 					hasUpper := false
 					for _, char := range str {
@@ -141,6 +153,7 @@ func newPlugin() error {
 		ValueComposition             schema.ValueComposition
 		FieldName                    string
 		CredentialEnvVarName         string
+		IsNewCredentialName          bool
 		CredentialNameUpperCamelCase string
 		CredentialNameSnakeCase      string
 	}{}
@@ -161,6 +174,14 @@ func newPlugin() error {
 	result.CredentialNameUpperCamelCase = strings.Join(credNameSplit, "")
 	result.CredentialNameSnakeCase = strings.ToLower(strings.Join(credNameSplit, "_"))
 	result.CredentialEnvVarName = strings.ToUpper(result.Name + "_" + result.CredentialNameSnakeCase)
+
+	result.IsNewCredentialName = true
+	for _, existing := range credname.ListAll() {
+		if result.CredentialName == existing.String() {
+			result.IsNewCredentialName = false
+			break
+		}
+	}
 
 	// As a placeholder, assume the field name is the last word of the credential name, e.g. "Token"
 	result.FieldName = credNameSplit[len(credNameSplit)-1]
@@ -319,7 +340,7 @@ import (
 
 func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.{{ .CredentialNameUpperCamelCase }},
+		Name:          credname.{{ .CredentialNameUpperCamelCase }},{{ if .IsNewCredentialName }} // TODO: Register name in project://sdk/schema/credname/names.go{{ end }}
 		DocsURL:       sdk.URL("https://{{ .Name }}.com/docs/{{ .CredentialNameSnakeCase }}"), // TODO: Replace with actual URL
 		ManagementURL: sdk.URL("https://console.{{ .Name }}.com/user/security/tokens"), // TODO: Replace with actual URL
 		Fields: []schema.CredentialField{
