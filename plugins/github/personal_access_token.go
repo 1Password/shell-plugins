@@ -23,8 +23,8 @@ func PersonalAccessToken() schema.CredentialType {
 				MarkdownDescription: "Token used to authenticate to GitHub.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 93,
-					Prefix: "github_pat_",
+					Length: 40,
+					Prefix: "ghp_",
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -80,7 +80,7 @@ func TryGitHubConfigFile() sdk.Importer {
 		}
 
 		for host, values := range config {
-			if strings.HasPrefix(values.Token, "github_pat_") {
+			if strings.HasPrefix(values.Token, "ghp_") {
 				candidate := sdk.ImportCandidate{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: values.Token,
