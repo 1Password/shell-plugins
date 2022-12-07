@@ -22,7 +22,7 @@ No more plaintext credentials in your home directory. Automatically authenticate
 
 ## 🪄 Usage
 
-![Example of 1Password Shell Plugins with AWS: user runs an `aws` command, a Touch ID prompt shows up, and `aws` is automatically authenticated](https://user-images.githubusercontent.com/7430639/205337855-41604aca-0ddb-4eab-a5f0-fb9107e09d8d.gif)
+![Example of 1Password Shell Plugins with AWS: user runs an `aws` command, a Touch ID prompt shows up, and `aws` is automatically authenticated](https://user-images.githubusercontent.com/1965218/206190113-6e197c33-96dd-48f2-8499-0be540cfcfae.gif)
 
 ## 🚀 Get started
 
