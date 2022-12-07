@@ -13,7 +13,7 @@ body:
     id: desired
     attributes:
       label: Desired or expected behavior
-      description: What would you like to see this plugin do that it currently doesn't do (well)?
+      description: What do you want to do with this plugin that is currently not possible or does not work well?
     validations:
       required: true
   - type: textarea
