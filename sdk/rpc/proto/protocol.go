@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	Version          uint = 2
+	Version          uint = 3
 	MagicCookieKey        = "OP_PLUGIN_MAGIC_COOKIE"
 	MagicCookieValue      = "ThisIsNotForSecurityPurposesButToImproveUserExperience"
 )
