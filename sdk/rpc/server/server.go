@@ -47,13 +47,14 @@ func newServer(p schema.Plugin) *RPCServer {
 	for i := range p.Executables {
 		s.needsAuth[proto.ExecutableID(i)] = p.Executables[i].NeedsAuth
 		p.Executables[i].NeedsAuth = nil
-		for _, credentialUse := range p.Executables[i].Uses {
+		for usageID, credentialUse := range p.Executables[i].Uses {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
 				Plugin:     credentialUse.Plugin,
 				Credential: credentialUse.Name,
 				Executable: &executableID,
 			}] = credentialUse.Provisioner
+			p.Executables[i].Uses[usageID].Provisioner = nil
 		}
 	}
 
