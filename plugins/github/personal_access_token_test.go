@@ -93,10 +93,10 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "github_pat_8BQUJmcVkoNo48YBxXjyF20gqFi7hYLdzhGmJUISVUCjyHOA0sdeO8Xmw7LqYY0Ng1wndPbww6fEXAMPLE",
-						fieldname.Host:  "github.com",
 					},
 				},
 				{
+					NameHint: "enterprise.github.com",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "github_pat_2BaueV0i4Jv832lprA6lLavL8H2cw9IPBVKqdmHdqKrYstzQUwTukwpX54Z8HAN3ehKGid6poaiEXAMPLE",
 						fieldname.Host:  "enterprise.github.com",

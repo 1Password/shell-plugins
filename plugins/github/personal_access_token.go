@@ -80,12 +80,18 @@ func TryGitHubConfigFile() sdk.Importer {
 
 		for host, values := range config {
 			if values.Token != "" {
-				out.AddCandidate(sdk.ImportCandidate{
+				candidate := sdk.ImportCandidate{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: values.Token,
-						fieldname.Host:  host,
 					},
-				})
+				}
+
+				if host != "github.com" {
+					candidate.NameHint = host
+					candidate.Fields[fieldname.Host] = host
+				}
+
+				out.AddCandidate(candidate)
 			}
 		}
 	})
