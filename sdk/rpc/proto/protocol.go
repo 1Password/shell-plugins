@@ -27,18 +27,32 @@ func (c CredentialID) String() string {
 	return fmt.Sprintf("plugin.Credentials[%d]", c)
 }
 
+// CredentialUsageID uniquely identifies a CredentialUsage within a plugin.
+type CredentialUsageID struct {
+	Executable ExecutableID
+	Usage      int
+}
+
+func (c CredentialUsageID) String() string {
+	return fmt.Sprintf("%s.Uses[%d]", c.Executable, c.Usage)
+}
+
 // ProvisionerID uniquely identifies a provisioner within a plugin.
 type ProvisionerID struct {
-	Plugin     string
-	Credential sdk.CredentialName
-	Executable *ExecutableID
+	// IsCredentialProvisioner is set to true if the ProvisionerID identifies the DefaultProvisioner of a credential.
+	// It is set to false if the ProvisionerID identifies the Provisioner of an executable's CredentialUsage.
+	IsCredentialProvisioner bool
+	// If IsCredentialProvisioner is true, Credential is the slice index of the credential in schema.Plugin.
+	Credential CredentialID
+	// If IsCredentialProvisioner is false, CredentialUsage identifies the Provisioner within the schema.Plugin.
+	CredentialUsage CredentialUsageID
 }
 
 func (p ProvisionerID) String() string {
-	if p.Executable == nil {
-		return fmt.Sprintf("plugin.Credentials[%s].DefaultProvisioner", p.Credential)
+	if p.IsCredentialProvisioner {
+		return fmt.Sprintf("%s.DefaultProvisioner", p.Credential)
 	}
-	return fmt.Sprintf("plugin.Credentials[%s].Provisioner[%d]", p.Credential, *p.Executable)
+	return fmt.Sprintf("%s.Provisioner", p.CredentialUsage)
 }
 
 // GetPluginResponse augments schema.Plugin with information about which credentials have the (optional) Importer set

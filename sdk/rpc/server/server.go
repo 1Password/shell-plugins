@@ -50,9 +50,11 @@ func newServer(p schema.Plugin) *RPCServer {
 		for usageID, credentialUse := range p.Executables[i].Uses {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
-				Plugin:     credentialUse.Plugin,
-				Credential: credentialUse.Name,
-				Executable: &executableID,
+				IsCredentialProvisioner: false,
+				CredentialUsage: proto.CredentialUsageID{
+					Executable: executableID,
+					Usage:      usageID,
+				},
 			}] = credentialUse.Provisioner
 			p.Executables[i].Uses[usageID].Provisioner = nil
 		}
@@ -63,9 +65,8 @@ func newServer(p schema.Plugin) *RPCServer {
 		c.Importer = nil
 
 		s.provisioners[proto.ProvisionerID{
-			Plugin:     p.Name,
-			Credential: c.Name,
-			Executable: nil,
+			IsCredentialProvisioner: true,
+			Credential:              id,
 		}] = c.DefaultProvisioner
 		c.DefaultProvisioner = nil
 	}
