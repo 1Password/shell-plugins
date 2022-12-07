@@ -1,0 +1,37 @@
+name: "✨ New plugin request"
+description: I'd like to request a new plugin.
+title: "New plugin: "
+labels: ["plugin-request"]
+body:
+  - type: input
+    id: plugin
+    attributes:
+      label: Platform or tool
+      description: Which platform or tool would you like to see a shell plugin for?
+      placeholder: e.g. AWS, Stripe, GitHub
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Relevant links
+      description: "For example: the platform homepage, CLI docs, authentication docs."
+      placeholder: |
+        * https://example.com
+        * https://example.com/docs/cli
+        * https://example.com/docs/authentication
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal or desired behavior
+      description: What should the plugin do?
+      placeholder: "For example: Authenticate the CLI using a Personal Access Token."
+    validations:
+      required: true
+  - type: textarea
+    id: info
+    attributes:
+      label: Additional information
+      description: Any additional information that's relevant to add?
