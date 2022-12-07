@@ -85,6 +85,25 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"GitHub config file": {
+			Files: map[string]string{
+				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts.yml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "github_pat_8BQUJmcVkoNo48YBxXjyF20gqFi7hYLdzhGmJUISVUCjyHOA0sdeO8Xmw7LqYY0Ng1wndPbww6fEXAMPLE",
+						fieldname.Host:  "github.com",
+					},
+				},
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "github_pat_2BaueV0i4Jv832lprA6lLavL8H2cw9IPBVKqdmHdqKrYstzQUwTukwpX54Z8HAN3ehKGid6poaiEXAMPLE",
+						fieldname.Host:  "enterprise.github.com",
+					},
+				},
+			},
+		},
 	})
 }
 

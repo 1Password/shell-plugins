@@ -1,6 +1,8 @@
 package github
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -55,10 +57,36 @@ func PersonalAccessToken() schema.CredentialType {
 				"GH_HOST":      fieldname.Host,
 				"GITHUB_TOKEN": fieldname.Token,
 			}),
+			TryGitHubConfigFile(),
 		),
 	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"GITHUB_TOKEN": fieldname.Token,
+}
+
+type Config struct {
+	Token string `yaml:"oauth_token"`
+}
+
+func TryGitHubConfigFile() sdk.Importer {
+	return importer.TryFile("~/.config/gh/hosts.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config map[string]Config
+		if err := contents.ToYAML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		for host, values := range config {
+			if values.Token != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: values.Token,
+						fieldname.Host:  host,
+					},
+				})
+			}
+		}
+	})
 }
