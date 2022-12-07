@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "❓ General 1Password questions"
+    url: https://1password.community
+    about: I have a question about 1Password that's not directly related to shell plugins.
