@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -79,7 +80,7 @@ func TryGitHubConfigFile() sdk.Importer {
 		}
 
 		for host, values := range config {
-			if values.Token != "" {
+			if strings.HasPrefix(values.Token, "github_pat_") {
 				candidate := sdk.ImportCandidate{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: values.Token,
