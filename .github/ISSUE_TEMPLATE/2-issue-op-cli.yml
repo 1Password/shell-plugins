@@ -13,7 +13,7 @@ body:
     id: desired
     attributes:
       label: Goal or desired behavior
-      description: What are you trying to achieve in 1Password CLI that's currently not working well?
+      description: What are you trying to achieve with 1Password Shell Plugins that's currently not working well?
     validations:
       required: true
   - type: textarea
