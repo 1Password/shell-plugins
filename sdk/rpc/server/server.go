@@ -80,15 +80,21 @@ func newServer(p schema.Plugin) *RPCServer {
 // replacing those values with an implementation that calls these functions over RPC.
 func (t *RPCServer) GetPlugin(_ int, resp *proto.GetPluginResponse) error {
 	*resp = proto.GetPluginResponse{
-		CredentialHasImporter: map[proto.CredentialID]bool{},
-		ExecutableHasNeedAuth: map[proto.ExecutableID]bool{},
-		Plugin:                t.p,
+		CredentialHasImporter:         map[proto.CredentialID]bool{},
+		ExecutableHasNeedAuth:         map[proto.ExecutableID]bool{},
+		CredentialUsageHasProvisioner: map[proto.CredentialUsageID]bool{},
+		Plugin:                        t.p,
 	}
 	for executableID, needsAuth := range t.needsAuth {
 		resp.ExecutableHasNeedAuth[executableID] = needsAuth != nil
 	}
 	for credentialID, importer := range t.importers {
 		resp.CredentialHasImporter[credentialID] = importer != nil
+	}
+	for provisionerID, provisioner := range t.provisioners {
+		if !provisionerID.IsCredentialProvisioner {
+			resp.CredentialUsageHasProvisioner[provisionerID.CredentialUsage] = provisioner != nil
+		}
 	}
 
 	return nil
