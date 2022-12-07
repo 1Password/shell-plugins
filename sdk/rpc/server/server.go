@@ -50,7 +50,7 @@ func newServer(p schema.Plugin) *RPCServer {
 		for usageID, credentialUse := range p.Executables[i].Uses {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
-				IsCredentialProvisioner: false,
+				IsDefaultProvisioner: false,
 				CredentialUsage: proto.CredentialUsageID{
 					Executable: executableID,
 					Usage:      usageID,
@@ -65,8 +65,8 @@ func newServer(p schema.Plugin) *RPCServer {
 		c.Importer = nil
 
 		s.provisioners[proto.ProvisionerID{
-			IsCredentialProvisioner: true,
-			Credential:              id,
+			IsDefaultProvisioner: true,
+			Credential:           id,
 		}] = c.DefaultProvisioner
 		c.DefaultProvisioner = nil
 	}
@@ -92,7 +92,7 @@ func (t *RPCServer) GetPlugin(_ int, resp *proto.GetPluginResponse) error {
 		resp.CredentialHasImporter[credentialID] = importer != nil
 	}
 	for provisionerID, provisioner := range t.provisioners {
-		if !provisionerID.IsCredentialProvisioner {
+		if !provisionerID.IsDefaultProvisioner {
 			resp.CredentialUsageHasProvisioner[provisionerID.CredentialUsage] = provisioner != nil
 		}
 	}

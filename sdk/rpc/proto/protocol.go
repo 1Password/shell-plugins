@@ -39,17 +39,17 @@ func (c CredentialUsageID) String() string {
 
 // ProvisionerID uniquely identifies a provisioner within a plugin.
 type ProvisionerID struct {
-	// IsCredentialProvisioner is set to true if the ProvisionerID identifies the DefaultProvisioner of a credential.
+	// IsDefaultProvisioner is set to true if the ProvisionerID identifies the DefaultProvisioner of a credential.
 	// It is set to false if the ProvisionerID identifies the Provisioner of an executable's CredentialUsage.
-	IsCredentialProvisioner bool
-	// If IsCredentialProvisioner is true, Credential is the slice index of the credential in schema.Plugin.
+	IsDefaultProvisioner bool
+	// If IsDefaultProvisioner is true, Credential is the slice index of the credential in schema.Plugin.
 	Credential CredentialID
-	// If IsCredentialProvisioner is false, CredentialUsage identifies the Provisioner within the schema.Plugin.
+	// If IsDefaultProvisioner is false, CredentialUsage identifies the Provisioner within the schema.Plugin.
 	CredentialUsage CredentialUsageID
 }
 
 func (p ProvisionerID) String() string {
-	if p.IsCredentialProvisioner {
+	if p.IsDefaultProvisioner {
 		return fmt.Sprintf("%s.DefaultProvisioner", p.Credential)
 	}
 	return fmt.Sprintf("%s.Provisioner", p.CredentialUsage)
