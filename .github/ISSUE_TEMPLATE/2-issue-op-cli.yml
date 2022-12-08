@@ -1,0 +1,31 @@
+name: "💲 1Password CLI overall shell plugins functionality"
+description: I have an issue or feature request around using shell plugins in 1Password CLI.
+labels: ["op-cli"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: op CLI version
+      description: "Add the output of: op --version"
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Goal or desired behavior
+      description: What are you trying to achieve with 1Password Shell Plugins that's currently not working well?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: What does the status quo look like? Why is that bad? Any workarounds worth mentioning?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: If this is a bug, add any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
