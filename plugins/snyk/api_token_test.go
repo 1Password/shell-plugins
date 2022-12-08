@@ -37,25 +37,6 @@ func TestAPITokenImporter(t *testing.T) {
 	})
 }
 
-func TestAPITokenImporterFromCustomLocation(t *testing.T) {
-	t.Setenv("XDG_CONFIG_HOME", "~/.snyk")
-
-	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
-		"config file custom path": {
-			Files: map[string]string{
-				"~/.snyk/configstore/snyk.json": plugintest.LoadFixture(t, "snyk.json"),
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "38j9ss3m5m3c44vi916z6p33m21xgexample",
-					},
-				},
-			},
-		},
-	})
-}
-
 func TestAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
