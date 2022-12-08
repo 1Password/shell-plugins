@@ -1,6 +1,10 @@
 package snyk
 
 import (
+	"context"
+	"os"
+	"strings"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -39,7 +43,41 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SNYK_TOKEN": fieldname.Token,
 }
 
+type Config struct {
+	Token string `json:"api"`
+}
+
 func TrySnykConfigFile() sdk.Importer {
-	// TODO: Import `api` field from ~/.config/configstore/snyk.json
-	return importer.NoOp()
+	path := configFilePath()
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToJSON(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		if config.Token == "" {
+			return
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: map[sdk.FieldName]string{
+				fieldname.Token: config.Token,
+			},
+		})
+	})
+}
+
+func configFilePath() string {
+	configPath := os.Getenv("XDG_CONFIG_HOME")
+	if configPath == "" {
+		configPath = "~/.config"
+	}
+
+	if !strings.HasSuffix(configPath, "/") {
+		configPath += "/"
+	}
+
+	configPath += "configstore/snyk.json"
+	return configPath
 }
