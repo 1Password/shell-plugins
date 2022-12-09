@@ -2,7 +2,6 @@ package tugboat
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -32,24 +31,15 @@ func AccessToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(tugboatConfig, provision.AtFixedPath("~/.tugboat.yml")),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryTugboatConfigFile(),
 		)}
 }
 
-func tugboatConfig(in sdk.ProvisionInput) ([]byte, error) {
-	content := ""
-
-	if token, ok := in.ItemFields[fieldname.Token]; ok {
-		content += configFileEntry("token", token)
-	}
-
-	return []byte(content), nil
-}
-
-func configFileEntry(key string, value string) string {
-	return fmt.Sprintf("%s: %s\n", key, value)
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"TUGBOAT_API_TOKEN": fieldname.Token,
 }
 
 func TryTugboatConfigFile() sdk.Importer {
