@@ -17,9 +17,6 @@ func CloudflareWorkersCLI() schema.Executable {
 			{
 				Name: credname.APIToken,
 			},
-			{
-				Name: credname.APIKey,
-			},
 		},
 	}
 }

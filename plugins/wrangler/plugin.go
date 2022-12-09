@@ -14,7 +14,6 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			APIToken(),
-			APIKey(),
 		},
 		Executables: []schema.Executable{
 			CloudflareWorkersCLI(),
