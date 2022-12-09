@@ -46,25 +46,48 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 	config.Region = region
 
+	roleArn, ok := in.ItemFields[fieldname.Role]
 	stsProvider := sts.NewFromConfig(*config)
-	input := &sts.GetSessionTokenInput{
-		DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
-		SerialNumber:    aws.String(p.MFASerial),
-		TokenCode:       aws.String(p.TOTPCode),
+
+	var awsTemporaryCredentials *types.Credentials
+
+	if ok {
+		input := &sts.AssumeRoleInput{
+			SerialNumber:    aws.String(p.MFASerial),
+			TokenCode:       aws.String(p.TOTPCode),
+			RoleArn:         aws.String(roleArn),
+			RoleSessionName: aws.String("1password-shell-plugin"),
+		}
+
+		resp, err := stsProvider.AssumeRole(ctx, input)
+		if err != nil {
+			out.AddError(err)
+			return
+		}
+
+		awsTemporaryCredentials = resp.Credentials
+	} else {
+		input := &sts.GetSessionTokenInput{
+			DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
+			SerialNumber:    aws.String(p.MFASerial),
+			TokenCode:       aws.String(p.TOTPCode),
+		}
+
+		resp, err := stsProvider.GetSessionToken(ctx, input)
+		if err != nil {
+			out.AddError(err)
+			return
+		}
+
+		awsTemporaryCredentials = resp.Credentials
 	}
 
-	result, err := stsProvider.GetSessionToken(ctx, input)
-	if err != nil {
-		out.AddError(err)
-		return
-	}
-
-	out.AddEnvVar("AWS_ACCESS_KEY_ID", *result.Credentials.AccessKeyId)
-	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *result.Credentials.SecretAccessKey)
-	out.AddEnvVar("AWS_SESSION_TOKEN", *result.Credentials.SessionToken)
+	out.AddEnvVar("AWS_ACCESS_KEY_ID", *awsTemporaryCredentials.AccessKeyId)
+	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *awsTemporaryCredentials.SecretAccessKey)
+	out.AddEnvVar("AWS_SESSION_TOKEN", *awsTemporaryCredentials.SessionToken)
 	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
-	err = out.Cache.Put("sts", *result.Credentials, *result.Credentials.Expiration)
+	err := out.Cache.Put("sts", *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
 	if err != nil {
 		out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
 	}
