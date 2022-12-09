@@ -9,15 +9,15 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func APIToken() schema.CredentialType {
+func APIKey() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIToken,
+		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://developers.cloudflare.com/workers/wrangler/system-environment-variables/"),
 		ManagementURL: sdk.URL("https://dash.cloudflare.com/profile/api-tokens"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.AccountID,
-				MarkdownDescription: "The account ID for the Workers related account, can be found in the Cloudflare dashboard, can usually be inferred by Wrangler.",
+				Name:                fieldname.Username,
+				MarkdownDescription: "The email address associated with your Cloudflare account, usually used for older authentication method with CLOUDFLARE_API_KEY",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
@@ -28,8 +28,8 @@ func APIToken() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Token,
-				MarkdownDescription: "The API token for your Cloudflare account, can be used for authentication for situations like CI/CD, and other automation.",
+				Name:                fieldname.APIKey,
+				MarkdownDescription: "The API key for your Cloudflare account, usually used for older authentication method with CLOUDFLARE_EMAIL",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
@@ -40,12 +40,12 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMappingApiToken),
-		Importer:           importer.TryEnvVarPair(defaultEnvVarMappingApiToken),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMappingApiKey),
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMappingApiKey),
 	}
 }
 
-var defaultEnvVarMappingApiToken = map[string]sdk.FieldName{
-	"CLOUDFLARE_ACCOUNT_ID": fieldname.AccountID,
-	"CLOUDFLARE_API_TOKEN":  fieldname.Token,
+var defaultEnvVarMappingApiKey = map[string]sdk.FieldName{
+	"CLOUDFLARE_EMAIL":   fieldname.Username,
+	"CLOUDFLARE_API_KEY": fieldname.APIKey,
 }
