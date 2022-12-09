@@ -1,5 +1,11 @@
 name: Test and Validate
-on: [push]
+on:
+  push:
+    paths:
+      - "**.go"
+  pull_request:
+    paths:
+      - "**.go"
 
 jobs:
   build:
