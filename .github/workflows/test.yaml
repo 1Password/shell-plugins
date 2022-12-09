@@ -1,11 +1,13 @@
 name: Test and Validate
 on:
   push:
-    paths:
-      - "**.go"
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
   pull_request:
-    paths:
-      - "**.go"
+    paths-ignore:
+      - '**.md'
+      - '.github/ISSUE_TEMPLATE/**'
 
 jobs:
   build:
