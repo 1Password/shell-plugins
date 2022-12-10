@@ -1,0 +1,11 @@
+[default]
+  account = "example"
+  api_key = "EXAMPLE_1234567890ABCDE1EXAMPLE1EXAMPLE123456789EXAMPLE"
+  api_secret = "_89368245c62f8d6d35e7c6626example"
+  version = 2
+
+[example]
+  account = "example2"
+  api_key = "EXAMPLE2_1234567890ABCDE1EXAMPLE1EXAMPLE123456789EXAMPLE"
+  api_secret = "_69ee92b3c71a6b27436a648acexample"
+  version = 2
