@@ -85,7 +85,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
-		"GitHub config file with ghp_ token prefix": {
+		"GitHub config file": {
 			Files: map[string]string{
 				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts.yml"),
 			},
@@ -104,9 +104,9 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
-		"GitHub config file with gho_ token prefix": {
+		"Not import gho_ tokens from GitHub config file": {
 			Files: map[string]string{
-				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts_gho_type.yml"),
+				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts_gho_token.yml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{},
 		},
