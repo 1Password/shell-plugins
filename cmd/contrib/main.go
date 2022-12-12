@@ -119,6 +119,10 @@ func newPlugin() error {
 			},
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
+					if str == "" {
+						return nil
+					}
+
 					hasUpper := false
 					for _, char := range str {
 						if unicode.IsUpper(char) {
@@ -377,7 +381,8 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			Try{{ .PlatformNameUpperCamelCase }}ConfigFile(),
-		)}
+		),
+	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
