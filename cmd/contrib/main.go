@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"html/template"
 	"log"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/1Password/shell-plugins/plugins"
@@ -168,17 +166,16 @@ func newPlugin() error {
 
 	if result.ExampleCredential != "" {
 		result.ValueComposition = getValueComposition(result.ExampleCredential)
-		result.TestCredentialExample = result.ExampleCredential
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(result.ValueComposition)
 	} else {
-		// If no example credential has been provided, a random 30-character alphanumeric
-		// value is generated to be used within the test suite.
-		lettersAndDigits := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-		rand.Seed(time.Now().UnixNano())
-		randomString := make([]rune, 30)
-		for i := range randomString {
-			randomString[i] = lettersAndDigits[rand.Intn(len(lettersAndDigits))]
-		}
-		result.TestCredentialExample = string(randomString)
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(schema.ValueComposition{
+			Charset: schema.Charset{
+				Uppercase: true,
+				Lowercase: true,
+				Digits:    true,
+			},
+			Length: 30,
+		})
 	}
 
 	result.PlatformNameUpperCamelCase = strings.ReplaceAll(result.PlatformName, " ", "")
