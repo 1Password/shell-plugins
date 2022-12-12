@@ -130,7 +130,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		comp := f.Composition
 		if comp != nil {
 			cs := comp.Charset
-			if cs.Lowercase && cs.Uppercase && cs.Digits && cs.Symbols && len(cs.Specific) == 0 {
+			if !cs.Lowercase && !cs.Uppercase && !cs.Digits && !cs.Symbols && len(cs.Specific) == 0 {
 				allCompositionsValid = false
 			}
 		}
