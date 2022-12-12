@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "readme",
 		Platform: schema.PlatformInfo{
 			Name:     "ReadMe",
-			Homepage: sdk.URL("https://readme.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://readme.com"),
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
