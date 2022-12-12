@@ -36,6 +36,6 @@ $(plugins_dir):
 test:
 	go test ./...
 
-%/remove: beta-notice
+%/remove-local: beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
 	rm -f ~/.op/plugins/local/$(plugin)
