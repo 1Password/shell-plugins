@@ -12,7 +12,7 @@ import (
 func APIToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://developers.cloudflare.com/workers/wrangler/system-environment-variables/"),
+		DocsURL:       sdk.URL("https://developers.cloudflare.com/fundamentals/api/get-started/create-token/"),
 		ManagementURL: sdk.URL("https://dash.cloudflare.com/profile/api-tokens"),
 		Fields: []schema.CredentialField{
 			{
