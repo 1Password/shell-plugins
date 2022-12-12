@@ -3,10 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"runtime/debug"
 )
 
 type errFunctionFieldNotSet struct {
@@ -144,17 +144,18 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.AddError(fmt.Errorf("your locally built plugin failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
-	*resp = sdk.ProvisionOutput{
-		Environment: make(map[string]string),
-		CommandLine: nil,
-		Files:       make(map[string]sdk.OutputFile),
-		Diagnostics: sdk.Diagnostics{},
-	}
+	*resp = req.ProvisionOutput
 	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
+
 	return nil
 }
 
