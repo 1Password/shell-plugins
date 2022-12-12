@@ -22,6 +22,18 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"config file": {
+			Files: map[string]string{
+				"~/Library/Application\\ Support/doctl/config.yaml": plugintest.LoadFixture(t, "config.yaml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "dop_v1_tr33mpd5m8q9t3ncisqbceydi8dd2n60pl1yiycg97z25fkqffp8j6ycjexample",
+					},
+				},
+			},
+		},
 	})
 }
 
