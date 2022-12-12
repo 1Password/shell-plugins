@@ -41,12 +41,12 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMappingApiToken),
-		Importer:           importer.TryEnvVarPair(defaultEnvVarMappingApiToken),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }
 
-var defaultEnvVarMappingApiToken = map[string]sdk.FieldName{
+var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"CLOUDFLARE_ACCOUNT_ID": fieldname.AccountID,
 	"CLOUDFLARE_API_TOKEN":  fieldname.Token,
 }
