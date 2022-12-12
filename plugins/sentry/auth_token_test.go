@@ -24,6 +24,19 @@ func TestAuthTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"config file": {
+			Files: map[string]string{
+				"~/.sentryclirc": plugintest.LoadFixture(t, ".sentryclirc"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token:        "mw4ms9tx4dci52bfr19sbj40lb0pu9w4camnf8w3hfzl8hckvkdocd28nexample",
+						fieldname.Organization: "my-org",
+					},
+				},
+			},
+		},
 	})
 }
 
