@@ -38,4 +38,4 @@ test:
 
 %/remove: beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
-	rm -rf ~/.op/plugins/local/$(plugin)
+	rm -f ~/.op/plugins/local/$(plugin)
