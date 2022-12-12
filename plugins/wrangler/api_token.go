@@ -18,7 +18,7 @@ func APIToken() schema.CredentialType {
 			{
 				Name:                fieldname.AccountID,
 				MarkdownDescription: "The account ID for the Workers related account, can be found in the Cloudflare dashboard, can usually be inferred by Wrangler.",
-				Secret:              true,
+				Secret:              false,
 				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
