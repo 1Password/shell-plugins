@@ -1,6 +1,8 @@
 package linode
 
 import (
+	"context"
+	"os"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -31,9 +33,39 @@ func PersonalAccessToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"LINODE_CLI_TOKEN": fieldname.Token,
+}
+
+// TryConfigFile looks for the token in the ~/.config/linode-cli file.
+func TryConfigFile() sdk.Importer {
+	return importer.TryFile("~/.config/linode-cli", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		configFile, err := contents.ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
+		}
+
+		if err != nil && !os.IsNotExist(err) {
+			out.AddError(err)
+		}
+
+		for _, section := range configFile.Sections() {
+			fields := make(map[sdk.FieldName]string)
+			if section.HasKey("token") && section.Key("token").Value() != "" {
+				fields[fieldname.Token] = section.Key("token").Value()
+			}
+
+			// add only candidates with required credential fields
+			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields:   fields,
+				})
+			}
+		}
+	})
 }
