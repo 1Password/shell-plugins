@@ -42,7 +42,7 @@ func PersonalAccessToken() schema.CredentialType {
 }
 
 func TryDigitalOceanConfigFile() sdk.Importer {
-	return importer.TryFile("~/Library/Application\\ Support/doctl/config.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return importer.TryFile("~/Library/Application Support/doctl/config.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
