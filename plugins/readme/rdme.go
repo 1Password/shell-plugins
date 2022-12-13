@@ -7,24 +7,24 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-var commands = []string{
-	"openapi",
+var commands = [][]string{
+	[]string{"openapi"},
 
-	"docs",
-	"docs:prune",
-	"guides",
-	"guides:prune",
+	[]string{"docs"},
+	[]string{"docs:prune"},
+	[]string{"guides"},
+	[]string{"guides:prune"},
 
-	"changelogs",
-	"custompages",
+	[]string{"changelogs"},
+	[]string{"custompages"},
 
-	"versions",
-	"versions:create",
-	"versions:delete",
-	"versions:update",
+	[]string{"versions"},
+	[]string{"versions:create"},
+	[]string{"versions:delete"},
+	[]string{"versions:update"},
 
-	"categories",
-	"categories:create",
+	[]string{"categories"},
+	[]string{"categories:create"},
 }
 
 func ReadMeCLI() schema.Executable {
