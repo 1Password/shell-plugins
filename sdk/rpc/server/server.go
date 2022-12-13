@@ -151,7 +151,6 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 	}
 	*resp = req.ProvisionOutput
 	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
-
 	return nil
 }
 
