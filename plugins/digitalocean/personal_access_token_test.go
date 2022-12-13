@@ -24,7 +24,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 		},
 		"config file": {
 			Files: map[string]string{
-				"~/Library/Application\\ Support/doctl/config.yaml": plugintest.LoadFixture(t, "config.yaml"),
+				"~/Library/Application Support/doctl/config.yaml": plugintest.LoadFixture(t, "config.yaml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
