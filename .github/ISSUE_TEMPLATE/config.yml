@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "💬 Chat with us on Slack"
+    url: https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA
+    about: Chat with us about shell plugins in our Developer Slack workspace.
+  - name: "❓ General 1Password questions"
+    url: https://1password.community
+    about: I have a question about 1Password that's not directly related to shell plugins.

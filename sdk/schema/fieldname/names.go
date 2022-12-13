@@ -6,6 +6,7 @@ import "github.com/1Password/shell-plugins/sdk"
 const (
 	APIHost         = sdk.FieldName("API Host")
 	APIKey          = sdk.FieldName("API Key")
+	APIKeyID        = sdk.FieldName("API Key ID")
 	APISecret       = sdk.FieldName("API Secret")
 	AccessKeyID     = sdk.FieldName("Access Key ID")
 	Account         = sdk.FieldName("Account")

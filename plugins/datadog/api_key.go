@@ -1,6 +1,8 @@
 package datadog
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -54,6 +56,26 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 }
 
 func TryDogrcFile() sdk.Importer {
-	// TODO: Try importing from ~/.dogrc file
-	return importer.NoOp()
+	return importer.TryFile("~/.dogrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		credentialsFile, err := contents.ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
+		}
+
+		fields := make(map[sdk.FieldName]string)
+		for _, section := range credentialsFile.Sections() {
+			if section.HasKey("apikey") && section.Key("apikey").Value() != "" {
+				fields[fieldname.APIKey] = section.Key("apikey").Value()
+			}
+
+			if section.HasKey("appkey") && section.Key("appkey").Value() != "" {
+				fields[fieldname.AppKey] = section.Key("appkey").Value()
+			}
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: fields,
+		})
+	})
 }

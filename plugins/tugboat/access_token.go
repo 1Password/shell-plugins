@@ -1,4 +1,4 @@
-package snyk
+package tugboat
 
 import (
 	"context"
@@ -11,19 +11,20 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func APIToken() schema.CredentialType {
+func AccessToken() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://docs.snyk.io/snyk-api-info/authentication-for-api"),
-		ManagementURL: sdk.URL("https://app.snyk.io/account"),
+		Name:          credname.AccessToken,
+		DocsURL:       sdk.URL("https://docs.tugboatqa.com/tugboat-cli/set-an-access-token/"),
+		ManagementURL: sdk.URL("https://dashboard.tugboatqa.com/access-tokens"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
-				MarkdownDescription: "Token used to authenticate to Snyk.",
+				MarkdownDescription: "Token used to authenticate to Tugboat.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 36,
+					Length: 32,
 					Charset: schema.Charset{
+						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
 					},
@@ -33,22 +34,18 @@ func APIToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TrySnykConfigFile(),
+			TryTugboatConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"SNYK_TOKEN": fieldname.Token,
+	"TUGBOAT_API_TOKEN": fieldname.Token,
 }
 
-type Config struct {
-	Token string `json:"api"`
-}
-
-func TrySnykConfigFile() sdk.Importer {
-	return importer.TryFile("~/.config/configstore/snyk.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryTugboatConfigFile() sdk.Importer {
+	return importer.TryFile("~/.tugboat.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
-		if err := contents.ToJSON(&config); err != nil {
+		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
 			return
 		}
@@ -63,4 +60,8 @@ func TrySnykConfigFile() sdk.Importer {
 			},
 		})
 	})
+}
+
+type Config struct {
+	Token string
 }

@@ -1,0 +1,36 @@
+name: "🗃️ Functionality around a specific plugin"
+description: I have an issue or feature request around a specific, existing plugin.
+body:
+  - type: input
+    id: plugin
+    attributes:
+      label: Platform or tool
+      description: Which plugin does this concern?
+      placeholder: e.g. AWS, Stripe, GitHub
+    validations:
+      required: true
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired or expected behavior
+      description: What do you want to do with this plugin that is currently not possible or does not work well?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: What does the status quo look like? Why is that bad? Any workarounds worth mentioning?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: If this is a bug, add any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: op CLI version
+      description: "Add the output of: op --version"
