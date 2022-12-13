@@ -140,12 +140,12 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 	if err != nil {
 		return err
 	}
-	*resp = sdk.ProvisionOutput{
-		Environment: make(map[string]string),
-		CommandLine: nil,
-		Files:       make(map[string]sdk.OutputFile),
-		Diagnostics: sdk.Diagnostics{},
-	}
+
+	*resp = sdk.NewProvisionOutput(make(map[string]string), req.CommandLine, make(map[string]sdk.OutputFile), sdk.CacheOperations{
+		Puts:    make(map[string]sdk.CacheEntry),
+		Removes: []string{},
+	}, sdk.Diagnostics{})
+
 	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
 	return nil
 }

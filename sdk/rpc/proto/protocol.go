@@ -60,6 +60,7 @@ type ImportCredentialRequest struct {
 
 // ProvisionCredentialRequest augments sdk.ProvisionInput with a CredentialID so Provision() can be called over RPC.
 type ProvisionCredentialRequest struct {
+	CommandLine []string
 	ProvisionerID
 	sdk.ProvisionInput
 }

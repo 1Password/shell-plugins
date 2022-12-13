@@ -71,6 +71,16 @@ type ProvisionOutput struct {
 	Diagnostics Diagnostics
 }
 
+func NewProvisionOutput(Environment map[string]string, CommandLine []string, Files map[string]OutputFile, Cache CacheOperations, Diagnostics Diagnostics) ProvisionOutput {
+	return ProvisionOutput{
+		Environment: Environment,
+		CommandLine: CommandLine,
+		Files:       Files,
+		Cache:       Cache,
+		Diagnostics: Diagnostics,
+	}
+}
+
 type DeprovisionOutput struct {
 	Diagnostics Diagnostics
 }
