@@ -61,7 +61,7 @@ func TryConfigFile() sdk.Importer {
 			}
 
 			// add only candidates with required credential fields
-			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+			if fields[fieldname.Token] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields:   fields,
 				})
