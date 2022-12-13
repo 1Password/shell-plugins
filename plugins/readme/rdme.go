@@ -8,23 +8,23 @@ import (
 )
 
 var commands = [][]string{
-	[]string{"openapi"},
+	{"openapi"},
 
-	[]string{"docs"},
-	[]string{"docs:prune"},
-	[]string{"guides"},
-	[]string{"guides:prune"},
+	{"docs"},
+	{"docs:prune"},
+	{"guides"},
+	{"guides:prune"},
 
-	[]string{"changelogs"},
-	[]string{"custompages"},
+	{"changelogs"},
+	{"custompages"},
 
-	[]string{"versions"},
-	[]string{"versions:create"},
-	[]string{"versions:delete"},
-	[]string{"versions:update"},
+	{"versions"},
+	{"versions:create"},
+	{"versions:delete"},
+	{"versions:update"},
 
-	[]string{"categories"},
-	[]string{"categories:create"},
+	{"categories"},
+	{"categories:create"},
 }
 
 func ReadMeCLI() schema.Executable {
@@ -32,7 +32,7 @@ func ReadMeCLI() schema.Executable {
 		Name:      "ReadMe CLI",
 		Runs:      []string{"rdme"},
 		DocsURL:   sdk.URL("https://docs.readme.com/main/docs/rdme"),
-		NeedsAuth: needsauth.ForCommands(commands),
+		NeedsAuth: needsauth.ForCommands(commands...),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
