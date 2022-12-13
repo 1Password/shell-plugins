@@ -73,18 +73,21 @@ type GetPluginResponse struct {
 type ImportCredentialRequest struct {
 	CredentialID
 	sdk.ImportInput
+	sdk.ImportOutput
 }
 
 // ProvisionCredentialRequest augments sdk.ProvisionInput with a CredentialID so Provision() can be called over RPC.
 type ProvisionCredentialRequest struct {
 	ProvisionerID
 	sdk.ProvisionInput
+	sdk.ProvisionOutput
 }
 
 // DeprovisionCredentialRequest augments sdk.DeprovisionInput with a CredentialID so Deprovision() can be called over RPC.
 type DeprovisionCredentialRequest struct {
 	ProvisionerID
 	sdk.DeprovisionInput
+	sdk.DeprovisionOutput
 }
 
 // ExecutableNeedsAuthRequest augments sdk.NeedsAuthenticationInput with the ID of an executable so NeedsAuth() can be

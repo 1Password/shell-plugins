@@ -124,6 +124,7 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 			funcName: "Importer",
 		}
 	}
+	*resp = req.ImportOutput
 	importer(context.Background(), req.ImportInput, resp)
 	return nil
 }
@@ -148,12 +149,7 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 	if err != nil {
 		return err
 	}
-	*resp = sdk.ProvisionOutput{
-		Environment: make(map[string]string),
-		CommandLine: nil,
-		Files:       make(map[string]sdk.OutputFile),
-		Diagnostics: sdk.Diagnostics{},
-	}
+	*resp = req.ProvisionOutput
 	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
 	return nil
 }
@@ -166,9 +162,7 @@ func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCreden
 	if err != nil {
 		return err
 	}
-	*resp = sdk.DeprovisionOutput{
-		Diagnostics: sdk.Diagnostics{},
-	}
+	*resp = req.DeprovisionOutput
 	provisioner.Deprovision(context.Background(), req.DeprovisionInput, resp)
 	return nil
 }
