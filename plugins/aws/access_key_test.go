@@ -17,7 +17,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -44,7 +43,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -71,7 +69,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -98,7 +95,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -122,7 +118,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
@@ -143,7 +138,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.AccessKeyID:     "AKIADEFFODNN7EXAMPLE",
 						fieldname.SecretAccessKey: "DEFlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",

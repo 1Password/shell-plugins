@@ -144,7 +144,7 @@ func TryCredentialsFile() sdk.Importer {
 			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields:   fields,
-					NameHint: profileName,
+					NameHint: importer.SanitizeNameHint(profileName),
 				})
 			}
 		}
