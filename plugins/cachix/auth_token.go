@@ -20,13 +20,12 @@ func AuthToken() schema.CredentialType {
 				MarkdownDescription: "Token used to authenticate to Cachix.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					// Cache auth token consists of 149 chars whereas personal auth token consists of
-					// 145 chars.
+					// The tokens are JWT's.
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
-						Symbols:   true,
+						Specific:  []rune{'.', '-', '_'},
 					},
 				},
 			},
