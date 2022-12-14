@@ -35,6 +35,12 @@ func APIKey() schema.CredentialType {
 					},
 				},
 			},
+			{
+				Name:                fieldname.Website,
+				MarkdownDescription: "The ReadMe project URL.",
+				Secret:              false,
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
@@ -43,11 +49,10 @@ func APIKey() schema.CredentialType {
 		)}
 }
 
-// TODO: figure out why RDME_API_KEY isn't being set as env var
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"RDME_API_KEY": fieldname.APIKey,
 	"RDME_EMAIL":   fieldname.Username,
-	// "RDME_PROJECT": fieldname.Website,
+	"RDME_PROJECT": fieldname.Website,
 }
 
 func TryReadMeConfigFile() sdk.Importer {
@@ -62,12 +67,14 @@ func TryReadMeConfigFile() sdk.Importer {
 			return
 		}
 
+		var website string = "https://dash.readme.com/go/" + config.Subdomain
+
 		out.AddCandidate(sdk.ImportCandidate{
 			NameHint: config.Subdomain,
 			Fields: map[sdk.FieldName]string{
 				fieldname.Username: config.Email,
 				fieldname.APIKey:   config.APIKey,
-				// fieldname.Website: config.Subdomain, // TODO: figure out URL templating here
+				fieldname.Website:  website,
 			},
 		})
 	})

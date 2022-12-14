@@ -14,14 +14,14 @@ func TestAPIKeyImporter(t *testing.T) {
 			Environment: map[string]string{
 				"RDME_API_KEY": "rdme_9o50rxz28p0msun40apgyzvkdji2vhxyd7b8emioclkrx57ucpb5x2d31yu39taexample",
 				"RDME_EMAIL":   "owlbert@readme.io",
-				// "RDME_PROJECT": "test-subdomain",
+				"RDME_PROJECT": "test-subdomain",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Username: "owlbert@readme.io",
 						fieldname.APIKey:   "rdme_9o50rxz28p0msun40apgyzvkdji2vhxyd7b8emioclkrx57ucpb5x2d31yu39taexample",
-						// fieldname.Website:  "test-subdomain",
+						fieldname.Website:  "test-subdomain",
 					},
 				},
 			},
@@ -35,7 +35,7 @@ func TestAPIKeyImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.Username: "owlbert@readme.io",
 						fieldname.APIKey:   "rdme_9o50rxz28p0msun40apgyzvkdji2vhxyd7b8emioclkrx57ucpb5x2d31yu39taexample",
-						// fieldname.Website: "test-subdomain",
+						fieldname.Website:  "https://dash.readme.com/go/test-subdomain",
 					},
 					NameHint: "test-subdomain",
 				},
@@ -50,13 +50,13 @@ func TestSecretKeyProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Username: "owlbert@readme.io",
 				fieldname.APIKey:   "rdme_9o50rxz28p0msun40apgyzvkdji2vhxyd7b8emioclkrx57ucpb5x2d31yu39taexample",
-				// fieldname.Website:  "test-subdomain",
+				fieldname.Website:  "https://dash.readme.com/go/test-subdomain",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"RDME_EMAIL":   "owlbert@readme.io",
 					"RDME_API_KEY": "rdme_9o50rxz28p0msun40apgyzvkdji2vhxyd7b8emioclkrx57ucpb5x2d31yu39taexample",
-					// "RDME_PROJECT": "test-subdomain",
+					"RDME_PROJECT": "https://dash.readme.com/go/test-subdomain",
 				},
 			},
 		},
