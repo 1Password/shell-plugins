@@ -9,7 +9,7 @@ import (
 )
 
 func TestAuthTokenImporter(t *testing.T) {
-	plugintest.TestImporter(t, AuthToken().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, PersonalAccessToken().Importer, map[string]plugintest.ImportCase{
 		"default": {
 			Environment: map[string]string{
 				"LINODE_CLI_TOKEN": "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
@@ -38,7 +38,7 @@ func TestAuthTokenImporter(t *testing.T) {
 }
 
 func TestAuthTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, AuthToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:        "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
