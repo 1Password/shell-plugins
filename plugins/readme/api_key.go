@@ -28,7 +28,6 @@ func APIKey() schema.CredentialType {
 				MarkdownDescription: "API Key used to authenticate to ReadMe.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 75,
 					Prefix: "rdme_",
 					Charset: schema.Charset{
 						Lowercase: true,
