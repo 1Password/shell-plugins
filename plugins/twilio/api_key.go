@@ -23,6 +23,7 @@ func APIKey() schema.CredentialType {
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
+						Lowercase: true,
 					},
 					Prefix: "AC",
 				},
@@ -36,6 +37,7 @@ func APIKey() schema.CredentialType {
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
+						Lowercase: true,
 					},
 					Prefix: "SK",
 				},
@@ -49,6 +51,7 @@ func APIKey() schema.CredentialType {
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
+						Lowercase: true,
 					},
 				},
 			},
