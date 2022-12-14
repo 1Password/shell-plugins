@@ -2,7 +2,6 @@ package linode
 
 import (
 	"context"
-	"os"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -50,22 +49,15 @@ func TryConfigFile() sdk.Importer {
 			return
 		}
 
-		if err != nil && !os.IsNotExist(err) {
-			out.AddError(err)
-		}
-
+		fields := make(map[sdk.FieldName]string)
 		for _, section := range configFile.Sections() {
-			fields := make(map[sdk.FieldName]string)
 			if section.HasKey("token") && section.Key("token").Value() != "" {
 				fields[fieldname.Token] = section.Key("token").Value()
 			}
-
-			// add only candidates with required credential fields
-			if fields[fieldname.Token] != "" {
-				out.AddCandidate(sdk.ImportCandidate{
-					Fields:   fields,
-				})
-			}
 		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: fields,
+		})
 	})
 }
