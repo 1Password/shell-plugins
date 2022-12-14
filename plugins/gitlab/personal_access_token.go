@@ -85,7 +85,7 @@ func TryGlabConfigFile() sdk.Importer {
 
 			out.AddCandidate(sdk.ImportCandidate{
 				Fields:   fields,
-				NameHint: nameHint,
+				NameHint: importer.SanitizeNameHint(nameHint),
 			})
 		}
 	})

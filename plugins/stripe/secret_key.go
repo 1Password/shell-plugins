@@ -2,7 +2,6 @@ package stripe
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -85,6 +84,8 @@ func TryStripeConfigFile() sdk.Importer {
 				continue // skip sections that don't define credentials
 			}
 
+			nameHint := importer.SanitizeNameHint(project)
+
 			// We only support secret keys for now.
 			// Support for publishable and restricted keys will be added later.
 			if strings.HasPrefix(config.LiveModeAPIKey, "sk_") {
@@ -93,16 +94,22 @@ func TryStripeConfigFile() sdk.Importer {
 						fieldname.Key:  config.LiveModeAPIKey,
 						fieldname.Mode: ModeLive,
 					},
-					NameHint: project,
+					NameHint: nameHint,
 				})
 			}
 			if strings.HasPrefix(config.TestModeAPIKey, "sk_") {
+				// Mention "test" in name hint
+				if nameHint != "" {
+					nameHint += " - "
+				}
+				nameHint += "test"
+
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  config.TestModeAPIKey,
 						fieldname.Mode: ModeTest,
 					},
-					NameHint: fmt.Sprintf("%s – test", project),
+					NameHint: nameHint,
 				})
 			}
 		}

@@ -85,6 +85,31 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"GitHub config file": {
+			Files: map[string]string{
+				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts.yml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "ghp_B2xokoZVNaqxLhWzxXY0MoARZyZlgEXAMPLE",
+					},
+				},
+				{
+					NameHint: "enterprise.github.com",
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "ghp_4v7aWhddhdqyIR1RmqiRcUjTgzrNFEXAMPLE",
+						fieldname.Host:  "enterprise.github.com",
+					},
+				},
+			},
+		},
+		"Not import gho_ tokens from GitHub config file": {
+			Files: map[string]string{
+				"~/.config/gh/hosts.yml": plugintest.LoadFixture(t, "hosts_gho_token.yml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{},
+		},
 	})
 }
 
