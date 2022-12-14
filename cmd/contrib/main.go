@@ -467,7 +467,7 @@ func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
 				},
 			},
 		},
-		// TODO: If you implemented a config file importer, add a test file example in {{ .Name }}/fixtures
+		// TODO: If you implemented a config file importer, add a test file example in {{ .Name }}/test-fixtures
 		// and fill the necessary details in the test template below.
 		"config file": {
 			Files: map[string]string{
