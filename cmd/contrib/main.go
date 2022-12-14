@@ -471,7 +471,7 @@ func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
 		// and fill the necessary details in the test template below.
 		"config file": {
 			Files: map[string]string{
-				// "~/path/to/config/file.yml": plugintest.LoadFixture(t, "your_local_fixture.yaml"),
+				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 			// 	{
