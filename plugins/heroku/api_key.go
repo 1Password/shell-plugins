@@ -63,7 +63,7 @@ func TryNetrcFile() sdk.Importer {
 				if login != "" && password != "" && machine != "" {
 					if machine == "api.heroku.com" || machine == "git.heroku.com" {
 						out.AddCandidate(sdk.ImportCandidate{
-							NameHint: login,
+							NameHint: importer.SanitizeNameHint(login),
 							Fields: map[sdk.FieldName]string{
 								fieldname.APIKey: password,
 							},

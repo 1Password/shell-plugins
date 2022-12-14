@@ -24,6 +24,19 @@ func TestAPIKeyImporter(t *testing.T) {
 				},
 			},
 		},
+		"config file": {
+			Files: map[string]string{
+				"~/.dogrc": plugintest.LoadFixture(t, ".dogrc"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.APIKey: "fbypf5r8ifaitop8l1v2eij5jexample",
+						fieldname.AppKey: "7czlyi5zub72zsheuctce49pfro8swdcnexample",
+					},
+				},
+			},
+		},
 	})
 }
 

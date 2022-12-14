@@ -34,21 +34,20 @@ func TestSecretKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "default – test",
+					NameHint: "test",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  "sk_uKVoEC2LqU1aXSbKM1ptxFB3QxWiSTMTnbr0CGvkEBMFOs2vetsHc148WMhtrVRAAsP4fcRd35Fz7ykqbhLoa04ZoA7AcRKvUEXAMPLE",
 						fieldname.Mode: ModeTest,
 					},
 				},
 				{
-					NameHint: "default",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  "sk_TEm8TYekzqaEKmSIDRb4PXJQAoq94iL6PZx4C1RQlr1Ls5kn67RVRJjhBfmejEX8OS4T7GxCWBnqBuIG20SzdEwopINxyEL05EXAMPLE",
 						fieldname.Mode: ModeLive,
 					},
 				},
 				{
-					NameHint: "custom – test",
+					NameHint: "custom - test",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Key:  "sk_9Q9YiSK3uWDqSiNYLakhI6s3f6uHQekczqqdfpRsOI0Zwc6ozOMNAzNfVSNlhnA6IipOakrnF8gdhJ5sC97acFy9d0UbhKe2WEXAMPLE",
 						fieldname.Mode: ModeTest,

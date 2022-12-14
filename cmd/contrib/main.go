@@ -118,7 +118,7 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans interface{}) error {
+			Validate: func(ans any) error {
 				if str, ok := ans.(string); ok {
 					hasUpper := false
 					for _, char := range str {
@@ -152,6 +152,7 @@ func newPlugin() error {
 		PlatformNameUpperCamelCase   string
 		ValueComposition             schema.ValueComposition
 		FieldName                    string
+		FieldNameUpperCamelCase      string
 		CredentialEnvVarName         string
 		IsNewCredentialName          bool
 		CredentialNameUpperCamelCase string
@@ -173,7 +174,6 @@ func newPlugin() error {
 
 	result.CredentialNameUpperCamelCase = strings.Join(credNameSplit, "")
 	result.CredentialNameSnakeCase = strings.ToLower(strings.Join(credNameSplit, "_"))
-	result.CredentialEnvVarName = strings.ToUpper(result.Name + "_" + result.CredentialNameSnakeCase)
 
 	result.IsNewCredentialName = true
 	for _, existing := range credname.ListAll() {
@@ -183,8 +183,24 @@ func newPlugin() error {
 		}
 	}
 
-	// As a placeholder, assume the field name is the last word of the credential name, e.g. "Token"
-	result.FieldName = credNameSplit[len(credNameSplit)-1]
+	// As a placeholder, assume the field name is the short version (max 7 chars) of the credential name, starting
+	// from the last word. For example:
+	// "Personal Access Token" => "Token"
+	// "Secret Key" => "Key"
+	// "API Key" => "API Key"
+	var fieldNameSplit []string
+	lengthCutoff := 7
+	for i := range credNameSplit {
+		word := credNameSplit[len(credNameSplit)-1-i]
+		if len(strings.Join(append(fieldNameSplit, word), " ")) > lengthCutoff {
+			break
+		}
+
+		fieldNameSplit = append([]string{word}, fieldNameSplit...)
+	}
+	result.FieldName = strings.Join(fieldNameSplit, " ")
+	result.FieldNameUpperCamelCase = strings.Join(fieldNameSplit, "")
+	result.CredentialEnvVarName = strings.ToUpper(strings.Join(append([]string{result.Name}, fieldNameSplit...), "_"))
 
 	relativeDirPath := filepath.Join("plugins", result.Name)
 	err = os.MkdirAll(relativeDirPath, 0777)
@@ -345,7 +361,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 		ManagementURL: sdk.URL("https://console.{{ .Name }}.com/user/security/tokens"), // TODO: Replace with actual URL
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.{{ .FieldName }},
+				Name:                fieldname.{{ .FieldNameUpperCamelCase }},
 				MarkdownDescription: "{{ .FieldName }} used to authenticate to {{ .PlatformName }}.",
 				Secret:              true,
 				{{- if .ValueComposition.Length }}
@@ -382,7 +398,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"{{ .CredentialEnvVarName }}": fieldname.{{ .FieldName }}, // TODO: Check if this is correct
+	"{{ .CredentialEnvVarName }}": fieldname.{{ .FieldNameUpperCamelCase }}, // TODO: Check if this is correct
 }
 
 // TODO: Check if the platform stores the {{ .CredentialName }} in a local config file, and if so,
@@ -395,13 +411,13 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 		// 	return
 		// }
 
-		// if config.{{ .FieldName }} == "" {
+		// if config.{{ .FieldNameUpperCamelCase }} == "" {
 		// 	return
 		// }
 
 		// out.AddCandidate(sdk.ImportCandidate{
 		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.{{ .FieldName }}: config.{{ .FieldName }},
+		// 		fieldname.{{ .FieldNameUpperCamelCase }}: config.{{ .FieldNameUpperCamelCase }},
 		// 	},
 		// })
 	})
@@ -409,7 +425,7 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 
 // TODO: Implement the config file schema
 // type Config struct {
-//	{{ .FieldName }} string
+//	{{ .FieldNameUpperCamelCase }} string
 // }
 `,
 }
