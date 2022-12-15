@@ -25,8 +25,6 @@ var commands = [][]string{
 
 	{"categories"},
 	{"categories:create"},
-
-	{"whoami"},
 }
 
 func ReadMeCLI() schema.Executable {
