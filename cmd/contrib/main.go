@@ -120,19 +120,16 @@ func newPlugin() error {
 			},
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
-					credNamesContainStr := false
-					for _, name := range credname.ListAll() {
-						if strings.EqualFold(name.String(), str) {
-							credNamesContainStr = true
-							break
+					if len(str) == 0 {
+						return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+					}
+
+					words := strings.Split(str, " ")
+					for _, word := range words {
+						if unicode.IsLower(int32(word[0])) {
+							return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
 						}
 					}
-
-					if !credNamesContainStr {
-						return errors.New(`credential name must be one of the suggested, e.g. "Access Key" or "Personal Access Token"`)
-					}
-
-					return nil
 				}
 
 				return nil
