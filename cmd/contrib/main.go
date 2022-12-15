@@ -118,7 +118,7 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans interface{}) error {
+			Validate: func(ans any) error {
 				if str, ok := ans.(string); ok {
 					if len(str) == 0 {
 						return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
@@ -134,7 +134,7 @@ func newPlugin() error {
 
 				return nil
 			},
-			Transform: func(ans interface{}) (newAns interface{}) {
+			Transform: func(ans any) (newAns any) {
 				if str, ok := ans.(string); ok {
 					for _, name := range credname.ListAll() {
 						if strings.EqualFold(name.String(), str) {
