@@ -120,9 +120,7 @@ func newPlugin() error {
 			},
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
-
 					credNamesContainStr := false
-
 					for _, name := range credname.ListAll() {
 						if strings.EqualFold(name.String(), str) {
 							credNamesContainStr = true
