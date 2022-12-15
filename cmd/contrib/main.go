@@ -137,6 +137,17 @@ func newPlugin() error {
 
 				return nil
 			},
+			Transform: func(ans interface{}) (newAns interface{}) {
+				if str, ok := ans.(string); ok {
+					for _, name := range credname.ListAll() {
+						if strings.ToLower(name.String()) == strings.ToLower(str) {
+							return string(name)
+						}
+					}
+				}
+
+				return ans
+			},
 		},
 		{
 			Name:   "ExampleCredential",
