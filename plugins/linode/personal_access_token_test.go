@@ -17,7 +17,7 @@ func TestAuthTokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token:        "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
+						fieldname.Token: "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
 					},
 				},
 			},
@@ -29,7 +29,7 @@ func TestAuthTokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token:        "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
+						fieldname.Token: "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
 					},
 				},
 			},
@@ -41,7 +41,7 @@ func TestAuthTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Token:        "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
+				fieldname.Token: "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
