@@ -120,9 +120,11 @@ func newPlugin() error {
 			},
 			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
+
 					credNamesContainStr := false
+
 					for _, name := range credname.ListAll() {
-						if strings.ToLower(name.String()) == strings.ToLower(str) {
+						if strings.EqualFold(name.String(), str) {
 							credNamesContainStr = true
 							break
 						}
@@ -140,7 +142,7 @@ func newPlugin() error {
 			Transform: func(ans interface{}) (newAns interface{}) {
 				if str, ok := ans.(string); ok {
 					for _, name := range credname.ListAll() {
-						if strings.ToLower(name.String()) == strings.ToLower(str) {
+						if strings.EqualFold(name.String(), str) {
 							return string(name)
 						}
 					}
