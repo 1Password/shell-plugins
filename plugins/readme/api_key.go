@@ -13,8 +13,8 @@ import (
 
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://docs.readme.com/main/reference/intro/authentication"),
+		Name:    credname.APIKey,
+		DocsURL: sdk.URL("https://docs.readme.com/main/reference/intro/authentication"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Username,
