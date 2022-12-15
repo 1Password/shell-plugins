@@ -19,7 +19,7 @@ func APIKey() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Username,
-				MarkdownDescription: "Currently logged-in ReadMe user.",
+				MarkdownDescription: "ReadMe user to log in as.",
 				Secret:              false,
 				Optional:            true,
 			},
