@@ -118,33 +118,8 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans any) error {
-				if str, ok := ans.(string); ok {
-					if len(str) == 0 {
-						return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
-					}
-
-					words := strings.Split(str, " ")
-					for _, word := range words {
-						if unicode.IsLower(int32(word[0])) {
-							return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
-						}
-					}
-				}
-
-				return nil
-			},
-			Transform: func(ans any) (newAns any) {
-				if str, ok := ans.(string); ok {
-					for _, name := range credname.ListAll() {
-						if strings.EqualFold(name.String(), str) {
-							return string(name)
-						}
-					}
-				}
-
-				return ans
-			},
+			Validate:  validateCredentialName,
+			Transform: transformCredentialName,
 		},
 		{
 			Name:   "ExampleCredential",
@@ -540,3 +515,32 @@ func init() {
 {{- end }}
 }
 `
+
+func validateCredentialName(ans any) error {
+	if str, ok := ans.(string); ok {
+		if len(str) == 0 {
+			return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+		}
+
+		words := strings.Split(str, " ")
+		for _, word := range words {
+			if unicode.IsLower(int32(word[0])) {
+				return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+			}
+		}
+	}
+
+	return nil
+}
+
+func transformCredentialName(ans any) (newAns any) {
+	if str, ok := ans.(string); ok {
+		for _, name := range credname.ListAll() {
+			if strings.EqualFold(name.String(), str) {
+				return string(name)
+			}
+		}
+	}
+
+	return ans
+}
