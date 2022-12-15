@@ -118,17 +118,20 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans any) error {
+			Validate: func(ans interface{}) error {
 				if str, ok := ans.(string); ok {
-					hasUpper := false
-					for _, char := range str {
-						if unicode.IsUpper(char) {
-							hasUpper = true
+					credNamesContainStr := false
+					for _, name := range credname.ListAll() {
+						if strings.ToLower(name.String()) == strings.ToLower(str) {
+							credNamesContainStr = true
+							break
 						}
 					}
-					if !hasUpper {
-						return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+
+					if !credNamesContainStr {
+						return errors.New(`credential name must be one of the suggested, e.g. "Access Key" or "Personal Access Token"`)
 					}
+
 					return nil
 				}
 
