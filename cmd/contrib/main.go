@@ -157,6 +157,7 @@ func newPlugin() error {
 		IsNewCredentialName          bool
 		CredentialNameUpperCamelCase string
 		CredentialNameSnakeCase      string
+		TestCredentialExample        string
 	}{}
 
 	err := survey.Ask(questionnaire, &result)
@@ -166,6 +167,16 @@ func newPlugin() error {
 
 	if result.ExampleCredential != "" {
 		result.ValueComposition = getValueComposition(result.ExampleCredential)
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(result.ValueComposition)
+	} else {
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(schema.ValueComposition{
+			Charset: schema.Charset{
+				Uppercase: true,
+				Lowercase: true,
+				Digits:    true,
+			},
+			Length: 30,
+		})
 	}
 
 	result.PlatformNameUpperCamelCase = strings.ReplaceAll(result.PlatformName, " ", "")
@@ -211,6 +222,7 @@ func newPlugin() error {
 	templates := []Template{pluginTemplate}
 	if result.CredentialName != "" {
 		templates = append(templates, credentialTemplate)
+		templates = append(templates, credentialTestTemplate)
 	}
 	if result.Executable != "" {
 		templates = append(templates, executableTemplate)
@@ -427,6 +439,66 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 // type Config struct {
 //	{{ .FieldNameUpperCamelCase }} string
 // }
+`,
+}
+
+var credentialTestTemplate = Template{
+	Filename: "{{ .CredentialNameSnakeCase }}_test.go",
+	Contents: `package {{ .Name }}
+
+import (
+	"testing"
+	
+	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/plugintest"
+	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+)
+	
+func Test{{ .CredentialNameUpperCamelCase }}Provisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, {{ .CredentialNameUpperCamelCase }}().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+				fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"{{ .CredentialEnvVarName }}": "{{ .TestCredentialExample }}",
+				},
+			},
+		},
+	})
+}
+
+func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
+	plugintest.TestImporter(t, {{ .CredentialNameUpperCamelCase }}().Importer, map[string]plugintest.ImportCase{
+		"environment": {
+			Environment: map[string]string{ // TODO: Check if this is correct
+				"{{ .CredentialEnvVarName }}": "{{ .TestCredentialExample }}",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+					},
+				},
+			},
+		},
+		// TODO: If you implemented a config file importer, add a test file example in {{ .Name }}/test-fixtures
+		// and fill the necessary details in the test template below.
+		"config file": {
+			Files: map[string]string{
+				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+			// 	{
+			// 		Fields: map[sdk.FieldName]string{
+			// 			fieldname.Token: "{{ .TestCredentialExample }}",
+			// 		},
+			// 	},
+			},
+		},
+	})
+}
 `,
 }
 
