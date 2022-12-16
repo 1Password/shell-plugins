@@ -4,3 +4,5 @@ default-user = acme
 [acme]
 token = cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample
 
+[prod]
+token = 92bs7ljhixcnfwlwhcdxkp3d4z6p5qza17jiwwf61duwcend43nlz86rkexample

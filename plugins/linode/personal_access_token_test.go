@@ -28,8 +28,15 @@ func TestAuthTokenImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
+					NameHint: "acme",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "cn5z4umbimz0lxgzvps1bl979n8lpwnu6qmb4x19bddzx6siormnoxg2yexample",
+					},
+				},
+				{
+					NameHint: "prod",
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "92bs7ljhixcnfwlwhcdxkp3d4z6p5qza17jiwwf61duwcend43nlz86rkexample",
 					},
 				},
 			},
