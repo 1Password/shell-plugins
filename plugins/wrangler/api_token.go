@@ -26,6 +26,7 @@ func APIToken() schema.CredentialType {
 						Lowercase: true,
 						Digits:    true,
 					},
+					Length: 32,
 				},
 			},
 			{
@@ -38,6 +39,7 @@ func APIToken() schema.CredentialType {
 						Lowercase: true,
 						Digits:    true,
 					},
+					Length: 37,
 				},
 			},
 		},
