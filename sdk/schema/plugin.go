@@ -3,6 +3,8 @@ package schema
 import (
 	"fmt"
 	"net/url"
+
+	"github.com/1Password/shell-plugins/sdk"
 )
 
 // Plugin provides the schema for a single shell plugin. A plugin focuses on a single platform
@@ -19,6 +21,10 @@ type Plugin struct {
 
 	// One or more specifications for the executables the plugin offers.
 	Executables []Executable
+
+	// (Optional) Register new credential selectors that other plugins can use to take over authentication for
+	// executables in this plugin.
+	CredentialSelectors []sdk.CredentialSelector
 }
 
 // PlatformInfo provides information on the platform of the shell plugin.

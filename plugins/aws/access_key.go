@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/credselect"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
@@ -61,6 +62,9 @@ func AccessKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: AWSProvisioner(),
+		CustomProvisioners: map[sdk.CredentialSelector]sdk.Provisioner{
+			credselect.CanAuthenticateToDockerRegistry: ECRProvisioner(),
+		},
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryEnvVarPair(map[string]sdk.FieldName{

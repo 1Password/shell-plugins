@@ -37,6 +37,18 @@ type CredentialUsage struct {
 	// set in the credential schema, so should only be used if this executable requires a custom configuration, that deviates
 	// from the way the credential is usually provisioned.
 	Provisioner sdk.Provisioner
+
+	ProvisionerFunc func(plugin string, credentialType CredentialType) sdk.Provisioner
+
+	Select sdk.CredentialSelector
+
+	SelectFrom []CredentialUsage
+
+	AllowMultiple bool
+
+	NeedsAuth sdk.NeedsAuthentication
+
+	Description string
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {

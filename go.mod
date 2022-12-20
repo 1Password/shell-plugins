@@ -7,6 +7,7 @@ require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/aws/aws-sdk-go-v2 v1.17.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.23
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.17.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.17.1
 	github.com/fatih/color v1.13.0
 	github.com/hashicorp/go-plugin v1.4.6
@@ -24,6 +25,7 @@ require (
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/hashicorp/go-hclog v0.14.1 // indirect
 	github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
