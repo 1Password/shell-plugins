@@ -34,13 +34,19 @@ No more plaintext credentials in your home directory. Automatically authenticate
 
 ## 👫 Contributing
 
-This repository contains the list of available plugins, as well as the SDK to create new plugins.
-
 Is your favorite CLI not listed yet? Learn how to [build a shell plugin](https://developer.1password.com/docs/cli/shell-plugins/contribute) yourself and [open a PR](https://github.com/1Password/shell-plugins/pulls)!
 
-If you need help when building a plugin, create an issue on GitHub or join our [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) to tell us about your plugin proposal and we can advise you on the most suitable approach for your use case.
-
 For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Not sure where or how to get started? We're happy to help! You can:
+- Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our teammates
+- Join the Developer [Slack](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) workspace, and ask us any questions there
+
+## 💚 Community & Support
+
+- Join the Developer [Slack](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) workspace
+- Subscribe to the [Newsletter](https://1password.com/dev-subscribe/)
+- File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
 
 ## 📣 Beta Notice
 
