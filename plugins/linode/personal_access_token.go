@@ -50,10 +50,8 @@ func TryConfigFile() sdk.Importer {
 			return
 		}
 
-		fields := make(map[sdk.FieldName]string)
 		for _, section := range configFile.Sections() {
 			if section.HasKey("token") && section.Key("token").Value() != "" {
-				fields[fieldname.Token] = section.Key("token").Value()
 				out.AddCandidate(sdk.ImportCandidate{
 					NameHint: importer.SanitizeNameHint(section.Name()),
 					Fields: map[sdk.FieldName]string{
