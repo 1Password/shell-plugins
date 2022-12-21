@@ -49,18 +49,18 @@ func TryDigitalOceanConfigFile() sdk.Importer {
 			return
 		}
 
-		if config.Token == "" {
+		if config.AccessToken == "" {
 			return
 		}
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.Token: config.Token,
+				fieldname.Token: config.AccessToken,
 			},
 		})
 	})
 }
 
 type Config struct {
-	Token string `yaml:"access-token"`
+	AccessToken string `yaml:"access-token"`
 }
