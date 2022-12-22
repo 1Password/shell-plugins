@@ -40,12 +40,12 @@ For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Not sure where or how to get started? We're happy to help! You can:
 - Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our teammates
-- Join the Developer [Slack](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) workspace, and ask us any questions there
+- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA), and ask us any questions there
 
 ## 💚 Community & Support
 
 - File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
-- Join the Developer [Slack](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA) workspace
+- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA)
 - Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/)
 - Join our [Community Office Hours](https://1password.zoom.us/meeting/register/tJIqdeqtqT4jHterIHSSJ63tY719lUrJCufe) on January 17 at 12:00 Noon Eastern (New York City) time for live help and support in getting started using or building a Shell Plugin
 
