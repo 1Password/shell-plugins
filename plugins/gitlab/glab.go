@@ -9,10 +9,13 @@ import (
 
 func GitLabCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "GitLab CLI",
-		Runs:      []string{"glab"},
-		DocsURL:   sdk.URL("https://glab.readthedocs.io"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Name:    "GitLab CLI",
+		Runs:    []string{"glab"},
+		DocsURL: sdk.URL("https://glab.readthedocs.io"),
+		NeedsAuth: needsauth.For(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAccessToken,

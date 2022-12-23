@@ -14,7 +14,8 @@ func CircleCICLI() schema.Executable {
 		DocsURL: sdk.URL("https://circleci.com/docs/local-cli/"),
 		NeedsAuth: needsauth.For(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotForArgs("config"),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("config"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
