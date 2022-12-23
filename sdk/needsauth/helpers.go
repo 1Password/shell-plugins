@@ -111,11 +111,26 @@ func NotWhenContainsArgs(argsToSkip ...string) sdk.NeedsAuthentication {
 }
 
 func NotForHelp() sdk.NeedsAuthentication {
-	return NotForArgs("-h", "--help", "-help", "help")
+	return For(
+		NotWhenContainsArgs("-h"),
+		NotWhenContainsArgs("--help"),
+		NotWhenContainsArgs("-help"),
+		NotWhenContainsArgs("help"),
+	)
 }
 
 func NotForVersion() sdk.NeedsAuthentication {
-	return NotForArgs("-v", "--version", "-version", "version")
+	return For(
+		NotForExactArgs("-v"),
+		NotForExactArgs("--version"),
+		NotForExactArgs("-version"),
+		NotForExactArgs("version"),
+		NotForExactArgs("-V"),
+	)
+}
+
+func NotWithoutArgs() sdk.NeedsAuthentication {
+	return NotForExactArgs()
 }
 
 func NotForHelpOrVersion() sdk.NeedsAuthentication {
