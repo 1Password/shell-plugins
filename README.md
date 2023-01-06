@@ -39,7 +39,7 @@ Is your favorite CLI not listed yet? Learn how to [build a shell plugin](https:/
 For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Not sure where or how to get started? We're happy to help! You can:
-- Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our teammates
+- Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our developers
 - Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA), and ask us any questions there
 
 ## 💚 Community & Support
