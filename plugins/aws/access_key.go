@@ -59,6 +59,11 @@ func AccessKey() schema.CredentialType {
 				MarkdownDescription: "ARN of the MFA serial number to use to generate temporary STS credentials if the item contains a TOTP setup.",
 				Optional:            true,
 			},
+			{
+				Name:                fieldname.Role,
+				MarkdownDescription: "ARN of the Role to be assumed.",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: AWSProvisioner(),
 		Importer: importer.TryAll(

@@ -43,6 +43,7 @@ const (
 	User            = sdk.FieldName("User")
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
+	Role            = sdk.FieldName("Role")
 )
 
 func ListAll() []sdk.FieldName {
