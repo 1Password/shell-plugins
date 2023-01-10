@@ -1,0 +1,4 @@
+access-token: dop_v1_tr33mpd5m8q9t3ncisqbceydi8dd2n60pl1yiycg97z25fkqffp8j6ycjexample
+config: ${HOME}/Library/Application Support/doctl/config.yaml
+context: default
+output: text
