@@ -19,7 +19,7 @@ func APIToken() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
-				MarkdownDescription: "Token used to authenticate to crates.io or another cargo registry.",
+				MarkdownDescription: "Token used to authenticate to crates.io.",
 				Secret:              true,
 			},
 		},
