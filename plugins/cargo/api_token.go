@@ -19,7 +19,7 @@ func APIToken() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
-				MarkdownDescription: "Token used to authenticate to crates.io.",
+				MarkdownDescription: "Token used to authenticate to crates.io or another cargo registry.",
 				Secret:              true,
 			},
 		},
@@ -49,22 +49,11 @@ func TryCargoConfigFile() sdk.Importer {
 			NameHint: importer.SanitizeNameHint("crates.io"),
 		})
 
-		for regName, configRegistry := range config.Registries {
-			out.AddCandidate(sdk.ImportCandidate{
-				Fields: map[sdk.FieldName]string{
-					fieldname.Token: configRegistry.Token,
-				},
-				NameHint: importer.SanitizeNameHint(regName),
-			})
-
-		}
-
 	})
 }
 
 type Config struct {
-	Registry   ConfigRegistry            `toml:"registry"`
-	Registries map[string]ConfigRegistry `toml:"registries"`
+	Registry ConfigRegistry `toml:"registry"`
 }
 
 type ConfigRegistry struct {

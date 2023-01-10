@@ -48,18 +48,6 @@ func TestAPITokenImporter(t *testing.T) {
 					},
 					NameHint: "crates.io",
 				},
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "9xAQsMIO2UubpsgD2eUOKqXEXAMPLE2",
-					},
-					NameHint: "reg1",
-				},
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "9xAQsMIO2UubpsgD2eUOKqXEXAMPLE3",
-					},
-					NameHint: "reg2",
-				},
 			},
 		},
 	})
