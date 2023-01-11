@@ -46,7 +46,6 @@ func TryCargoConfigFile() sdk.Importer {
 			Fields: map[sdk.FieldName]string{
 				fieldname.Token: config.Registry.Token,
 			},
-			NameHint: importer.SanitizeNameHint("crates.io"),
 		})
 
 	})
