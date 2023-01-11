@@ -7,32 +7,34 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-var commands = [][]string{
-	{"openapi"},
-
-	{"docs"},
-	{"docs:prune"},
-	{"guides"},
-	{"guides:prune"},
-
-	{"changelogs"},
-	{"custompages"},
-
-	{"versions"},
-	{"versions:create"},
-	{"versions:delete"},
-	{"versions:update"},
-
-	{"categories"},
-	{"categories:create"},
-}
-
 func ReadMeCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "ReadMe CLI",
-		Runs:      []string{"rdme"},
-		DocsURL:   sdk.URL("https://docs.readme.com/main/docs/rdme"),
-		NeedsAuth: needsauth.ForCommands(commands...),
+		Name:    "ReadMe CLI",
+		Runs:    []string{"rdme"},
+		DocsURL: sdk.URL("https://docs.readme.com/main/docs/rdme"),
+		NeedsAuth: needsauth.For(
+			needsauth.NotForHelpOrVersion(),
+
+			needsauth.OnlyFor(
+				needsauth.ForCommand("openapi"),
+
+				needsauth.ForCommand("docs"),
+				needsauth.ForCommand("docs:prune"),
+				needsauth.ForCommand("guides"),
+				needsauth.ForCommand("guides:prune"),
+
+				needsauth.ForCommand("changelogs"),
+				needsauth.ForCommand("custompages"),
+
+				needsauth.ForCommand("versions"),
+				needsauth.ForCommand("versions:create"),
+				needsauth.ForCommand("versions:delete"),
+				needsauth.ForCommand("versions:update"),
+
+				needsauth.ForCommand("categories"),
+				needsauth.ForCommand("categories:create"),
+			),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,

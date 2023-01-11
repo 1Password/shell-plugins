@@ -15,8 +15,11 @@ import (
 // setting the environment variables, and configuring the home path using the temp dir.
 func TestImporter(t *testing.T, importer sdk.Importer, cases map[string]ImportCase) {
 	t.Helper()
+
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
+			t.Helper()
+
 			if c.ExpectedOutput != nil && len(c.ExpectedCandidates) > 0 {
 				t.Fatal("ExpectedOutput and ExpectedCandidates can't both be set in the same test case")
 			}
