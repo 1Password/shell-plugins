@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
@@ -145,6 +146,11 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.AddError(fmt.Errorf("your locally built plugin failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
