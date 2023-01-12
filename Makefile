@@ -27,6 +27,8 @@ validate: registry
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)
+	chmod 700 ~/.op
+	chmod 700 ~/.op/plugins
 
 %/build: $(plugins_dir) registry beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
