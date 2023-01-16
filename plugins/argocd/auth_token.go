@@ -61,14 +61,14 @@ func TryArgocdConfigFile() sdk.Importer {
 			nameHint := context.Name
 
 			for _, server := range config.Servers {
-				if server.ServerAddress == context.Server && server.ServerAddress != "" {
-					fields[fieldname.Address] = server.ServerAddress
+				if server.Server == context.Server && server.Server != "" {
+					fields[fieldname.Address] = server.Server
 				}
 			}
 
 			for _, user := range config.Users {
-				if user.Name == context.User && user.AuthenticationToken != "" {
-					fields[fieldname.AuthToken] = user.AuthenticationToken
+				if user.Name == context.User && user.AuthToken != "" {
+					fields[fieldname.AuthToken] = user.AuthToken
 				}
 			}
 
@@ -93,10 +93,10 @@ type Context struct {
 }
 
 type Server struct {
-	ServerAddress string `yaml:"server"`
+	Server string `yaml:"server"`
 }
 
 type User struct {
-	Name                string `yaml:"name"`
-	AuthenticationToken string `yaml:"auth-token"`
+	Name      string `yaml:"name"`
+	AuthToken string `yaml:"auth-token"`
 }
