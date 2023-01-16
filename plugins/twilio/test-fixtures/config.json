@@ -1,0 +1,18 @@
+{
+  "email": {},
+  "prompts": {},
+  "projects": [],
+  "profiles": {
+    "prod": {
+      "accountSid": "ACtdgcL157CFBnWjM7ZeJKysIjEEXAMPLE",
+      "apiKey": "SK4bqP76ByZgGEuwqm0eTFzYrWBEXAMPLE",
+      "apiSecret": "1KAe9Vshg4EkUvaBVS8pZwDS1EXAMPLE"
+    },
+    "dev": {
+      "accountSid": "ACZBgJOUfaX2AuuLMWK7jT3tdS9EXAMPLE",
+      "apiKey": "SKrhNjOV2LgR1xatOpVFsMa5fOpEXAMPLE",
+      "apiSecret": "4ELE8BqwbCrzbyTqu7HNylK00EXAMPLE"
+    }
+  },
+  "activeProject": null
+}
