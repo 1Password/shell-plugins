@@ -15,9 +15,6 @@ func PersonalAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.PersonalAccessToken,
 		DocsURL: sdk.URL("https://docs.databricks.com/dev-tools/auth.html"),
-		// The management URL is spesific to each deployment of Databricks, but this
-		// link describes how to manage tokens provided you are logged in.
-		ManagementURL: sdk.URL("https://docs.databricks.com/dev-tools/auth.html"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
