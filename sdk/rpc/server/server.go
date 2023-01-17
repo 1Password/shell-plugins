@@ -121,7 +121,7 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 	defer func() {
 		if err := recover(); err != nil {
 			caughtPanic := fmt.Errorf("your locally built plugin's importing failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))
-			diagnostics := sdk.Diagnostics{Errors: []sdk.Error{{caughtPanic.Error()}}}
+			diagnostics := sdk.Diagnostics{Errors: []sdk.Error{{Message: caughtPanic.Error()}}}
 			resp.Attempts = []*sdk.ImportAttempt{
 				{
 					Candidates:  nil,
@@ -180,7 +180,7 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.AddError(fmt.Errorf("your locally built plugin's deprovisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+			resp.Diagnostics.Errors = append(resp.Diagnostics.Errors, sdk.Error{Message: fmt.Sprintf("your locally built plugin's deprovisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))})
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
