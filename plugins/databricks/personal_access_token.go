@@ -30,21 +30,9 @@ func PersonalAccessToken() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Username,
-				MarkdownDescription: "The username of the user to authenticate as. This is only required if you are using username/password authentication.",
-				Optional:            true,
-			},
-			{
-				Name:                fieldname.Password,
-				MarkdownDescription: "The password of the user to authenticate as. This is only required if you are using username/password authentication.",
-				Optional:            true,
-				Secret:              true,
-			},
-			{
 				Name:                fieldname.Token,
 				MarkdownDescription: "Personal access token used to authenticate to Databricks.",
 				Secret:              true,
-				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Length: 38,
 					Charset: schema.Charset{
@@ -65,10 +53,8 @@ func PersonalAccessToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"DATABRICKS_HOST":     fieldname.Host,
-	"DATABRICKS_TOKEN":    fieldname.Token,
-	"DATABRICKS_USERNAME": fieldname.Username,
-	"DATABRICKS_PASSWORD": fieldname.Password,
+	"DATABRICKS_HOST":  fieldname.Host,
+	"DATABRICKS_TOKEN": fieldname.Token,
 }
 
 func TryDatabricksConfigFile() sdk.Importer {
@@ -86,18 +72,12 @@ func TryDatabricksConfigFile() sdk.Importer {
 			if section.HasKey("host") && section.Key("host").Value() != "" {
 				fields[fieldname.Host] = section.Key("host").Value()
 			}
-			if section.HasKey("username") && section.Key("username").Value() != "" {
-				fields[fieldname.Username] = section.Key("username").Value()
-			}
-			if section.HasKey("password") && section.Key("password").Value() != "" {
-				fields[fieldname.Password] = section.Key("password").Value()
-			}
 			if section.HasKey("token") && section.Key("token").Value() != "" {
 				fields[fieldname.Token] = section.Key("token").Value()
 			}
 
 			// add only candidates with required credential fields
-			if fields[fieldname.Host] != "" && (fields[fieldname.Token] != "" || (fields[fieldname.Username] != "" && fields[fieldname.Password] != "")) {
+			if fields[fieldname.Host] != "" && fields[fieldname.Token] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields:   fields,
 					NameHint: importer.SanitizeNameHint(profileName),
@@ -108,8 +88,6 @@ func TryDatabricksConfigFile() sdk.Importer {
 }
 
 type Config struct {
-	Host     string
-	Username string
-	Password string
-	Token    string
+	Host  string
+	Token string
 }
