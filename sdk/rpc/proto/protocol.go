@@ -76,11 +76,21 @@ type ImportCredentialRequest struct {
 	sdk.ImportOutput
 }
 
+type ImportCredentialResponse struct {
+	*sdk.ImportOutput
+	Panic *Panic
+}
+
 // ProvisionCredentialRequest augments sdk.ProvisionInput with a CredentialID so Provision() can be called over RPC.
 type ProvisionCredentialRequest struct {
 	ProvisionerID
 	sdk.ProvisionInput
 	sdk.ProvisionOutput
+}
+
+type ProvisionCredentialResponse struct {
+	*sdk.ProvisionOutput
+	Panic *Panic
 }
 
 // DeprovisionCredentialRequest augments sdk.DeprovisionInput with a CredentialID so Deprovision() can be called over RPC.
@@ -90,9 +100,19 @@ type DeprovisionCredentialRequest struct {
 	sdk.DeprovisionOutput
 }
 
+type DeprovisionCredentialResponse struct {
+	*sdk.DeprovisionOutput
+	Panic *Panic
+}
+
 // ExecutableNeedsAuthRequest augments sdk.NeedsAuthenticationInput with the ID of an executable so NeedsAuth() can be
 // called over RPC. ExecutableID resembles the slice index of the executable in schema.Plugin.
 type ExecutableNeedsAuthRequest struct {
 	ExecutableID
 	sdk.NeedsAuthenticationInput
+}
+
+type Panic struct {
+	Error string
+	Stack []byte
 }
