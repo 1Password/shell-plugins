@@ -16,13 +16,13 @@ func AccessToken() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Username,
-				MarkdownDescription: "Your Sourcegraph username.",
+				MarkdownDescription: "Username on your Sourcegraph instance.",
 				Secret:              false,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
-						Symbols:   true,
+						Specific:  []rune{'.', '-', '_'},
 					},
 				},
 				Optional: true,
