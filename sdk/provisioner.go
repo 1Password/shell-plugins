@@ -132,6 +132,12 @@ func (out *ProvisionOutput) AddError(err error) {
 	out.Diagnostics.Errors = append(out.Diagnostics.Errors, Error{err.Error()})
 }
 
+// AddError can be used to report an error to the deprovision output. If the deprovision output contains one
+// or more errors, provisioning is considered failed.
+func (out *DeprovisionOutput) AddError(err error) {
+	out.Diagnostics.Errors = append(out.Diagnostics.Errors, Error{err.Error()})
+}
+
 // FromHomeDir returns a path with the user's home directory prepended.
 func (in *ProvisionInput) FromHomeDir(path ...string) string {
 	return filepath.Join(append([]string{in.HomeDir}, path...)...)

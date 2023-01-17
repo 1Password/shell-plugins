@@ -118,6 +118,20 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 // CredentialImport is a remote version of the Import() function in schema.CredentialType.
 // The call is forwarded to the Import() function of the credential identified by req.CredentialID.
 func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sdk.ImportOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			caughtPanic := fmt.Errorf("your locally built plugin's importing failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))
+			diagnostics := sdk.Diagnostics{Errors: []sdk.Error{{caughtPanic.Error()}}}
+			resp.Attempts = []*sdk.ImportAttempt{
+				{
+					Candidates:  nil,
+					Source:      sdk.ImportSource{},
+					Diagnostics: diagnostics,
+				},
+			}
+		}
+	}()
+
 	importer, ok := t.importers[req.CredentialID]
 	if !ok || importer == nil {
 		return &errFunctionFieldNotSet{
@@ -148,7 +162,7 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.AddError(fmt.Errorf("your locally built plugin failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+			resp.AddError(fmt.Errorf("your locally built plugin's provisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
@@ -164,6 +178,11 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 // interface. The call is forwarded to the Deprovision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.AddError(fmt.Errorf("your locally built plugin's deprovisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
