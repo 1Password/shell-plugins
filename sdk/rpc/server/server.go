@@ -3,10 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
 	"github.com/1Password/shell-plugins/sdk/schema"
-	"runtime/debug"
 )
 
 type errFunctionFieldNotSet struct {
