@@ -2,6 +2,8 @@ package digitalocean
 
 import (
 	"context"
+	"os"
+	"path"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -37,6 +39,7 @@ func PersonalAccessToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryAllEnvVars(fieldname.Token, "DIGITALOCEAN_ACCESS_TOKEN"),
 			importer.MacOnly(TryDigitalOceanConfigFile("~/Library/Application Support/doctl/config.yaml")),
+			importer.LinuxOnly(TryDigitalOceanConfigFile(digitalOceanConfigFileOnLinux())),
 		),
 	}
 }
@@ -59,6 +62,14 @@ func TryDigitalOceanConfigFile(path string) sdk.Importer {
 			},
 		})
 	})
+}
+
+func digitalOceanConfigFileOnLinux() string {
+	basePath := "~/.config"
+	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
+		basePath = xdg
+	}
+	return path.Join(basePath, "doctl/config.yaml")
 }
 
 type Config struct {
