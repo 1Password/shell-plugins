@@ -5,7 +5,7 @@ import (
 )
 
 // For returns a NeedsAuthentication that opts in to the authentication requirement, unless there's
-// one rule specified that opts out to the authentication requirement.
+// one rule specified that opts out of the authentication requirement.
 func For(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
 		for _, rule := range rules {
