@@ -12,8 +12,8 @@ func TestAccessTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.HostAddress: "https://sourcegraph.com",
-				fieldname.Token:       "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+				fieldname.Endpoint: "https://sourcegraph.com",
+				fieldname.Token:    "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{

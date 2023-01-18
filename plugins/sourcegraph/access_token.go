@@ -28,7 +28,7 @@ func AccessToken() schema.CredentialType {
 				Optional: true,
 			},
 			{
-				Name:                fieldname.HostAddress,
+				Name:                fieldname.Endpoint,
 				MarkdownDescription: "Base URL for your Sourcegraph instance.",
 				Secret:              false,
 				Composition: &schema.ValueComposition{
@@ -59,6 +59,6 @@ func AccessToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"SRC_ENDPOINT":     fieldname.HostAddress,
+	"SRC_ENDPOINT":     fieldname.Endpoint,
 	"SRC_ACCESS_TOKEN": fieldname.Token,
 }
