@@ -36,13 +36,13 @@ func PersonalAccessToken() schema.CredentialType {
 		}),
 		Importer: importer.TryAll(
 			importer.TryAllEnvVars(fieldname.Token, "DIGITALOCEAN_ACCESS_TOKEN"),
-			TryDigitalOceanConfigFile(),
+			importer.MacOnly(TryDigitalOceanConfigFile("~/Library/Application Support/doctl/config.yaml")),
 		),
 	}
 }
 
-func TryDigitalOceanConfigFile() sdk.Importer {
-	return importer.TryFile("~/Library/Application Support/doctl/config.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryDigitalOceanConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
