@@ -38,7 +38,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 		"config file linux": {
 			OS: "linux",
 			Files: map[string]string{
-				digitalOceanConfigFileOnLinux(): plugintest.LoadFixture(t, "config.yaml"),
+				"~/.config/doctl/config.yaml": plugintest.LoadFixture(t, "config.yaml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
