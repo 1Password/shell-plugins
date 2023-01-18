@@ -32,6 +32,7 @@ func TestImporter(t *testing.T, importer sdk.Importer, cases map[string]ImportCa
 			in := sdk.ImportInput{
 				HomeDir: filepath.Join(fsRoot, "~"),
 				RootDir: fsRoot,
+				OS:      c.OS,
 			}
 
 			for path, contents := range c.Files {
@@ -74,6 +75,9 @@ type ImportCase struct {
 	// For example: ~/.config/my-pugin/config -> '{"foo":"bar"}'. This is useful in conjunction with the
 	// LoadFixture helper.
 	Files map[string]string
+
+	// OS can be used to test OS-specific importers. Supported values: "darwin", "linux"
+	OS string
 
 	// ExpectedCandidates is a shorthand to set the expected import candidates. Mutually exclusive with ExpectedOutput.
 	ExpectedCandidates []sdk.ImportCandidate

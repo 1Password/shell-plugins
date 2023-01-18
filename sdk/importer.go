@@ -40,6 +40,9 @@ type ImportSource struct {
 type ImportInput struct {
 	HomeDir string
 	RootDir string
+
+	// Supported values: "darwin", "linux"
+	OS string
 }
 
 type ImportOutput struct {

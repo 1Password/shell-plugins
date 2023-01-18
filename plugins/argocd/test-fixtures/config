@@ -1,0 +1,10 @@
+contexts:
+- name: test-context
+  server: argocd.test.domain
+  user: test-user
+current-context: test-context
+servers:
+- server: argocd.test.domain
+users:
+- name: test-user
+  auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhcmdvY2QiLCJzdWIiOiJhZG1pbjphcGlLZXkiLCJuYmYiOjE2NzM3MjE0MDMsImlhdCI6MTY3MzcyMTQwMywianRpIjoiNTI5ODcwMTEtNGRiNy00ZmIxLWE4Y2MtMTk5NGViYTRjZDU0In0.ApWbS8sQbtp1l_ILaRO94izPv9AML2vnv1F3EXAMPLE
