@@ -118,22 +118,8 @@ func newPlugin() error {
 					return suggestions
 				},
 			},
-			Validate: func(ans interface{}) error {
-				if str, ok := ans.(string); ok {
-					hasUpper := false
-					for _, char := range str {
-						if unicode.IsUpper(char) {
-							hasUpper = true
-						}
-					}
-					if !hasUpper {
-						return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
-					}
-					return nil
-				}
-
-				return nil
-			},
+			Validate:  validateCredentialName,
+			Transform: transformCredentialName,
 		},
 		{
 			Name:   "ExampleCredential",
@@ -152,10 +138,12 @@ func newPlugin() error {
 		PlatformNameUpperCamelCase   string
 		ValueComposition             schema.ValueComposition
 		FieldName                    string
+		FieldNameUpperCamelCase      string
 		CredentialEnvVarName         string
 		IsNewCredentialName          bool
 		CredentialNameUpperCamelCase string
 		CredentialNameSnakeCase      string
+		TestCredentialExample        string
 	}{}
 
 	err := survey.Ask(questionnaire, &result)
@@ -165,6 +153,16 @@ func newPlugin() error {
 
 	if result.ExampleCredential != "" {
 		result.ValueComposition = getValueComposition(result.ExampleCredential)
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(result.ValueComposition)
+	} else {
+		result.TestCredentialExample = plugintest.ExampleSecretFromComposition(schema.ValueComposition{
+			Charset: schema.Charset{
+				Uppercase: true,
+				Lowercase: true,
+				Digits:    true,
+			},
+			Length: 30,
+		})
 	}
 
 	result.PlatformNameUpperCamelCase = strings.ReplaceAll(result.PlatformName, " ", "")
@@ -173,7 +171,6 @@ func newPlugin() error {
 
 	result.CredentialNameUpperCamelCase = strings.Join(credNameSplit, "")
 	result.CredentialNameSnakeCase = strings.ToLower(strings.Join(credNameSplit, "_"))
-	result.CredentialEnvVarName = strings.ToUpper(result.Name + "_" + result.CredentialNameSnakeCase)
 
 	result.IsNewCredentialName = true
 	for _, existing := range credname.ListAll() {
@@ -183,8 +180,24 @@ func newPlugin() error {
 		}
 	}
 
-	// As a placeholder, assume the field name is the last word of the credential name, e.g. "Token"
-	result.FieldName = credNameSplit[len(credNameSplit)-1]
+	// As a placeholder, assume the field name is the short version (max 7 chars) of the credential name, starting
+	// from the last word. For example:
+	// "Personal Access Token" => "Token"
+	// "Secret Key" => "Key"
+	// "API Key" => "API Key"
+	var fieldNameSplit []string
+	lengthCutoff := 7
+	for i := range credNameSplit {
+		word := credNameSplit[len(credNameSplit)-1-i]
+		if len(strings.Join(append(fieldNameSplit, word), " ")) > lengthCutoff {
+			break
+		}
+
+		fieldNameSplit = append([]string{word}, fieldNameSplit...)
+	}
+	result.FieldName = strings.Join(fieldNameSplit, " ")
+	result.FieldNameUpperCamelCase = strings.Join(fieldNameSplit, "")
+	result.CredentialEnvVarName = strings.ToUpper(strings.Join(append([]string{result.Name}, fieldNameSplit...), "_"))
 
 	relativeDirPath := filepath.Join("plugins", result.Name)
 	err = os.MkdirAll(relativeDirPath, 0777)
@@ -195,6 +208,7 @@ func newPlugin() error {
 	templates := []Template{pluginTemplate}
 	if result.CredentialName != "" {
 		templates = append(templates, credentialTemplate)
+		templates = append(templates, credentialTestTemplate)
 	}
 	if result.Executable != "" {
 		templates = append(templates, executableTemplate)
@@ -345,7 +359,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 		ManagementURL: sdk.URL("https://console.{{ .Name }}.com/user/security/tokens"), // TODO: Replace with actual URL
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.{{ .FieldName }},
+				Name:                fieldname.{{ .FieldNameUpperCamelCase }},
 				MarkdownDescription: "{{ .FieldName }} used to authenticate to {{ .PlatformName }}.",
 				Secret:              true,
 				{{- if .ValueComposition.Length }}
@@ -382,7 +396,7 @@ func {{ .CredentialNameUpperCamelCase }}() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"{{ .CredentialEnvVarName }}": fieldname.{{ .FieldName }}, // TODO: Check if this is correct
+	"{{ .CredentialEnvVarName }}": fieldname.{{ .FieldNameUpperCamelCase }}, // TODO: Check if this is correct
 }
 
 // TODO: Check if the platform stores the {{ .CredentialName }} in a local config file, and if so,
@@ -395,13 +409,13 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 		// 	return
 		// }
 
-		// if config.{{ .FieldName }} == "" {
+		// if config.{{ .FieldNameUpperCamelCase }} == "" {
 		// 	return
 		// }
 
 		// out.AddCandidate(sdk.ImportCandidate{
 		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.{{ .FieldName }}: config.{{ .FieldName }},
+		// 		fieldname.{{ .FieldNameUpperCamelCase }}: config.{{ .FieldNameUpperCamelCase }},
 		// 	},
 		// })
 	})
@@ -409,8 +423,68 @@ func Try{{ .PlatformNameUpperCamelCase }}ConfigFile() sdk.Importer {
 
 // TODO: Implement the config file schema
 // type Config struct {
-//	{{ .FieldName }} string
+//	{{ .FieldNameUpperCamelCase }} string
 // }
+`,
+}
+
+var credentialTestTemplate = Template{
+	Filename: "{{ .CredentialNameSnakeCase }}_test.go",
+	Contents: `package {{ .Name }}
+
+import (
+	"testing"
+	
+	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/plugintest"
+	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+)
+	
+func Test{{ .CredentialNameUpperCamelCase }}Provisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, {{ .CredentialNameUpperCamelCase }}().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+				fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"{{ .CredentialEnvVarName }}": "{{ .TestCredentialExample }}",
+				},
+			},
+		},
+	})
+}
+
+func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
+	plugintest.TestImporter(t, {{ .CredentialNameUpperCamelCase }}().Importer, map[string]plugintest.ImportCase{
+		"environment": {
+			Environment: map[string]string{ // TODO: Check if this is correct
+				"{{ .CredentialEnvVarName }}": "{{ .TestCredentialExample }}",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+					},
+				},
+			},
+		},
+		// TODO: If you implemented a config file importer, add a test file example in {{ .Name }}/test-fixtures
+		// and fill the necessary details in the test template below.
+		"config file": {
+			Files: map[string]string{
+				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+			// 	{
+			// 		Fields: map[sdk.FieldName]string{
+			// 			fieldname.Token: "{{ .TestCredentialExample }}",
+			// 		},
+			// 	},
+			},
+		},
+	})
+}
 `,
 }
 
@@ -513,3 +587,32 @@ func init() {
 {{- end }}
 }
 `
+
+func validateCredentialName(ans any) error {
+	if str, ok := ans.(string); ok {
+		if len(str) == 0 {
+			return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+		}
+
+		words := strings.Split(str, " ")
+		for _, word := range words {
+			if unicode.IsLower(int32(word[0])) {
+				return errors.New(`credential name must be titlecased, e.g. "Access Key" or "Personal Access Token"`)
+			}
+		}
+	}
+
+	return nil
+}
+
+func transformCredentialName(ans any) (newAns any) {
+	if str, ok := ans.(string); ok {
+		for _, name := range credname.ListAll() {
+			if strings.EqualFold(name.String(), str) {
+				return string(name)
+			}
+		}
+	}
+
+	return ans
+}

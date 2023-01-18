@@ -47,13 +47,16 @@ func newServer(p schema.Plugin) *RPCServer {
 	for i := range p.Executables {
 		s.needsAuth[proto.ExecutableID(i)] = p.Executables[i].NeedsAuth
 		p.Executables[i].NeedsAuth = nil
-		for _, credentialUse := range p.Executables[i].Uses {
+		for usageID, credentialUse := range p.Executables[i].Uses {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
-				Plugin:     credentialUse.Plugin,
-				Credential: credentialUse.Name,
-				Executable: &executableID,
+				IsDefaultProvisioner: false,
+				CredentialUsage: proto.CredentialUsageID{
+					Executable: executableID,
+					Usage:      usageID,
+				},
 			}] = credentialUse.Provisioner
+			p.Executables[i].Uses[usageID].Provisioner = nil
 		}
 	}
 
@@ -62,9 +65,8 @@ func newServer(p schema.Plugin) *RPCServer {
 		c.Importer = nil
 
 		s.provisioners[proto.ProvisionerID{
-			Plugin:     p.Name,
-			Credential: c.Name,
-			Executable: nil,
+			IsDefaultProvisioner: true,
+			Credential:           id,
 		}] = c.DefaultProvisioner
 		c.DefaultProvisioner = nil
 	}
@@ -78,15 +80,21 @@ func newServer(p schema.Plugin) *RPCServer {
 // replacing those values with an implementation that calls these functions over RPC.
 func (t *RPCServer) GetPlugin(_ int, resp *proto.GetPluginResponse) error {
 	*resp = proto.GetPluginResponse{
-		CredentialHasImporter: map[proto.CredentialID]bool{},
-		ExecutableHasNeedAuth: map[proto.ExecutableID]bool{},
-		Plugin:                t.p,
+		CredentialHasImporter:         map[proto.CredentialID]bool{},
+		ExecutableHasNeedAuth:         map[proto.ExecutableID]bool{},
+		CredentialUsageHasProvisioner: map[proto.CredentialUsageID]bool{},
+		Plugin:                        t.p,
 	}
 	for executableID, needsAuth := range t.needsAuth {
 		resp.ExecutableHasNeedAuth[executableID] = needsAuth != nil
 	}
 	for credentialID, importer := range t.importers {
 		resp.CredentialHasImporter[credentialID] = importer != nil
+	}
+	for provisionerID, provisioner := range t.provisioners {
+		if !provisionerID.IsDefaultProvisioner {
+			resp.CredentialUsageHasProvisioner[provisionerID.CredentialUsage] = provisioner != nil
+		}
 	}
 
 	return nil
@@ -116,6 +124,7 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 			funcName: "Importer",
 		}
 	}
+	*resp = req.ImportOutput
 	importer(context.Background(), req.ImportInput, resp)
 	return nil
 }
@@ -140,12 +149,7 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 	if err != nil {
 		return err
 	}
-	*resp = sdk.ProvisionOutput{
-		Environment: make(map[string]string),
-		CommandLine: nil,
-		Files:       make(map[string]sdk.OutputFile),
-		Diagnostics: sdk.Diagnostics{},
-	}
+	*resp = req.ProvisionOutput
 	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
 	return nil
 }
@@ -158,9 +162,7 @@ func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCreden
 	if err != nil {
 		return err
 	}
-	*resp = sdk.DeprovisionOutput{
-		Diagnostics: sdk.Diagnostics{},
-	}
+	*resp = req.DeprovisionOutput
 	provisioner.Deprovision(context.Background(), req.DeprovisionInput, resp)
 	return nil
 }

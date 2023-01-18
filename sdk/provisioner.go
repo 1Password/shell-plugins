@@ -144,7 +144,7 @@ func (in *ProvisionInput) FromTempDir(path ...string) string {
 
 // Get returns the cached value at the specified key if it exists. The data can be returned either as a []byte
 // or unmarshaled as JSON.
-func (c CacheState) Get(key string, out interface{}) (ok bool) {
+func (c CacheState) Get(key string, out any) (ok bool) {
 	entry, ok := c[key]
 	if !ok {
 		return false
@@ -166,7 +166,7 @@ func (c CacheState) Get(key string, out interface{}) (ok bool) {
 
 // Put puts data into the cache at the specified key and with the specified TTL, which will be applied to the provision step of
 // all consecutive runs, until the TTL is met or Remove is called. The data will be stored as a []byte or marshaled as JSON.
-func (c *CacheOperations) Put(key string, data interface{}, expiresAt time.Time) error {
+func (c *CacheOperations) Put(key string, data any, expiresAt time.Time) error {
 	var marshaled []byte
 	var err error
 

@@ -30,6 +30,13 @@ body:
       placeholder: "For example: Authenticate the CLI using a Personal Access Token."
     validations:
       required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Shell Plugins are a community effort, so you're more than welcome to [build the plugin yourself](https://developer.1password.com/docs/cli/shell-plugins/contribute/)! We're here to help when you have any questions.
+      options:
+        - label: I'd be up for building the plugin myself.
   - type: textarea
     id: info
     attributes:

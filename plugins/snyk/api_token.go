@@ -1,6 +1,8 @@
 package snyk
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -39,7 +41,26 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SNYK_TOKEN": fieldname.Token,
 }
 
+type Config struct {
+	Token string `json:"api"`
+}
+
 func TrySnykConfigFile() sdk.Importer {
-	// TODO: Import `api` field from ~/.config/configstore/snyk.json
-	return importer.NoOp()
+	return importer.TryFile("~/.config/configstore/snyk.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToJSON(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		if config.Token == "" {
+			return
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: map[sdk.FieldName]string{
+				fieldname.Token: config.Token,
+			},
+		})
+	})
 }
