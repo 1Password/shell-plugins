@@ -36,7 +36,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 			},
 		},
 		"config file linux": {
-			OS: "darwin",
+			OS: "linux",
 			Files: map[string]string{
 				digitalOceanConfigFileOnLinux(): plugintest.LoadFixture(t, "config.yaml"),
 			},
