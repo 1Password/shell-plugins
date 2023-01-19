@@ -1,4 +1,4 @@
-package okta
+package databricks
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,15 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func OktaCLI() schema.Executable {
+func DatabricksCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Okta CLI",
-		Runs:    []string{"okta"},
-		DocsURL: sdk.URL("https://cli.okta.com"),
-		NeedsAuth: needsauth.IfAll(
-			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
-		),
+		Name:      "Databricks CLI",
+		Runs:      []string{"databricks"},
+		DocsURL:   sdk.URL("https://docs.databricks.com/dev-tools/cli/"),
+		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIToken,
+				Name: credname.PersonalAccessToken,
 			},
 		},
 	}

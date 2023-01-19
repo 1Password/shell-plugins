@@ -12,7 +12,7 @@ func DigitalOceanCLI() schema.Executable {
 		Name:    "DigitalOcean CLI",
 		Runs:    []string{"doctl"},
 		DocsURL: sdk.URL("https://docs.digitalocean.com/reference/doctl"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

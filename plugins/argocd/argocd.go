@@ -1,4 +1,4 @@
-package okta
+package argocd
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,15 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func OktaCLI() schema.Executable {
+func ArgocdCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Okta CLI",
-		Runs:    []string{"okta"},
-		DocsURL: sdk.URL("https://cli.okta.com"),
-		NeedsAuth: needsauth.IfAll(
-			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
-		),
+		Name:      "Argo CD CLI",
+		Runs:      []string{"argocd"},
+		DocsURL:   sdk.URL("https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd/"),
+		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIToken,
+				Name: credname.AuthToken,
 			},
 		},
 	}

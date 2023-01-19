@@ -26,6 +26,29 @@ func TestAPIKeyImporter(t *testing.T) {
 				},
 			},
 		},
+		"config file": {
+			Files: map[string]string{
+				"~/.twilio-cli/config.json": plugintest.LoadFixture(t, "config.json"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					NameHint: "prod",
+					Fields: map[sdk.FieldName]string{
+						fieldname.AccountSID: "ACtdgcL157CFBnWjM7ZeJKysIjEEXAMPLE",
+						fieldname.APIKey:     "SK4bqP76ByZgGEuwqm0eTFzYrWBEXAMPLE",
+						fieldname.APISecret:  "1KAe9Vshg4EkUvaBVS8pZwDS1EXAMPLE",
+					},
+				},
+				{
+					NameHint: "dev",
+					Fields: map[sdk.FieldName]string{
+						fieldname.AccountSID: "ACZBgJOUfaX2AuuLMWK7jT3tdS9EXAMPLE",
+						fieldname.APIKey:     "SKrhNjOV2LgR1xatOpVFsMa5fOpEXAMPLE",
+						fieldname.APISecret:  "4ELE8BqwbCrzbyTqu7HNylK00EXAMPLE",
+					},
+				},
+			},
+		},
 	})
 }
 

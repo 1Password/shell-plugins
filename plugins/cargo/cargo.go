@@ -1,4 +1,4 @@
-package okta
+package cargo
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,14 +7,18 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func OktaCLI() schema.Executable {
+func CargoCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Okta CLI",
-		Runs:    []string{"okta"},
-		DocsURL: sdk.URL("https://cli.okta.com"),
+		Name:    "Cargo CLI",
+		Runs:    []string{"cargo"},
+		DocsURL: sdk.URL("https://doc.rust-lang.org/cargo/index.html"),
 		NeedsAuth: needsauth.IfAll(
-			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
+			needsauth.IfAny(
+				needsauth.ForCommand("publish"),
+				needsauth.ForCommand("yank"),
+				needsauth.ForCommand("owner"),
+			),
+			needsauth.NotForHelp(),
 		),
 		Uses: []schema.CredentialUsage{
 			{

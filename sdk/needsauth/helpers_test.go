@@ -115,14 +115,14 @@ func TestComplexChain(t *testing.T) {
 	// * Not for "--version" and "--help", or when no args are specified
 	// * Never when the "--local" flag is specified
 
-	needsAuth := /*needsauth.*/ For(
+	needsAuth := /*needsauth.*/ IfAll(
 		/*needsauth.*/ NotWithoutArgs(),
 		/*needsauth.*/ NotForHelpOrVersion(),
 		/*needsauth.*/ NotWhenContainsArgs("--local"),
-		/*needsauth.*/ OnlyFor(
+		/*needsauth.*/ IfAny(
 			/*needsauth.*/ ForCommand("auth"),
 			/*needsauth.*/ ForCommand("install"),
-			/*needsauth.*/ For(
+			/*needsauth.*/ IfAll(
 				/*needsauth.*/ ForCommand("publish"),
 				/*needsauth.*/ NotWhenContainsArgs("--dry-run"),
 			),

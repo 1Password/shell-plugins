@@ -12,7 +12,7 @@ func AWSCLI() schema.Executable {
 		Name:    "AWS CLI",
 		Runs:    []string{"aws"},
 		DocsURL: sdk.URL("https://aws.amazon.com/cli/"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

@@ -12,7 +12,7 @@ func GitHubCLI() schema.Executable {
 		Name:    "GitHub CLI",
 		Runs:    []string{"gh"},
 		DocsURL: sdk.URL("https://cli.github.com"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

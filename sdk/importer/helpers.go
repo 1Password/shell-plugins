@@ -14,6 +14,26 @@ func TryAll(importers ...sdk.Importer) sdk.Importer {
 	}
 }
 
+func MacOnly(importers ...sdk.Importer) sdk.Importer {
+	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		if in.OS == "darwin" {
+			for _, imp := range importers {
+				imp(ctx, in, out)
+			}
+		}
+	}
+}
+
+func LinuxOnly(importers ...sdk.Importer) sdk.Importer {
+	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		if in.OS == "linux" {
+			for _, imp := range importers {
+				imp(ctx, in, out)
+			}
+		}
+	}
+}
+
 const maxNameHintLength = 24
 
 // SanitizeNameHint can be used to sanitize the name hint before passing it to the import candidate to
