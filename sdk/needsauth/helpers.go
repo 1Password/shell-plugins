@@ -4,9 +4,9 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
-// For returns a NeedsAuthentication that opts in to the authentication requirement, unless there's
-// one rule specified that opts out of the authentication requirement.
-func For(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
+// IfAll returns a NeedsAuthentication that opts in to the authentication requirement only if
+// all the specified rules opt in to the authentication requirement.
+func IfAll(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
 		for _, rule := range rules {
 			if !rule(in) {
@@ -17,9 +17,9 @@ func For(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	}
 }
 
-// OnlyFor returns a NeedsAuthentication rule that only opts in of the authentication requirement if there's
-// at least one rule specified that opts in to the authentication requirement.
-func OnlyFor(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
+// IfAny returns a NeedsAuthentication rule that only opts in to the authentication requirement
+// if at least one specified rule opts in to the authentication requirement.
+func IfAny(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
 		for _, rule := range rules {
 			if rule(in) {
@@ -111,7 +111,7 @@ func NotWhenContainsArgs(argsToSkip ...string) sdk.NeedsAuthentication {
 }
 
 func NotForHelp() sdk.NeedsAuthentication {
-	return For(
+	return IfAll(
 		NotWhenContainsArgs("-h"),
 		NotWhenContainsArgs("--help"),
 		NotWhenContainsArgs("-help"),
@@ -120,7 +120,7 @@ func NotForHelp() sdk.NeedsAuthentication {
 }
 
 func NotForVersion() sdk.NeedsAuthentication {
-	return For(
+	return IfAll(
 		NotForExactArgs("-v"),
 		NotForExactArgs("--version"),
 		NotForExactArgs("-version"),
@@ -134,5 +134,5 @@ func NotWithoutArgs() sdk.NeedsAuthentication {
 }
 
 func NotForHelpOrVersion() sdk.NeedsAuthentication {
-	return For(NotForHelp(), NotForVersion())
+	return IfAll(NotForHelp(), NotForVersion())
 }

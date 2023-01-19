@@ -12,10 +12,10 @@ func ReadMeCLI() schema.Executable {
 		Name:    "ReadMe CLI",
 		Runs:    []string{"rdme"},
 		DocsURL: sdk.URL("https://docs.readme.com/main/docs/rdme"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 
-			needsauth.OnlyFor(
+			needsauth.IfAny(
 				needsauth.ForCommand("openapi"),
 
 				needsauth.ForCommand("docs"),

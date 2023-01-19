@@ -12,8 +12,8 @@ func CargoCLI() schema.Executable {
 		Name:    "Cargo CLI",
 		Runs:    []string{"cargo"},
 		DocsURL: sdk.URL("https://doc.rust-lang.org/cargo/index.html"),
-		NeedsAuth: needsauth.For(
-			needsauth.OnlyFor(
+		NeedsAuth: needsauth.IfAll(
+			needsauth.IfAny(
 				needsauth.ForCommand("publish"),
 				needsauth.ForCommand("yank"),
 				needsauth.ForCommand("owner"),
