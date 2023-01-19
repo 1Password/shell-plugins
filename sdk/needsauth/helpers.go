@@ -78,24 +78,24 @@ func NotForExactArgs(argsToSkip ...string) sdk.NeedsAuthentication {
 
 // NotWhenContainsArgs returns a NeedsAuthentication rule to not require authentication when
 // the exact sequence of argsToSkip is present somewhere in the command-line args.
-func NotWhenContainsArgs(argsToSkip ...string) sdk.NeedsAuthentication {
+func NotWhenContainsArgs(argsSequence ...string) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
-		if len(argsToSkip) == 0 {
+		if len(argsSequence) == 0 {
 			return true
 		}
 
-		if len(argsToSkip) > len(in.CommandArgs) {
+		if len(argsSequence) > len(in.CommandArgs) {
 			return true
 		}
 
 		for i := range in.CommandArgs {
-			if i+len(argsToSkip) > len(in.CommandArgs) {
+			if i+len(argsSequence) > len(in.CommandArgs) {
 				return true
 			}
 
 			matches := true
-			for i, argsToCompare := range in.CommandArgs[i : i+len(argsToSkip)] {
-				if argsToCompare != argsToSkip[i] {
+			for i, argsToCompare := range in.CommandArgs[i : i+len(argsSequence)] {
+				if argsToCompare != argsSequence[i] {
 					matches = false
 				}
 			}
