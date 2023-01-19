@@ -12,7 +12,7 @@ func GitLabCLI() schema.Executable {
 		Name:    "GitLab CLI",
 		Runs:    []string{"glab"},
 		DocsURL: sdk.URL("https://glab.readthedocs.io"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

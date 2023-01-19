@@ -12,7 +12,7 @@ func HerokuCLI() schema.Executable {
 		Name:    "Heroku CLI",
 		Runs:    []string{"heroku"},
 		DocsURL: sdk.URL("https://devcenter.heroku.com/articles/heroku-cli"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

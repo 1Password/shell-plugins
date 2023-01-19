@@ -12,9 +12,9 @@ func HomebrewCLI() schema.Executable {
 		Name:    "Homebrew CLI",
 		Runs:    []string{"brew"},
 		DocsURL: sdk.URL("https://brew.sh/"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.OnlyFor(
+			needsauth.IfAny(
 				needsauth.ForCommand("search"),
 				needsauth.ForCommand("bump-cask-pr"),
 				needsauth.ForCommand("bump-formula-pr"),

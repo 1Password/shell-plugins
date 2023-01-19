@@ -12,7 +12,7 @@ func OktaCLI() schema.Executable {
 		Name:    "Okta CLI",
 		Runs:    []string{"okta"},
 		DocsURL: sdk.URL("https://cli.okta.com"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),

@@ -12,7 +12,7 @@ func FOSSACLI() schema.Executable {
 		Name:    "FOSSA CLI",
 		Runs:    []string{"fossa"},
 		DocsURL: sdk.URL("https://github.com/fossas/fossa-cli"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),
