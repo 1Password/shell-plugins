@@ -117,14 +117,10 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 
 // CredentialImport is a remote version of the Import() function in schema.CredentialType.
 // The call is forwarded to the Import() function of the credential identified by req.CredentialID.
-func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp proto.ImportCredentialResponse) error {
+func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *proto.ImportCredentialResponse) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.Panic = &proto.Panic{
-				Error: fmt.Sprintf("your locally built plugin's importing failed with the following panic: %s", err),
-				Stack: debug.Stack(),
-			}
-
+			resp.Panic = getPanicDiagnostics(err)
 		}
 	}()
 	importer, ok := t.importers[req.CredentialID]
@@ -134,8 +130,8 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp pro
 			funcName: "Importer",
 		}
 	}
-	*resp.ImportOutput = req.ImportOutput
-	importer(context.Background(), req.ImportInput, resp.ImportOutput)
+	resp.ImportOutput = req.ImportOutput
+	importer(context.Background(), req.ImportInput, &resp.ImportOutput)
 	return nil
 }
 
@@ -154,44 +150,36 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 // CredentialProvisionerProvision is a remote version of the the Provision() method of the sdk.Provisioner
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
-func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp proto.ProvisionCredentialResponse) error {
+func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *proto.ProvisionCredentialResponse) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.Panic = &proto.Panic{
-				Error: fmt.Sprintf("your locally built plugin's provisioning failed with the following panic: %s", err),
-				Stack: debug.Stack(),
-			}
-
+			resp.Panic = getPanicDiagnostics(err)
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
-	*resp.ProvisionOutput = req.ProvisionOutput
-	provisioner.Provision(context.Background(), req.ProvisionInput, resp.ProvisionOutput)
+	resp.ProvisionOutput = req.ProvisionOutput
+	provisioner.Provision(context.Background(), req.ProvisionInput, &resp.ProvisionOutput)
 	return nil
 }
 
 // CredentialProvisionerDeprovision is a remote version of the the Deprovision() method of the sdk.Provisioner
 // interface. The call is forwarded to the Deprovision() function of the Provisioner of the credential identified by
 // req.CredentialID.
-func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp proto.DeprovisionCredentialResponse) error {
+func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *proto.DeprovisionCredentialResponse) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.Panic = &proto.Panic{
-				Error: fmt.Sprintf("your locally built plugin's deprovisioning failed with the following panic: %s", err),
-				Stack: debug.Stack(),
-			}
-
+			resp.Panic = getPanicDiagnostics(err)
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
-	*resp.DeprovisionOutput = req.DeprovisionOutput
-	provisioner.Deprovision(context.Background(), req.DeprovisionInput, resp.DeprovisionOutput)
+	resp.DeprovisionOutput = req.DeprovisionOutput
+	provisioner.Deprovision(context.Background(), req.DeprovisionInput, &resp.DeprovisionOutput)
 	return nil
 }
 
@@ -204,4 +192,11 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 		}
 	}
 	return provisioner, nil
+}
+
+func getPanicDiagnostics(err any) *proto.Panic {
+	return &proto.Panic{
+		Error: fmt.Sprintf("your locally built plugin failed with the following panic: %s", err),
+		Stack: debug.Stack(),
+	}
 }

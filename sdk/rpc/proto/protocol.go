@@ -77,7 +77,7 @@ type ImportCredentialRequest struct {
 }
 
 type ImportCredentialResponse struct {
-	*sdk.ImportOutput
+	sdk.ImportOutput
 	Panic *Panic
 }
 
@@ -89,7 +89,7 @@ type ProvisionCredentialRequest struct {
 }
 
 type ProvisionCredentialResponse struct {
-	*sdk.ProvisionOutput
+	sdk.ProvisionOutput
 	Panic *Panic
 }
 
@@ -101,7 +101,7 @@ type DeprovisionCredentialRequest struct {
 }
 
 type DeprovisionCredentialResponse struct {
-	*sdk.DeprovisionOutput
+	sdk.DeprovisionOutput
 	Panic *Panic
 }
 
