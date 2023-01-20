@@ -120,8 +120,7 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sdk.ImportOutput) error {
 	defer func() {
 		if err := recover(); err != nil {
-			caughtPanic := fmt.Errorf("your locally built plugin's importing failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))
-			diagnostics := sdk.Diagnostics{Errors: []sdk.Error{{Message: caughtPanic.Error()}}}
+			diagnostics := getPanicDiagnostics(err)
 			resp.Attempts = []*sdk.ImportAttempt{
 				{
 					Candidates:  nil,
@@ -162,7 +161,8 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.AddError(fmt.Errorf("your locally built plugin's provisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack())))
+			diagnostics := getPanicDiagnostics(err)
+			resp.Diagnostics = diagnostics
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
@@ -180,7 +180,8 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
 	defer func() {
 		if err := recover(); err != nil {
-			resp.Diagnostics.Errors = append(resp.Diagnostics.Errors, sdk.Error{Message: fmt.Sprintf("your locally built plugin's deprovisioning failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))})
+			diagnostics := getPanicDiagnostics(err)
+			resp.Diagnostics = diagnostics
 		}
 	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
@@ -201,4 +202,9 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 		}
 	}
 	return provisioner, nil
+}
+
+func getPanicDiagnostics(err any) sdk.Diagnostics {
+	caughtPanic := fmt.Errorf("your locally built plugin's importing failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))
+	return sdk.Diagnostics{Errors: []sdk.Error{{Message: caughtPanic.Error()}}}
 }
