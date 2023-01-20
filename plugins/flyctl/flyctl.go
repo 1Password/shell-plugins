@@ -10,7 +10,7 @@ import (
 func FlyctlCLI() schema.Executable {
 	return schema.Executable{
 		Name:      "Flyctl",
-		Runs:      []string{"fly"},
+		Runs:      []string{"flyctl"},
 		DocsURL:   sdk.URL("https://fly.io/docs/flyctl/"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
