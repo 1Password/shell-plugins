@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "flyctl",
 		Platform: schema.PlatformInfo{
 			Name:     "Fly.io",
-			Homepage: sdk.URL("https://fly.io/docs/flyctl/"),
+			Homepage: sdk.URL("https://fly.io"),
 		},
 		Credentials: []schema.CredentialType{
 			AccessToken(),
