@@ -25,7 +25,6 @@ func AccessToken() schema.CredentialType {
 						Specific:  []rune{'.', '-', '_'},
 					},
 				},
-				Optional: true,
 			},
 			{
 				Name:                fieldname.Endpoint,
