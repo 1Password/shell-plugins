@@ -9,9 +9,9 @@ import (
 
 func SnowflakeCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Snowflake CLI", // TODO: Check if this is correct
+		Name:      "Snowflake",
 		Runs:      []string{"snowsql"},
-		DocsURL:   sdk.URL("https://snowflake.com/docs/cli"), // TODO: Replace with actual URL
+		DocsURL:   sdk.URL("https://docs.snowflake.com/en/user-guide/snowsql.html"),
 		NeedsAuth: needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{

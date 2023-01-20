@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "snowflake",
 		Platform: schema.PlatformInfo{
 			Name:     "Snowflake",
-			Homepage: sdk.URL("https://snowflake.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://snowflake.com"),
 		},
 		Credentials: []schema.CredentialType{
 			Credentials(),
