@@ -13,19 +13,48 @@ import (
 
 func Credentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.Credentials,
-		DocsURL:       sdk.URL("https://snowflake.com/docs/credentials"), // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.snowflake.com/user/security/tokens"), // TODO: Replace with actual URL
+		Name:    credname.Credentials,
+		DocsURL: sdk.URL("https://docs.snowflake.com/en/user-guide/snowsql.html"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.,
-				MarkdownDescription: " used to authenticate to Snowflake.",
-				Secret:              true,
+				Name:                fieldname.Account,
+				MarkdownDescription: "Snowflake account name.",
+				Optional:            false,
+				Secret:              false,
 				Composition: &schema.ValueComposition{
-					Length: 11,
 					Charset: schema.Charset{
 						Lowercase: true,
+						Uppercase: true,
 						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.Username,
+				MarkdownDescription: "Snowflake username.",
+				Optional:            false,
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Uppercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.Password,
+				MarkdownDescription: "Password used to authenticate to Snowflake account.",
+				Optional:            false,
+				Secret:              true,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Uppercase: true,
+						Digits:    true,
+						Symbols:   true,
 					},
 				},
 			},
@@ -38,32 +67,42 @@ func Credentials() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"SNOWFLAKE": fieldname., // TODO: Check if this is correct
+	"SNOWSQL_ACCOUNT": fieldname.Account,
+	"SNOWSQL_USER":    fieldname.Username,
+	"SNOWSQL_PWD":     fieldname.Password,
 }
 
-// TODO: Check if the platform stores the Credentials in a local config file, and if so,
-// implement the function below to add support for importing it.
 func TrySnowflakeConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
+	return importer.TryFile("~/.snowsql/config", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		credentialsFile, err := contents.ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
+		}
 
-		// if config. == "" {
-		// 	return
-		// }
+		fields := make(map[sdk.FieldName]string)
+		for _, section := range credentialsFile.Sections() {
+			// Note: The generated ~/.snowsql/config file, by default, includes an uncommented [connections.example] credential section below
+			// the true [connections] section. For this reason, we only set each field the first time and ignore any successive matches
 
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.: config.,
-		// 	},
-		// })
+			if section.HasKey("accountname") && section.Key("accountname").Value() != "" && fields[fieldname.Account] == "" {
+				fields[fieldname.Account] = section.Key("accountname").Value()
+			}
+
+			if section.HasKey("username") && section.Key("username").Value() != "" && fields[fieldname.Username] == "" {
+				fields[fieldname.Username] = section.Key("username").Value()
+			}
+
+			if section.HasKey("password") && section.Key("password").Value() != "" && fields[fieldname.Password] == "" {
+				fields[fieldname.Password] = section.Key("password").Value()
+			}
+		}
+
+		// Only add candidates with all required credential fields
+		if fields[fieldname.Account] != "" && fields[fieldname.Username] != "" && fields[fieldname.Password] != "" {
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields: fields,
+			})
+		}
 	})
 }
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	 string
-// }
