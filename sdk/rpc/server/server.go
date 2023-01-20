@@ -3,11 +3,10 @@ package server
 import (
 	"context"
 	"fmt"
-	"runtime/debug"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"runtime/debug"
 )
 
 type errFunctionFieldNotSet struct {
@@ -205,6 +204,6 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 }
 
 func getPanicDiagnostics(err any) sdk.Diagnostics {
-	caughtPanic := fmt.Errorf("your locally built plugin's importing failed with the following panic: %s; and with stack trace: %s", err, string(debug.Stack()))
+	caughtPanic := fmt.Errorf("locally built plugin panicked: %s\nstack trace:\n%s", err, string(debug.Stack()))
 	return sdk.Diagnostics{Errors: []sdk.Error{{Message: caughtPanic.Error()}}}
 }
