@@ -49,6 +49,7 @@ func ListAll() []sdk.FieldName {
 	return []sdk.FieldName{
 		APIHost,
 		APIKey,
+		APIKeyID,
 		APISecret,
 		AccessKeyID,
 		Account,
