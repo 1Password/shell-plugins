@@ -16,6 +16,8 @@ func TestProvisioner(t *testing.T, provisioner sdk.Provisioner, cases map[string
 
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
+			t.Helper()
+
 			if c.ExpectedOutput.Environment == nil {
 				c.ExpectedOutput.Environment = make(map[string]string)
 			}

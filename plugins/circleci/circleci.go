@@ -12,9 +12,10 @@ func CircleCICLI() schema.Executable {
 		Name:    "CircleCI CLI",
 		Runs:    []string{"circleci"},
 		DocsURL: sdk.URL("https://circleci.com/docs/local-cli/"),
-		NeedsAuth: needsauth.For(
+		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotForArgs("config"),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("config"),
 		),
 		Uses: []schema.CredentialUsage{
 			{

@@ -44,7 +44,7 @@ func TestAPIKeyImporter(t *testing.T) {
 	})
 }
 
-func TestSecretKeyProvisioner(t *testing.T) {
+func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{

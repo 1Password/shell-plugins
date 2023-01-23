@@ -1,10 +1,12 @@
 package needsauth
 
-import "github.com/1Password/shell-plugins/sdk"
+import (
+	"github.com/1Password/shell-plugins/sdk"
+)
 
-// For returns a NeedsAuthentication rule that iterates over other NeedsAuthentication rules
-// until there's one that opts out of the authentication requirement.
-func For(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
+// IfAll returns a NeedsAuthentication that opts in to the authentication requirement only if
+// all the specified rules opt in to the authentication requirement.
+func IfAll(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
 		for _, rule := range rules {
 			if !rule(in) {
@@ -15,22 +17,33 @@ func For(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	}
 }
 
-// ForCommands returns a NeedsAuthentication rule to require authentication for
-// certain (sub)command, e.g. ["account"] or ["account", "list"], ["account", "delete"].
-func ForCommands(commands ...[]string) sdk.NeedsAuthentication {
+// IfAny returns a NeedsAuthentication rule that only opts in to the authentication requirement
+// if at least one specified rule opts in to the authentication requirement.
+func IfAny(rules ...sdk.NeedsAuthentication) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
-		for _, command := range commands {
-			if len(command) > len(in.CommandArgs) {
-				continue
+		for _, rule := range rules {
+			if rule(in) {
+				return true
 			}
+		}
+		return false
+	}
+}
 
-			for i := range command {
-				if command[i] != in.CommandArgs[i] {
-					break
-				}
-				if i == len(command)-1 {
-					return true
-				}
+// ForCommand returns a NeedsAuthentication rule to require authentication for
+// certain (sub)command, e.g. ["account"] or ["account", "list"].
+func ForCommand(command ...string) sdk.NeedsAuthentication {
+	return func(in sdk.NeedsAuthenticationInput) bool {
+		if len(command) > len(in.CommandArgs) {
+			return false
+		}
+
+		for i := range command {
+			if command[i] != in.CommandArgs[i] {
+				return false
+			}
+			if i == len(command)-1 {
+				return true
 			}
 		}
 
@@ -45,15 +58,52 @@ func Always() sdk.NeedsAuthentication {
 	}
 }
 
-// NotForArgs returns a NeedsAuthentication rule to not require authentication when
-// certain command-line args or flags are present.
-func NotForArgs(argsToSkip ...string) sdk.NeedsAuthentication {
+// NotForExactArgs returns a NeedsAuthentication rule to opt out of authentication when
+// the command-line args are an exact match with the passed in args.
+func NotForExactArgs(argsToSkip ...string) sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
-		for _, commandArg := range in.CommandArgs {
-			for _, ignoreArg := range argsToSkip {
-				if commandArg == ignoreArg {
-					return false
+		if len(in.CommandArgs) != len(argsToSkip) {
+			return true
+		}
+
+		for i, commandArg := range in.CommandArgs {
+			if commandArg != argsToSkip[i] {
+				return true
+			}
+		}
+
+		return false
+	}
+}
+
+// NotWhenContainsArgs returns a NeedsAuthentication rule to not require authentication when
+// the exact sequence of argsToSkip is present somewhere in the command-line args.
+func NotWhenContainsArgs(argsSequence ...string) sdk.NeedsAuthentication {
+	return func(in sdk.NeedsAuthenticationInput) bool {
+		if len(argsSequence) == 0 {
+			return true
+		}
+
+		if len(argsSequence) > len(in.CommandArgs) {
+			return true
+		}
+
+		for i := range in.CommandArgs {
+			if i+len(argsSequence) > len(in.CommandArgs) {
+				return true
+			}
+
+			matches := true
+			for i, argsToCompare := range in.CommandArgs[i : i+len(argsSequence)] {
+				if argsToCompare != argsSequence[i] {
+					matches = false
 				}
+			}
+
+			// If the argsToSkip are found in the command-line args, return that the command
+			// does not not require authentication
+			if matches {
+				return false
 			}
 		}
 		return true
@@ -61,13 +111,28 @@ func NotForArgs(argsToSkip ...string) sdk.NeedsAuthentication {
 }
 
 func NotForHelp() sdk.NeedsAuthentication {
-	return NotForArgs("-h", "--help", "-help", "help")
+	return IfAll(
+		NotWhenContainsArgs("-h"),
+		NotWhenContainsArgs("--help"),
+		NotWhenContainsArgs("-help"),
+		NotWhenContainsArgs("help"),
+	)
 }
 
 func NotForVersion() sdk.NeedsAuthentication {
-	return NotForArgs("-v", "--version", "-version", "version")
+	return IfAll(
+		NotForExactArgs("-v"),
+		NotForExactArgs("--version"),
+		NotForExactArgs("-version"),
+		NotForExactArgs("version"),
+		NotForExactArgs("-V"),
+	)
+}
+
+func NotWithoutArgs() sdk.NeedsAuthentication {
+	return NotForExactArgs()
 }
 
 func NotForHelpOrVersion() sdk.NeedsAuthentication {
-	return For(NotForHelp(), NotForVersion())
+	return IfAll(NotForHelp(), NotForVersion())
 }

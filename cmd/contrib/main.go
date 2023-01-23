@@ -504,7 +504,10 @@ func {{ .PlatformNameUpperCamelCase }}CLI() schema.Executable {
 		Name:      "{{ .PlatformName }} CLI", // TODO: Check if this is correct
 		Runs:      []string{"{{ .Executable }}"},
 		DocsURL:   sdk.URL("https://{{ .Name }}.com/docs/cli"), // TODO: Replace with actual URL
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		{{- if .CredentialName }}
 		Uses: []schema.CredentialUsage{
 			{
