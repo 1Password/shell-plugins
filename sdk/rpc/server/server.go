@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
@@ -117,6 +118,19 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 // CredentialImport is a remote version of the Import() function in schema.CredentialType.
 // The call is forwarded to the Import() function of the credential identified by req.CredentialID.
 func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sdk.ImportOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			diagnostics := getPanicDiagnostics(err)
+			resp.Attempts = []*sdk.ImportAttempt{
+				{
+					Candidates:  nil,
+					Source:      sdk.ImportSource{},
+					Diagnostics: diagnostics,
+				},
+			}
+		}
+	}()
+
 	importer, ok := t.importers[req.CredentialID]
 	if !ok || importer == nil {
 		return &errFunctionFieldNotSet{
@@ -145,6 +159,12 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			diagnostics := getPanicDiagnostics(err)
+			resp.Diagnostics = diagnostics
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
@@ -158,6 +178,12 @@ func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredential
 // interface. The call is forwarded to the Deprovision() function of the Provisioner of the credential identified by
 // req.CredentialID.
 func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
+	defer func() {
+		if err := recover(); err != nil {
+			diagnostics := getPanicDiagnostics(err)
+			resp.Diagnostics = diagnostics
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
@@ -176,4 +202,9 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 		}
 	}
 	return provisioner, nil
+}
+
+func getPanicDiagnostics(err any) sdk.Diagnostics {
+	caughtPanic := fmt.Errorf("locally built plugin panicked: %s\nstack trace:\n%s", err, string(debug.Stack()))
+	return sdk.Diagnostics{Errors: []sdk.Error{{Message: caughtPanic.Error()}}}
 }
