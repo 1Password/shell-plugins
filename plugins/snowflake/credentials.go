@@ -81,31 +81,27 @@ func TrySnowflakeConfigFile() sdk.Importer {
 		}
 
 		// The generated ~/.snowsql/config file, by default, includes an uncommented [connections.example] credential section below the actual
-		// [connections] section. We want to ensure that only the accountname, username, and password listed under [connections] is saved
+		// [connections] section. We save the accountname, username, and password listed under [connections] then stop parsing the file
 		fields := make(map[sdk.FieldName]string)
-		connections := false // A Boolean flag tracking if the [connections] block is being read
 		for _, section := range credentialsFile.Sections() {
-			if section.HasKey("[connections]") {
-				connections = true
-				continue
+			if section.HasKey("accountname") && section.Key("accountname").Value() != "" {
+				fields[fieldname.Account] = section.Key("accountname").Value()
 			}
 
-			if connections {
-				if section.HasKey("accountname") && section.Key("accountname").Value() != "" {
-					fields[fieldname.Account] = section.Key("accountname").Value()
-				} else if section.HasKey("username") && section.Key("username").Value() != "" {
-					fields[fieldname.Username] = section.Key("username").Value()
-				} else if section.HasKey("password") && section.Key("password").Value() != "" {
-					fields[fieldname.Password] = section.Key("password").Value()
-				}
+			if section.HasKey("username") && section.Key("username").Value() != "" {
+				fields[fieldname.Username] = section.Key("username").Value()
+			}
 
-				// Only add candidates with all required credential fields
-				if fields[fieldname.Account] != "" && fields[fieldname.Username] != "" && fields[fieldname.Password] != "" {
-					out.AddCandidate(sdk.ImportCandidate{
-						Fields: fields,
-					})
-					break
-				}
+			if section.HasKey("password") && section.Key("password").Value() != "" {
+				fields[fieldname.Password] = section.Key("password").Value()
+			}
+
+			// Only add candidates with all required credential fields
+			if fields[fieldname.Account] != "" && fields[fieldname.Username] != "" && fields[fieldname.Password] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields: fields,
+				})
+				break
 			}
 		}
 	})
