@@ -82,27 +82,28 @@ func TrySnowflakeConfigFile() sdk.Importer {
 
 		fields := make(map[sdk.FieldName]string)
 		for _, section := range credentialsFile.Sections() {
-			// Note: The generated ~/.snowsql/config file, by default, includes an uncommented [connections.example] credential section below
-			// the true [connections] section. For this reason, we only set each field the first time and ignore any successive matches
+			// Note: The generated ~/.snowsql/config file, by default, includes an uncommented [connections.example] credential section below the
+			// true [connections] section. For this reason, we want to save the first matches for Account, Username, and Password that are found then stop
 
-			if section.HasKey("accountname") && section.Key("accountname").Value() != "" && fields[fieldname.Account] == "" {
+			if section.HasKey("accountname") && section.Key("accountname").Value() != "" {
 				fields[fieldname.Account] = section.Key("accountname").Value()
 			}
 
-			if section.HasKey("username") && section.Key("username").Value() != "" && fields[fieldname.Username] == "" {
+			if section.HasKey("username") && section.Key("username").Value() != "" {
 				fields[fieldname.Username] = section.Key("username").Value()
 			}
 
-			if section.HasKey("password") && section.Key("password").Value() != "" && fields[fieldname.Password] == "" {
+			if section.HasKey("password") && section.Key("password").Value() != "" {
 				fields[fieldname.Password] = section.Key("password").Value()
 			}
-		}
 
-		// Only add candidates with all required credential fields
-		if fields[fieldname.Account] != "" && fields[fieldname.Username] != "" && fields[fieldname.Password] != "" {
-			out.AddCandidate(sdk.ImportCandidate{
-				Fields: fields,
-			})
+			// Only add candidates with all required credential fields
+			if fields[fieldname.Account] != "" && fields[fieldname.Username] != "" && fields[fieldname.Password] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields: fields,
+				})
+				break
+			}
 		}
 	})
 }
