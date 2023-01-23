@@ -37,7 +37,7 @@ func PersonalAccessToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryAllEnvVars(fieldname.Token, "DIGITALOCEAN_ACCESS_TOKEN"),
 			importer.MacOnly(
-				TryDigitalOceanConfigFile("~/Library/Application Support/doctl/config.yaml")
+				TryDigitalOceanConfigFile("~/Library/Application Support/doctl/config.yaml"),
 			),
 		),
 	}
