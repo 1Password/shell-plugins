@@ -9,10 +9,13 @@ import (
 
 func DigitalOceanCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "DigitalOcean CLI",
-		Runs:      []string{"doctl"},
-		DocsURL:   sdk.URL("https://docs.digitalocean.com/reference/doctl"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Name:    "DigitalOcean CLI",
+		Runs:    []string{"doctl"},
+		DocsURL: sdk.URL("https://docs.digitalocean.com/reference/doctl"),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.PersonalAccessToken,

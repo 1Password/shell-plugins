@@ -9,10 +9,13 @@ import (
 
 func AWSCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "AWS CLI",
-		Runs:      []string{"aws"},
-		DocsURL:   sdk.URL("https://aws.amazon.com/cli/"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Name:    "AWS CLI",
+		Runs:    []string{"aws"},
+		DocsURL: sdk.URL("https://aws.amazon.com/cli/"),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.AccessKey,
