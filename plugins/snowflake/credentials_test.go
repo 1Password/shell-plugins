@@ -28,6 +28,12 @@ func TestCredentialsProvisioner(t *testing.T) {
 }
 
 func TestCredentialsImporter(t *testing.T) {
+	expectedFields := map[sdk.FieldName]string{
+		fieldname.Account:  "accountname",
+		fieldname.Username: "username",
+		fieldname.Password: "password1234",
+	}
+
 	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
@@ -36,27 +42,31 @@ func TestCredentialsImporter(t *testing.T) {
 				"SNOWSQL_PWD":     "password1234",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Account:  "accountname",
-						fieldname.Username: "username",
-						fieldname.Password: "password1234",
-					},
-				},
+				{Fields: expectedFields},
 			},
 		},
-		"config file": {
+		"config file ([connections] section only)": {
 			Files: map[string]string{
-				"~/.snowsql/config": plugintest.LoadFixture(t, "config"),
+				"~/.snowsql/config": plugintest.LoadFixture(t, "config1"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Account:  "accountname",
-						fieldname.Username: "username",
-						fieldname.Password: "password1234",
-					},
-				},
+				{Fields: expectedFields},
+			},
+		},
+		"config file ([connections] and [connections.example] sections)": {
+			Files: map[string]string{
+				"~/.snowsql/config": plugintest.LoadFixture(t, "config2"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{Fields: expectedFields},
+			},
+		},
+		"config file ([connections.example] section first)": {
+			Files: map[string]string{
+				"~/.snowsql/config": plugintest.LoadFixture(t, "config3"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{Fields: expectedFields},
 			},
 		},
 	})

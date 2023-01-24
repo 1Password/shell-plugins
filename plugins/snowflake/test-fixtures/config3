@@ -1,0 +1,11 @@
+[connections.example]
+
+accountname = exampleaccountname
+username = exampleusername
+password = examplepassword1234
+
+[connections]
+
+accountname = accountname
+username = username
+password = password1234
