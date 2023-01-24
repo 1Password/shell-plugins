@@ -15,18 +15,6 @@ func AccessToken() schema.CredentialType {
 		DocsURL: sdk.URL("https://docs.sourcegraph.com/cli"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Username,
-				MarkdownDescription: "Username on your Sourcegraph instance.",
-				Secret:              false,
-				Composition: &schema.ValueComposition{
-					Charset: schema.Charset{
-						Lowercase: true,
-						Digits:    true,
-						Specific:  []rune{'.', '-', '_'},
-					},
-				},
-			},
-			{
 				Name:                fieldname.Endpoint,
 				MarkdownDescription: "Base URL for your Sourcegraph instance.",
 				Secret:              false,
