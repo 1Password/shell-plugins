@@ -12,7 +12,7 @@ func VultrCLI() schema.Executable {
 		Name:      "Vultr CLI",
 		Runs:      []string{"vultr-cli"},
 		DocsURL:   sdk.URL("https://github.com/vultr/vultr-cli"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		NeedsAuth: needsauth.NotWhenContainsArgs("--config"),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,

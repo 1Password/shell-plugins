@@ -51,3 +51,12 @@ func TestAPIKeyImporter(t *testing.T) {
 		},
 	})
 }
+
+func TestAPIKeyNeedsAuth(t *testing.T) {
+	plugintest.TestNeedsAuth(t, VultrCLI().NeedsAuth, map[string]plugintest.NeedsAuthCase{
+		"no for --config": {
+			Args:              []string{"--config"},
+			ExpectedNeedsAuth: false,
+		},
+	})
+}
