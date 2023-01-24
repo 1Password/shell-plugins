@@ -28,5 +28,9 @@ func TestRdmeNeedsAuth(t *testing.T) {
 			Args:              []string{"openapi", "--version", "2.0"},
 			ExpectedNeedsAuth: true,
 		},
+		"no for openapi with --key flag": {
+			Args:              []string{"openapi", "--key", "rdme_test"},
+			ExpectedNeedsAuth: false,
+		},
 	})
 }

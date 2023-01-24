@@ -15,6 +15,8 @@ func ReadMeCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 
+			needsauth.NotWhenContainsArgs("--key"),
+
 			needsauth.IfAny(
 				needsauth.ForCommand("openapi"),
 
