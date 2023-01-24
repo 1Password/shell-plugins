@@ -39,7 +39,7 @@ func TestAPIKeyImporter(t *testing.T) {
 		},
 		"config file": {
 			Files: map[string]string{
-				"~/.vultr-cli.yaml": plugintest.LoadFixture(t, "config.yml"),
+				"~/.vultr-cli.yaml": plugintest.LoadFixture(t, "vultr-cli.yaml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
