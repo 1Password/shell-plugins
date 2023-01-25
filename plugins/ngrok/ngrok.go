@@ -9,10 +9,13 @@ import (
 
 func ngrokCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "ngrok CLI",
-		Runs:      []string{"ngrok"},
-		DocsURL:   sdk.URL("https://ngrok.com/docs/ngrok-agent/ngrok"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Name:    "ngrok CLI",
+		Runs:    []string{"ngrok"},
+		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/ngrok"),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.Credentials,
