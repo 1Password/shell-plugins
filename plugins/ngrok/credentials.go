@@ -44,10 +44,15 @@ func Credentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("ngrok.yml"), provision.AddArgs("--config", "{{ .Path }}")),
+		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("config.yml"), provision.AddArgs("--config", "{{ .Path }}")),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryngrokConfigFile(),
+			importer.MacOnly(
+				TryngrokConfigFile("~/Library/Application Support/ngrok/ngrok.yml"),
+			),
+			importer.LinuxOnly(
+				TryngrokConfigFile("~/.config/ngrok/ngrok.yml"),
+			),
 		)}
 }
 
@@ -69,8 +74,8 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NGROK_API_KEY":   fieldname.APIKey,
 }
 
-func TryngrokConfigFile() sdk.Importer {
-	return importer.TryFile("~/.ngrok2/ngrok.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryngrokConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
