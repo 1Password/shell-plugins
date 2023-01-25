@@ -24,3 +24,22 @@ func TestAccessTokenProvisioner(t *testing.T) {
 		},
 	})
 }
+
+func TestAccessTokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, AccessToken().Importer, map[string]plugintest.ImportCase{
+		"environment": {
+			Environment: map[string]string{
+				"SRC_ENDPOINT":     "https://sourcegraph.com",
+				"SRC_ACCESS_TOKEN": "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Endpoint: "https://sourcegraph.com",
+						fieldname.Token:    "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+					},
+				},
+			},
+		},
+	})
+}
