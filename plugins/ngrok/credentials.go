@@ -14,9 +14,8 @@ import (
 
 func Credentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.Credentials,
-		DocsURL:       sdk.URL("https://ngrok.com/docs/credentials"),             // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.ngrok.com/user/security/tokens"), // TODO: Replace with actual URL
+		Name:    credname.Credentials,
+		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.AuthToken,

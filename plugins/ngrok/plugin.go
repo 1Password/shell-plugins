@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "ngrok",
 		Platform: schema.PlatformInfo{
 			Name:     "ngrok",
-			Homepage: sdk.URL("https://ngrok.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://ngrok.com"),
 		},
 		Credentials: []schema.CredentialType{
 			Credentials(),
