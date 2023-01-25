@@ -8,6 +8,26 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
+func TestCredentialsProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+		"temp file": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
+				fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+			},
+			CommandLine: []string{"ngrok"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				CommandLine: []string{"ngrok", "--config", "/tmp/config.yml"},
+				Files: map[string]sdk.OutputFile{
+					"/tmp/config.yml": {
+						Contents: []byte(plugintest.LoadFixture(t, "config.yml")),
+					},
+				},
+			},
+		},
+	})
+}
+
 func TestCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
 		"environment": {
