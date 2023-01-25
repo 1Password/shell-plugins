@@ -9,10 +9,13 @@ import (
 
 func SourcegraphCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Sourcegraph CLI",
-		Runs:      []string{"src"},
-		DocsURL:   sdk.URL("https://docs.sourcegraph.com/cli"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		Name:    "Sourcegraph CLI",
+		Runs:    []string{"src"},
+		DocsURL: sdk.URL("https://docs.sourcegraph.com/cli"),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.AccessToken,
