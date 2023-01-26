@@ -14,7 +14,7 @@ import (
 func Credentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.Credentials,
-		DocsURL: sdk.URL("https://docs.snowflake.com/en/user-guide/snowsql.html"),
+		DocsURL: sdk.URL("https://docs.snowflake.com/en/user-guide/admin-user-management.html#creating-users"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Account,
