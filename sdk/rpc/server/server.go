@@ -196,7 +196,7 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 
 func getPanicDiagnostics(err any) *proto.Panic {
 	return &proto.Panic{
-		Error: fmt.Sprintf("your locally built plugin failed with the following panic: %s", err),
-		Stack: debug.Stack(),
+		RecoveredString: fmt.Sprintf("%s", err),
+		Stack:           debug.Stack(),
 	}
 }

@@ -113,6 +113,6 @@ type ExecutableNeedsAuthRequest struct {
 }
 
 type Panic struct {
-	Error string
-	Stack []byte
+	RecoveredString string
+	Stack           []byte
 }
