@@ -136,3 +136,37 @@ func NotWithoutArgs() sdk.NeedsAuthentication {
 func NotForHelpOrVersion() sdk.NeedsAuthentication {
 	return IfAll(NotForHelp(), NotForVersion())
 }
+
+// WhenContainsArgs returns a NeedsAuthentication rule to not require authentication unless
+// the exact sequence of argsToSkip is present somewhere in the command-line args.
+func WhenContainsArgs(argsSequence ...string) sdk.NeedsAuthentication {
+	return func(in sdk.NeedsAuthenticationInput) bool {
+		if len(argsSequence) == 0 {
+			return false
+		}
+
+		if len(argsSequence) > len(in.CommandArgs) {
+			return false
+		}
+
+		for i := range in.CommandArgs {
+			if i+len(argsSequence) > len(in.CommandArgs) {
+				return false
+			}
+
+			matches := true
+			for i, argsToCompare := range in.CommandArgs[i : i+len(argsSequence)] {
+				if argsToCompare != argsSequence[i] {
+					matches = false
+				}
+			}
+
+			// If the argsToSkip are found in the command-line args, return that the command
+			// requires authentication
+			if matches {
+				return true
+			}
+		}
+		return false
+	}
+}

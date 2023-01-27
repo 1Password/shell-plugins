@@ -65,7 +65,7 @@ func TestVersion(t *testing.T) {
 	})
 }
 
-func TestContainsArgs(t *testing.T) {
+func TestNotWhenContainsArgs(t *testing.T) {
 	plugintest.TestNeedsAuth(t, NotWhenContainsArgs("--mode", "dry-run"), map[string]plugintest.NeedsAuthCase{
 		"yes by default": {
 			Args:              []string{"deploy"},
@@ -82,6 +82,27 @@ func TestContainsArgs(t *testing.T) {
 		"no when all args are present in sequence": {
 			Args:              []string{"deploy", "--mode", "dry-run"},
 			ExpectedNeedsAuth: false,
+		},
+	})
+}
+
+func TestWhenContainsArgs(t *testing.T) {
+	plugintest.TestNeedsAuth(t, WhenContainsArgs("--mode", "dry-run"), map[string]plugintest.NeedsAuthCase{
+		"no by default": {
+			Args:              []string{"deploy"},
+			ExpectedNeedsAuth: false,
+		},
+		"no when only one of the args is present": {
+			Args:              []string{"deploy", "--mode", "live"},
+			ExpectedNeedsAuth: false,
+		},
+		"no when both args are present, but not in sequence": {
+			Args:              []string{"deploy", "--mode", "live", "--app-name", "dry-run"},
+			ExpectedNeedsAuth: false,
+		},
+		"yes when all args are present in sequence": {
+			Args:              []string{"deploy", "--mode", "dry-run"},
+			ExpectedNeedsAuth: true,
 		},
 	})
 }
