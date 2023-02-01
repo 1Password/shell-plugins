@@ -26,3 +26,20 @@ func TestAPIKeyProvisioner(t *testing.T) {
 		},
 	})
 }
+
+func TestAPIKeyImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
+		"config file": {
+			Files: map[string]string{
+				"~/.tunnelto/key.token": plugintest.LoadFixture(t, "key.token"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.APIKey: "XddpK7jZiQ0CpE3EXAMPLE",
+					},
+				},
+			},
+		},
+	})
+}
