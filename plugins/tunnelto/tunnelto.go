@@ -16,6 +16,7 @@ func tunneltodevCLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWhenContainsArgs("-k"),
 			needsauth.NotWhenContainsArgs("--key"),
+			needsauth.NotWhenContainsArgs("set-auth"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
