@@ -92,7 +92,7 @@ func TryngrokConfigFile(path string) sdk.Importer {
 			return
 		}
 
-		if config.AuthToken == "" {
+		if config.AuthToken == "" || config.APIKey == "" || config.Version == "" {
 			return
 		}
 
