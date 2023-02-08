@@ -18,6 +18,7 @@ func FastlyCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("-t"),
 			needsauth.NotWhenContainsArgs("--token"),
 			needsauth.NotWhenContainsArgs("profile"),
+			needsauth.NotWhenContainsArgs("config"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
