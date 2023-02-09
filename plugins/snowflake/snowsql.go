@@ -9,7 +9,7 @@ import (
 
 func SnowflakeCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Snowflake",
+		Name:    "Snowflake CLI",
 		Runs:    []string{"snowsql"},
 		DocsURL: sdk.URL("https://docs.snowflake.com/en/user-guide/snowsql.html"),
 		NeedsAuth: needsauth.IfAll(
@@ -25,7 +25,7 @@ func SnowflakeCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name: credname.UserCredentials,
 			},
 		},
 	}

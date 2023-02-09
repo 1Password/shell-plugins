@@ -11,9 +11,9 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func Credentials() schema.CredentialType {
+func UserCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.Credentials,
+		Name:    credname.UserCredentials,
 		DocsURL: sdk.URL("https://docs.snowflake.com/en/user-guide/admin-user-management.html#creating-users"),
 		Fields: []schema.CredentialField{
 			{

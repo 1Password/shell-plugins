@@ -8,8 +8,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestUserCredentialsProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, UserCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Account:  "accountname",
@@ -27,14 +27,14 @@ func TestCredentialsProvisioner(t *testing.T) {
 	})
 }
 
-func TestCredentialsImporter(t *testing.T) {
+func TestUserCredentialsImporter(t *testing.T) {
 	expectedFields := map[sdk.FieldName]string{
 		fieldname.Account:  "accountname",
 		fieldname.Username: "username",
 		fieldname.Password: "password1234",
 	}
 
-	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, UserCredentials().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"SNOWSQL_ACCOUNT": "accountname",
