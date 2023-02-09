@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/rpc/proto"
@@ -116,7 +117,12 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 
 // CredentialImport is a remote version of the Import() function in schema.CredentialType.
 // The call is forwarded to the Import() function of the credential identified by req.CredentialID.
-func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sdk.ImportOutput) error {
+func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *proto.ImportCredentialResponse) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.Panic = getPanicDiagnostics(err)
+		}
+	}()
 	importer, ok := t.importers[req.CredentialID]
 	if !ok || importer == nil {
 		return &errFunctionFieldNotSet{
@@ -124,8 +130,8 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 			funcName: "Importer",
 		}
 	}
-	*resp = req.ImportOutput
-	importer(context.Background(), req.ImportInput, resp)
+	resp.ImportOutput = req.ImportOutput
+	importer(context.Background(), req.ImportInput, &resp.ImportOutput)
 	return nil
 }
 
@@ -144,26 +150,36 @@ func (t *RPCServer) CredentialProvisionerDescription(req proto.ProvisionerID, re
 // CredentialProvisionerProvision is a remote version of the the Provision() method of the sdk.Provisioner
 // interface. The call is forwarded to the Provision() function of the Provisioner of the credential identified by
 // req.CredentialID.
-func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *sdk.ProvisionOutput) error {
+func (t *RPCServer) CredentialProvisionerProvision(req proto.ProvisionCredentialRequest, resp *proto.ProvisionCredentialResponse) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.Panic = getPanicDiagnostics(err)
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
-	*resp = req.ProvisionOutput
-	provisioner.Provision(context.Background(), req.ProvisionInput, resp)
+	resp.ProvisionOutput = req.ProvisionOutput
+	provisioner.Provision(context.Background(), req.ProvisionInput, &resp.ProvisionOutput)
 	return nil
 }
 
 // CredentialProvisionerDeprovision is a remote version of the the Deprovision() method of the sdk.Provisioner
 // interface. The call is forwarded to the Deprovision() function of the Provisioner of the credential identified by
 // req.CredentialID.
-func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *sdk.DeprovisionOutput) error {
+func (t *RPCServer) CredentialProvisionerDeprovision(req proto.DeprovisionCredentialRequest, resp *proto.DeprovisionCredentialResponse) error {
+	defer func() {
+		if err := recover(); err != nil {
+			resp.Panic = getPanicDiagnostics(err)
+		}
+	}()
 	provisioner, err := t.getProvisioner(req.ProvisionerID)
 	if err != nil {
 		return err
 	}
-	*resp = req.DeprovisionOutput
-	provisioner.Deprovision(context.Background(), req.DeprovisionInput, resp)
+	resp.DeprovisionOutput = req.DeprovisionOutput
+	provisioner.Deprovision(context.Background(), req.DeprovisionInput, &resp.DeprovisionOutput)
 	return nil
 }
 
@@ -176,4 +192,11 @@ func (t *RPCServer) getProvisioner(provisionerID proto.ProvisionerID) (sdk.Provi
 		}
 	}
 	return provisioner, nil
+}
+
+func getPanicDiagnostics(err any) *proto.Panic {
+	return &proto.Panic{
+		RecoveredString: fmt.Sprintf("%s", err),
+		Stack:           debug.Stack(),
+	}
 }
