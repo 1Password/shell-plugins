@@ -25,7 +25,7 @@ func SnowflakeCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.UserCredentials,
+				Name: credname.LoginDetails,
 			},
 		},
 	}

@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://snowflake.com"),
 		},
 		Credentials: []schema.CredentialType{
-			UserCredentials(),
+			LoginDetails(),
 		},
 		Executables: []schema.Executable{
 			SnowflakeCLI(),
