@@ -9,12 +9,18 @@ import (
 
 func IBMCloudCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "IBM Cloud CLI", // TODO: Check if this is correct
-		Runs:      []string{"ibmcloud"},
-		DocsURL:   sdk.URL("https://ibmcloud.com/docs/cli"), // TODO: Replace with actual URL
+		Name:    "IBM Cloud CLI",
+		Runs:    []string{"ibmcloud"},
+		DocsURL: sdk.URL("https://cloud.ibm.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("-u"),
+			needsauth.NotWhenContainsArgs("-p"),
+			needsauth.NotWhenContainsArgs("--apikey"),
+			needsauth.NotWhenContainsArgs("--cr-token"),
+			needsauth.NotWhenContainsArgs("--profile"),
+			needsauth.NotWhenContainsArgs("--sso"),
+			needsauth.NotWhenContainsArgs("--no-account"),
 		),
 		Uses: []schema.CredentialUsage{
 			{

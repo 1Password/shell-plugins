@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "ibmcloud",
 		Platform: schema.PlatformInfo{
 			Name:     "IBM Cloud",
-			Homepage: sdk.URL("https://ibmcloud.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://www.ibm.com/cloud"),
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
