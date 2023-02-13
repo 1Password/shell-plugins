@@ -17,6 +17,7 @@ import (
 type STSProvisioner struct {
 	TOTPCode  string
 	MFASerial string
+	RoleArn   string
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {

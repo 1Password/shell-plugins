@@ -2,6 +2,10 @@ package aws
 
 import (
 	"context"
+	"fmt"
+	"github.com/1Password/shell-plugins/sdk/importer"
+	"os"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -25,9 +29,15 @@ func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	totp, hasTotp := in.ItemFields[fieldname.OneTimePassword]
 	mfaSerial, hasMFASerial := in.ItemFields[fieldname.MFASerial]
 
-	if hasTotp && hasMFASerial {
+	roleArn := findRoleArnIfSpecified(in, out)
+	if len(out.Diagnostics.Errors) > 0 {
+		return
+	}
+
+	if (hasTotp && hasMFASerial) || roleArn != "" {
 		p.stsProvisioner.MFASerial = mfaSerial
 		p.stsProvisioner.TOTPCode = totp
+		p.stsProvisioner.RoleArn = roleArn
 		p.stsProvisioner.Provision(ctx, in, out)
 	} else {
 		p.envVarProvisioner.Provision(ctx, in, out)
@@ -40,4 +50,58 @@ func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 
 func (p awsProvisioner) Description() string {
 	return p.envVarProvisioner.Description()
+}
+
+func findRoleArnIfSpecified(in sdk.ProvisionInput, out *sdk.ProvisionOutput) string {
+	for i, arg := range out.CommandLine {
+		if arg == "--profile" {
+			// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+			configPath := os.Getenv("AWS_CONFIG_FILE")
+			if configPath != "" {
+				if strings.HasPrefix(configPath, "~") {
+					configPath = in.FromHomeDir(configPath[1:])
+				}
+			} else {
+				configPath = in.FromHomeDir(".aws", "config") // default config file location
+			}
+			contents, err := os.ReadFile(configPath)
+			if os.IsNotExist(err) {
+				out.AddError(fmt.Errorf("you've specified the --profile flag but no profiles to choose from were present at: %s", configPath))
+				return ""
+			} else if err != nil {
+				out.AddError(err)
+				return ""
+			}
+
+			configFile, err := importer.FileContents(contents).ToINI()
+			if err != nil {
+				out.AddError(err)
+				return ""
+			}
+
+			if configFile != nil {
+				if i+1 == len(out.CommandLine) {
+					return ""
+				}
+				profileSection := getConfigSectionByProfile(configFile, out.CommandLine[i+1])
+				if profileSection != nil {
+					if profileSection.HasKey("role_arn") {
+						key, err := profileSection.GetKey("role_arn")
+						if err != nil {
+							out.AddError(err)
+							return ""
+						}
+
+						// remove the --profile flag so the aws cli does not use it
+						out.CommandLine[i] = ""
+						out.CommandLine[i+1] = ""
+
+						return key.Value()
+					}
+				}
+			}
+			break
+		}
+	}
+	return ""
 }
