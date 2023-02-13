@@ -24,13 +24,12 @@ func (p btpProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		out.AddArgs("--password", password)
 	}
 
-	return
 }
 
 func (p btpProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// Nothing to do here: environment variables get wiped automatically when the process exits.
+	// Nothing to do here: command line args are wiped when process exits
 }
 
 func (p btpProvisioner) Description() string {
-	return "Provision command line variables --user and --password with BTP cli"
+	return "Provision command line variables --user and --password with BTP cli's login command."
 }
