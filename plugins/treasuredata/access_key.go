@@ -20,7 +20,7 @@ func AccessKey() schema.CredentialType {
 			{
 				Name:                fieldname.User,
 				MarkdownDescription: "User name specified by email",
-			},			
+			},
 			{
 				Name:                fieldname.APIKey,
 				MarkdownDescription: "APIKey used to authenticate to Treasure Data.",
@@ -55,7 +55,7 @@ func TryTreasureDataConfigFile(path string) sdk.Importer {
 		for _, section := range credentialsFile.Sections() {
 			if section.HasKey("user") && section.Key("user").Value() != "" {
 				fields[fieldname.User] = section.Key("user").Value()
-			}			
+			}
 			if section.HasKey("apikey") && section.Key("apikey").Value() != "" {
 				fields[fieldname.APIKey] = section.Key("apikey").Value()
 			}

@@ -2,12 +2,12 @@ package treasuredata
 
 import (
 	"testing"
-	
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
-	
+
 func TestAccessKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
@@ -32,7 +32,7 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.User: "user@example.com",
+						fieldname.User:   "user@example.com",
 						fieldname.APIKey: "1/xxx",
 					},
 				},
