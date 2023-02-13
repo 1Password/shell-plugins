@@ -93,9 +93,7 @@ func findRoleArnIfSpecified(in sdk.ProvisionInput, out *sdk.ProvisionOutput) str
 						}
 
 						// remove the --profile flag so the aws cli does not use it
-						out.CommandLine[i] = ""
-						out.CommandLine[i+1] = ""
-
+						out.CommandLine = out.CommandLine[0:i]
 						return key.Value()
 					}
 				}
