@@ -13,8 +13,8 @@ const (
 	AuthToken           = sdk.CredentialName("Auth Token")
 	CLIToken            = sdk.CredentialName("CLI Token")
 	Credential          = sdk.CredentialName("Credential")
-	Credentials         = sdk.CredentialName("Credentials")
 	DatabaseCredentials = sdk.CredentialName("Database Credentials")
+	LoginDetails        = sdk.CredentialName("Login Details")
 	PersonalAPIToken    = sdk.CredentialName("Personal API Token")
 	PersonalAccessToken = sdk.CredentialName("Personal Access Token")
 	RegistryCredentials = sdk.CredentialName("Registry Credentials")
@@ -32,8 +32,8 @@ func ListAll() []sdk.CredentialName {
 		AuthToken,
 		CLIToken,
 		Credential,
-		Credentials,
 		DatabaseCredentials,
+		LoginDetails,
 		PersonalAPIToken,
 		PersonalAccessToken,
 		RegistryCredentials,
