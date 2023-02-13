@@ -16,6 +16,7 @@ func HomebrewCLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.IfAny(
 				needsauth.ForCommand("search"),
+				needsauth.ForCommand("bump"),
 				needsauth.ForCommand("bump-cask-pr"),
 				needsauth.ForCommand("bump-formula-pr"),
 			),
