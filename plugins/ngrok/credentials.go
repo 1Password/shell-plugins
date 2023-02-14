@@ -20,6 +20,7 @@ func Credentials() schema.CredentialType {
 			{
 				Name:                fieldname.AuthToken,
 				MarkdownDescription: "Auth Token used to authenticate to ngrok.",
+				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 43,
@@ -33,6 +34,7 @@ func Credentials() schema.CredentialType {
 			{
 				Name:                fieldname.APIKey,
 				MarkdownDescription: "API Key used to authenticate to ngrok API.",
+				Optional:            true,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 48,
@@ -45,7 +47,8 @@ func Credentials() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.Version,
-				MarkdownDescription: "API Key used to authenticate to ngrok API.",
+				MarkdownDescription: "[Version of the ngrok config file](https://ngrok.com/docs/ngrok-agent/config#version). Required field for configuration file-based authentication.",
+				Optional:            false,
 				Composition: &schema.ValueComposition{
 					Length: 1,
 					Charset: schema.Charset{
