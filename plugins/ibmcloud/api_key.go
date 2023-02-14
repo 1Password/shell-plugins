@@ -14,7 +14,7 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://www.ibm.com/docs/en/app-connect/container?topic=servers-creating-cloud-api-key"),
+		DocsURL:       sdk.URL("https://cloud.ibm.com/docs/account?topic=account-userapikey"),
 		ManagementURL: sdk.URL("https://cloud.ibm.com/iam/apikeys"),
 		Fields: []schema.CredentialField{
 			{
