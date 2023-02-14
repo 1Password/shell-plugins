@@ -43,7 +43,6 @@ const (
 	URL             = sdk.FieldName("URL")
 	User            = sdk.FieldName("User")
 	Username        = sdk.FieldName("Username")
-	Version         = sdk.FieldName("Version")
 	Website         = sdk.FieldName("Website")
 )
 
@@ -88,7 +87,6 @@ func ListAll() []sdk.FieldName {
 		URL,
 		User,
 		Username,
-		Version,
 		Website,
 	}
 }

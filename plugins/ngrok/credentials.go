@@ -45,17 +45,6 @@ func Credentials() schema.CredentialType {
 					},
 				},
 			},
-			{
-				Name:                fieldname.Version,
-				MarkdownDescription: "[Version of the ngrok config file](https://ngrok.com/docs/ngrok-agent/config#version). Required field for configuration file-based authentication.",
-				Optional:            false,
-				Composition: &schema.ValueComposition{
-					Length: 1,
-					Charset: schema.Charset{
-						Digits: true,
-					},
-				},
-			},
 		},
 		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("config.yml"), provision.AddArgs("--config", "{{ .Path }}")),
 		Importer: importer.TryAll(
@@ -73,7 +62,7 @@ func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := Config{
 		AuthToken: in.ItemFields[fieldname.AuthToken],
 		APIKey:    in.ItemFields[fieldname.APIKey],
-		Version:   in.ItemFields[fieldname.Version],
+		Version:   "2", // required field for ngrok CLI to work when file-based configuration is used; automatically configured by the CLI program and is not configurable by the user
 	}
 	contents, err := yaml.Marshal(&config)
 	if err != nil {
@@ -103,7 +92,6 @@ func TryngrokConfigFile(path string) sdk.Importer {
 			Fields: map[sdk.FieldName]string{
 				fieldname.AuthToken: config.AuthToken,
 				fieldname.APIKey:    config.APIKey,
-				fieldname.Version:   config.Version,
 			},
 		})
 	})
@@ -112,5 +100,5 @@ func TryngrokConfigFile(path string) sdk.Importer {
 type Config struct {
 	AuthToken string `yaml:"authtoken"`
 	APIKey    string `yaml:"api_key"`
-	Version   string `yaml:"version"`
+	Version   string
 }

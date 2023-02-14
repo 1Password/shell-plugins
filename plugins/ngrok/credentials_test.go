@@ -14,7 +14,6 @@ func TestCredentialsProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 				fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
-				fieldname.Version:   "2",
 			},
 			CommandLine: []string{"ngrok"},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -55,7 +54,6 @@ func TestCredentialsImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
-						fieldname.Version:   "2",
 					},
 				},
 			},
@@ -70,7 +68,6 @@ func TestCredentialsImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
-						fieldname.Version:   "2",
 					},
 				},
 			},
