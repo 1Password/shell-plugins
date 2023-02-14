@@ -19,8 +19,11 @@ func IBMCloudCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("-p"),
 			needsauth.NotWhenContainsArgs("--apikey"),
 			needsauth.NotWhenContainsArgs("--cr-token"),
+			needsauth.NotWhenContainsArgs("--vpc-cri"),
 			needsauth.NotWhenContainsArgs("--profile"),
 			needsauth.NotWhenContainsArgs("--sso"),
+			needsauth.NotWhenContainsArgs("-c"),
+			needsauth.NotWhenContainsArgs("--no-account"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
