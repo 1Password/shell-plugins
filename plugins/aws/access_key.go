@@ -91,7 +91,11 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
 func TryCredentialsFile() sdk.Importer {
-	return importer.TryFile("~/.aws/credentials", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	file := os.Getenv("AWS_SHARED_CREDENTIALS_FILE")
+	if file == "" {
+		file = "~/.aws/credentials"
+	}
+	return importer.TryFile(file, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		credentialsFile, err := contents.ToINI()
 		if err != nil {
 			out.AddError(err)
