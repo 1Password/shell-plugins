@@ -21,7 +21,6 @@ func IBMCloudCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("--cr-token"),
 			needsauth.NotWhenContainsArgs("--profile"),
 			needsauth.NotWhenContainsArgs("--sso"),
-			needsauth.NotWhenContainsArgs("--no-account"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
