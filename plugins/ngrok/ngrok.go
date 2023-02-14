@@ -16,6 +16,8 @@ func ngrokCLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 			needsauth.NotWhenContainsArgs("--config"),
+			needsauth.NotForExactArgs("config"),
+			needsauth.NotForExactArgs("update"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
