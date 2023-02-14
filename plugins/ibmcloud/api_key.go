@@ -1,8 +1,6 @@
 package ibmcloud
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -34,34 +32,9 @@ func APIKey() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryIBMCloudConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"IBMCLOUD_API_KEY": fieldname.APIKey,
-}
-
-func TryIBMCloudConfigFile() sdk.Importer {
-	return importer.TryFile("~/.bluemix/config.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		var config Config
-		if err := contents.ToJSON(&config); err != nil {
-			out.AddError(err)
-			return
-		}
-
-		if config.APIKey == "" {
-			return
-		}
-
-		out.AddCandidate(sdk.ImportCandidate{
-			Fields: map[sdk.FieldName]string{
-				fieldname.APIKey: config.APIKey,
-			},
-		})
-	})
-}
-
-type Config struct {
-	APIKey string `json:"APIKey"`
 }

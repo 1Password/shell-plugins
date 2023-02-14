@@ -37,17 +37,5 @@ func TestAPIKeyImporter(t *testing.T) {
 				},
 			},
 		},
-		"config file": {
-			Files: map[string]string{
-				"~/.bluemix/config.json": plugintest.LoadFixture(t, "config.json"),
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "tjLKgtZ5MSkC9zhSVGCeSfbxBbqr7KCbkfFaHEXAMPLE",
-					},
-				},
-			},
-		},
 	})
 }
