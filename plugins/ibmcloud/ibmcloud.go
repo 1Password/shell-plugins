@@ -24,6 +24,7 @@ func IBMCloudCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("--sso"),
 			needsauth.NotWhenContainsArgs("-c"),
 			needsauth.NotWhenContainsArgs("--no-account"),
+			needsauth.NotWhenContainsArgs("logout"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
