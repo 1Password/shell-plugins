@@ -14,6 +14,7 @@ func IBMCloudCLI() schema.Executable {
 		DocsURL: sdk.URL("https://cloud.ibm.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
 			needsauth.NotWhenContainsArgs("-u"),
 			needsauth.NotWhenContainsArgs("-p"),
 			needsauth.NotWhenContainsArgs("--apikey"),
