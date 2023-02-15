@@ -44,9 +44,12 @@ func APIKey() schema.CredentialType {
 }
 
 func ibmCloudConfig(in sdk.ProvisionInput) ([]byte, error) {
-	var accessToken string
+	type ibmCacheEntry struct {
+		accessToken string
+	}
+	var cache ibmCacheEntry
 	// try finding it in cache
-	ok := in.Cache.Get("IBMAccessToken", accessToken)
+	ok := in.Cache.Get("IBMAccessToken", cache)
 	if !ok {
 		// if the credential is not in cache, fetch it from ibm
 		tokenRequest := uaa.APIKeyTokenRequest(in.ItemFields[fieldname.APIKey])
@@ -55,7 +58,7 @@ func ibmCloudConfig(in sdk.ProvisionInput) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		accessToken = token.AccessToken
+		cache.accessToken = token.AccessToken
 	}
 
 	configDir := config_helpers.ConfigFilePath()
@@ -79,7 +82,7 @@ func ibmCloudConfig(in sdk.ProvisionInput) ([]byte, error) {
 		// ... check what other config is mandatory
 	}
 
-	initialConfig.IAMToken = accessToken
+	initialConfig.IAMToken = cache.accessToken
 
 	configJSON, err := json.Marshal(initialConfig)
 	if err != nil {
