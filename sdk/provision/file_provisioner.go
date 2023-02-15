@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"path/filepath"
 	"text/template"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -18,6 +19,7 @@ type FileProvisioner struct {
 	outfileName         string
 	outpathFixed        string
 	outpathEnvVar       string
+	outdirEnvVar        string
 	setOutpathAsArg     bool
 	outpathArgTemplates []string
 }
@@ -74,6 +76,13 @@ func SetPathAsEnvVar(envVarName string) FileOption {
 	}
 }
 
+// SetOutputDirAsEnvVar can be used to provision the directory of the output file as an environment variable.
+func SetOutputDirAsEnvVar(envVarName string) FileOption {
+	return func(p *FileProvisioner) {
+		p.outdirEnvVar = envVarName
+	}
+}
+
 // AddArgs can be used to add args to the command line. This is useful when the output file path
 // should be passed as an arg. The output path is available as "{{ .Path }}" in each arg.
 // For example:
@@ -116,6 +125,12 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	if p.outpathEnvVar != "" {
 		// Populate the specified environment variable with the output path.
 		out.AddEnvVar(p.outpathEnvVar, outpath)
+	}
+
+	if p.outdirEnvVar != "" {
+		// Populate the specified environment variable with the output dir.
+		dir := filepath.Dir(outpath)
+		out.AddEnvVar(p.outpathEnvVar, dir)
 	}
 
 	// Add args to specify the output path.
