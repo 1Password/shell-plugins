@@ -58,7 +58,7 @@ func Credentials() schema.CredentialType {
 		)}
 }
 
-func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
+func ngrokConfig(in sdk.ProvisionInput, _ *sdk.ProvisionOutput) ([]byte, error) {
 	config := Config{
 		AuthToken: in.ItemFields[fieldname.AuthToken],
 		APIKey:    in.ItemFields[fieldname.APIKey],

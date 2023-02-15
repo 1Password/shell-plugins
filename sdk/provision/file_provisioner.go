@@ -15,7 +15,7 @@ import (
 type FileProvisioner struct {
 	sdk.Provisioner
 
-	fileContents        ItemToFileContents
+	fileContents        FileContentsFunc
 	outfileName         string
 	outpathFixed        string
 	outpathEnvVar       string
@@ -24,11 +24,11 @@ type FileProvisioner struct {
 	outpathArgTemplates []string
 }
 
-type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
+type FileContentsFunc func(in sdk.ProvisionInput, out *sdk.ProvisionOutput) ([]byte, error)
 
 // FieldAsFile can be used to store the value of a single field as a file.
-func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
-	return ItemToFileContents(func(in sdk.ProvisionInput) ([]byte, error) {
+func FieldAsFile(fieldName sdk.FieldName) FileContentsFunc {
+	return FileContentsFunc(func(in sdk.ProvisionInput, _ *sdk.ProvisionOutput) ([]byte, error) {
 		if value, ok := in.ItemFields[fieldName]; ok {
 			return []byte(value), nil
 		} else {
@@ -39,7 +39,7 @@ func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
 
 // TempFile returns a file provisioner and takes a function that maps a 1Password item to the contents of
 // a single file.
-func TempFile(fileContents ItemToFileContents, opts ...FileOption) sdk.Provisioner {
+func TempFile(fileContents FileContentsFunc, opts ...FileOption) sdk.Provisioner {
 	p := FileProvisioner{
 		fileContents: fileContents,
 	}
@@ -96,7 +96,7 @@ func AddArgs(argTemplates ...string) FileOption {
 }
 
 func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	contents, err := p.fileContents(in)
+	contents, err := p.fileContents(in, out)
 	if err != nil {
 		out.AddError(err)
 		return

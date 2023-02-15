@@ -63,7 +63,7 @@ func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
 	p := sdk.ProvisionInput{
 		ItemFields: map[sdk.FieldName]string{},
 	}
-	_, err := mysqlConfig(p)
+	_, err := mysqlConfig(p, nil)
 	if err != nil {
 		assert.Fail(t, "should not throw error if no ItemFields")
 	}

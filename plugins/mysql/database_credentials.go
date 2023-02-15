@@ -53,7 +53,7 @@ func DatabaseCredentials() schema.CredentialType {
 	}
 }
 
-func mysqlConfig(in sdk.ProvisionInput) ([]byte, error) {
+func mysqlConfig(in sdk.ProvisionInput, _ *sdk.ProvisionOutput) ([]byte, error) {
 	content := "[client]\n"
 
 	if user, ok := in.ItemFields[fieldname.User]; ok {
