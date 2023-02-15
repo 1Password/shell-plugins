@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/aws-sdk-go-v2/service/sts/types"
+	"os"
+	"path/filepath"
 )
 
 const (
@@ -60,8 +60,8 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			out.AddError(err)
 			return
 		}
-
-		awsTemporaryCredentials = resp.Credentials
+		out.AddEnvVar("AWS_ACCESS_KEY_ID", *resp.Credentials.AccessKeyId)
+		// TODO: write response to aws cache using file provisioner
 		err = out.Cache.Put(assumeRoleWithMFACacheKey, *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
 		if err != nil {
 			out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
@@ -82,8 +82,10 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			return
 		}
 
-		awsTemporaryCredentials = resp.Credentials
-		err = out.Cache.Put(MFACacheKey, *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
+		out.AddEnvVar("AWS_ACCESS_KEY_ID", *resp.Credentials.AccessKeyId)
+		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *resp.Credentials.SecretAccessKey)
+		out.AddEnvVar("AWS_SESSION_TOKEN", *resp.Credentials.SessionToken)
+		err = out.Cache.Put(MFACacheKey, *resp.Credentials, *resp.Credentials.Expiration)
 		if err != nil {
 			out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
 		}
@@ -100,12 +102,17 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			return
 		}
 
+		temp := fmt.Sprintf("{\"Credentials\": {\"AccessKeyId\": \"%s\", \"SecretAccessKey\": \"%s\",\"SessionToken\": \"%s\", \"Expiration\": \"2023-02-14T20:20:10+00:00\"},\"AssumedRoleUser\": {\"AssumedRoleId\": \"%s\",\"Arn\": \"%s\"}}",
+			*resp.Credentials.AccessKeyId, *resp.Credentials.SecretAccessKey, *resp.Credentials.SessionToken, *resp.AssumedRoleUser.AssumedRoleId, *resp.AssumedRoleUser.Arn)
+
+		err = os.WriteFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), []byte(temp), 0700)
+		if err != nil {
+			return
+		}
+
 		awsTemporaryCredentials = resp.Credentials
 	}
 
-	out.AddEnvVar("AWS_ACCESS_KEY_ID", *awsTemporaryCredentials.AccessKeyId)
-	out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *awsTemporaryCredentials.SecretAccessKey)
-	out.AddEnvVar("AWS_SESSION_TOKEN", *awsTemporaryCredentials.SessionToken)
 	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
 	err := out.Cache.Put("sts", *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)

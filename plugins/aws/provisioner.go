@@ -36,7 +36,9 @@ func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 
 	if (hasTotp && hasMFASerial) || roleArn != "" {
 		p.stsProvisioner.MFASerial = mfaSerial
+		p.stsProvisioner.MFASerial = ""
 		p.stsProvisioner.TOTPCode = totp
+		p.stsProvisioner.TOTPCode = ""
 		p.stsProvisioner.RoleArn = roleArn
 		p.stsProvisioner.Provision(ctx, in, out)
 	} else {
@@ -93,7 +95,7 @@ func findRoleArnIfSpecified(in sdk.ProvisionInput, out *sdk.ProvisionOutput) str
 						}
 
 						// remove the --profile flag so the aws cli does not use it
-						out.CommandLine = out.CommandLine[0:i]
+						//out.CommandLine = out.CommandLine[0:i]
 						return key.Value()
 					}
 				}
