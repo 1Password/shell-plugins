@@ -1,0 +1,16 @@
+[profile]
+
+[profile.first]
+default = true
+email = "user@example.com"
+token = "4Oncq0V723ZO8HIqUgOTB77dsEXAMPLE"
+
+[profile.second]
+default = false
+email = "user-2@example.com"
+token = "NyK5NwkqXpuf74Le0omvFVUtZEXAMPLE"
+
+[profile.third]
+default = false
+email = "user-3@example.com"
+token = "L2IofeJGtvwy1fDSKNj5dEIRgEXAMPLE"
