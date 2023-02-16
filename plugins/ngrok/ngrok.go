@@ -15,9 +15,9 @@ func ngrokCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.NotWhenContainsArgs("--config"),
-			needsauth.NotForExactArgs("config"),
-			needsauth.NotForExactArgs("update"),
+			needsauth.NotWhenContainsArgs("--config"), // skip 1Password authentication when any command contains "--config" flag
+			needsauth.NotWhenContainsArgs("config"),   // skip 1Password authentication for "ngrok config" and its subcommands
+			needsauth.NotWhenContainsArgs("update"),   // skip 1Password authentication for "ngrok update" and "ngrok update --channel=beta"
 		),
 		Uses: []schema.CredentialUsage{
 			{
