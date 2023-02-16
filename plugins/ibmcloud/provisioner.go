@@ -49,7 +49,9 @@ func (p ibmProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			out.AddError(err)
 			return
 		}
-	} else {
+	}
+
+	if outputConfig.APIEndpoint == "" {
 		endpointProvider := endpoints.NewEndpointLocator(config.Region, config.Visibility, config.EndpointsFile)
 		IAMEndpoint, err := endpointProvider.IAMEndpoint()
 		if err != nil {
