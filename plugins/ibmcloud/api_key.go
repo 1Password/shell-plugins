@@ -1,11 +1,17 @@
 package ibmcloud
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
+	"os"
+	"path/filepath"
+
+	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix"
+	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix/authentication/iam"
 	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix/configuration/config_helpers"
 	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix/configuration/core_config"
-	"os"
+	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix/models"
+	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/common/rest"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -13,8 +19,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/bluemix/authentication/uaa"
-	"github.com/IBM-Cloud/ibm-cloud-cli-sdk/common/rest"
 )
 
 func APIKey() schema.CredentialType {
@@ -37,36 +41,63 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(ibmCloudConfig, provision.Filename("config.json"), provision.SetOutputDirAsEnvVar("IBMCLOUD_HOME")),
+		DefaultProvisioner: provision.TempFile(ibmCloudConfig, provision.Filename("config.json")),
 		Importer: importer.TryAll(
-			TryIBMCloudConfigFile(),
+			importer.TryEnvVarPair(defaultEnvVarMapping),
 		)}
 }
 
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"IBMCLOUD_API_KEY": fieldname.APIKey,
+}
+
 func ibmCloudConfig(in sdk.ProvisionInput) ([]byte, error) {
+	// Config info to cache for more efficient authentication
+	// These values get added and removed from the config file when calling `ibmcloud login` and `ibmcloud logout`
 	type ibmCacheEntry struct {
-		accessToken string
+		accessToken    string
+		refreshToken   string
+		accountDetails models.Account
 	}
+
 	var cache ibmCacheEntry
-	// try finding it in cache
-	ok := in.Cache.Get("IBMAccessToken", cache)
+	// Try finding the config info in cache
+	ok := in.Cache.Get("IBMAccessToken", cache.accessToken) &&
+		in.Cache.Get("IBMRefreshToken", cache.refreshToken) &&
+		in.Cache.Get("IBMAccountDetails", cache.accountDetails)
 	if !ok {
-		// if the credential is not in cache, fetch it from ibm
-		tokenRequest := uaa.APIKeyTokenRequest(in.ItemFields[fieldname.APIKey])
-		restClient := uaa.NewClient(uaa.DefaultConfig("https://cloud.ibm.com"), rest.NewClient())
+		// If the config info is not in cache, retrieve it using the IBM Cloud SDK
+		tokenRequest := iam.APIKeyTokenRequest(in.ItemFields[fieldname.APIKey])
+		restClient := iam.NewClient(iam.DefaultConfig("https://iam.cloud.ibm.com"), rest.NewClient()) // TODO: Check whether the iamEndpoint should be fetched instead of hard-coded
 		token, err := restClient.GetToken(tokenRequest)
 		if err != nil {
 			return nil, err
 		}
 		cache.accessToken = token.AccessToken
+		cache.refreshToken = token.RefreshToken
+		// TODO: Is there a way to retrieve the account information using the API key?
+		// cache.accountDetails.GUID = ""
+		// cache.accountDetails.Name = ""
+		// cache.accountDetails.Owner = ""
 	}
 
-	configDir := config_helpers.ConfigFilePath()
+	// Get the config file path
+	// If the `IBM_CLOUD_HOME` env var is set use that, otherwise default to the user's home directory
+	var configDir string
+	if configDir = bluemix.EnvConfigHome.Get(); configDir == "" {
+		var homeDir string
+		if homeDir = config_helpers.UserHomeDir(); homeDir == "" {
+			return nil, errors.New("could not retrieve user home directory")
+		}
+		configDir = filepath.Join(homeDir, "/.bluemix")
+	}
+	configPath := filepath.Join(configDir, "config.json")
+
 	var initialConfig core_config.BXConfigData
 
-	// check if an already existing file is present and use its information for building the config file
-	if _, err := os.Stat(configDir); err == nil {
-		configFile, err := os.ReadFile(configDir)
+	// Check if an already existing config file is present and if so use its information to build the temporary config file
+	if _, err := os.Stat(configPath); err == nil {
+		configFile, err := os.ReadFile(configPath)
 		if err != nil {
 			return nil, err
 		}
@@ -76,44 +107,29 @@ func ibmCloudConfig(in sdk.ProvisionInput) ([]byte, error) {
 			return nil, err
 		}
 	} else {
-		// set the following
-		//API Endpoint
-		//Region
-		// ... check what other config is mandatory
+		// TODO: Reconsider whether these should be hard-coded
+		initialConfig.APIEndpoint = "https://cloud.ibm.com"
+		initialConfig.ConsoleEndpoint = "https://cloud.ibm.com"
+		initialConfig.CloudType = "public"
+		initialConfig.CloudName = "bluemix"
+		initialConfig.IAMEndpoint = "https://iam.cloud.ibm.com"
 	}
 
-	initialConfig.IAMToken = cache.accessToken
+	initialConfig.IAMToken = "Bearer " + cache.accessToken
+	initialConfig.IAMRefreshToken = cache.refreshToken
+	initialConfig.Account.GUID = cache.accountDetails.GUID
+	initialConfig.Account.Name = cache.accountDetails.Name
+	initialConfig.Account.Owner = cache.accountDetails.Owner
 
 	configJSON, err := json.Marshal(initialConfig)
 	if err != nil {
 		return nil, err
 	}
-	// Write access token to cache
+
+	// Uncomment below for a quick way to check the JSON output
+	// return nil, fmt.Errorf(string(configJSON))
+
+	// TODO: Write config info to cache
+
 	return configJSON, nil
-}
-
-func TryIBMCloudConfigFile() sdk.Importer {
-	return importer.TryFile("~/.bluemix/config.json",
-		func(ctx context.Context, contents importer.FileContents,
-			in sdk.ImportInput, out *sdk.ImportAttempt) {
-			var config Config
-			if err := contents.ToJSON(&config); err != nil {
-				out.AddError(err)
-				return
-			}
-
-			if config.APIKey == "" {
-				return
-			}
-
-			out.AddCandidate(sdk.ImportCandidate{
-				Fields: map[sdk.FieldName]string{
-					fieldname.APIKey: config.APIKey,
-				},
-			})
-		})
-}
-
-type Config struct {
-	APIKey string `json:"APIKey"`
 }
