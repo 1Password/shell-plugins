@@ -63,7 +63,7 @@ func (p ibmProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 
 	if ok := in.Cache.Get("ibm-access-token", config.IAMAccessToken); !ok {
 		tokenRequest := iam.APIKeyTokenRequest(in.ItemFields[fieldname.APIKey])
-		restClient := iam.NewClient(iam.DefaultConfig(outputConfig.IAMEndpoint), rest.NewClient()) // TODO: Check whether the iamEndpoint should be fetched instead of hard-coded
+		restClient := iam.NewClient(iam.DefaultConfig(outputConfig.IAMEndpoint), rest.NewClient())
 		token, err := restClient.GetToken(tokenRequest)
 		if err != nil {
 			out.AddError(err)
