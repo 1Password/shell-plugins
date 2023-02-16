@@ -16,7 +16,10 @@ import (
 	"path/filepath"
 )
 
-const cloudEndpoint = "https://cloud.ibm.com"
+const (
+	cloudEndpoint = "https://cloud.ibm.com"
+	cacheKey      = "ibm-access-token"
+)
 
 type ibmProvisioner struct {
 	provision.FileProvisioner
@@ -63,7 +66,7 @@ func (p ibmProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		outputConfig.Region = config.Region
 	}
 
-	if ok := in.Cache.Get("ibm-access-token", config.IAMAccessToken); !ok {
+	if ok := in.Cache.Get(cacheKey, config.IAMAccessToken); !ok {
 		tokenRequest := iam.APIKeyTokenRequest(in.ItemFields[fieldname.APIKey])
 		restClient := iam.NewClient(iam.DefaultConfig(outputConfig.IAMEndpoint), rest.NewClient())
 		token, err := restClient.GetToken(tokenRequest)
@@ -73,7 +76,7 @@ func (p ibmProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		}
 		config.IAMAccessToken = token.AccessToken
 
-		err = out.Cache.Put("ibm-access-token", token.AccessToken, token.Expiry)
+		err = out.Cache.Put(cacheKey, token.AccessToken, token.Expiry)
 		if err != nil {
 			out.AddError(err)
 			return
