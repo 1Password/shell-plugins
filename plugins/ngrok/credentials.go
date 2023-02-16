@@ -19,7 +19,7 @@ func Credentials() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.AuthToken,
-				MarkdownDescription: "Auth Token used to authenticate to ngrok.",
+				MarkdownDescription: "Authtoken used to authenticate to ngrok.",
 				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
