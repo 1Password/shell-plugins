@@ -25,6 +25,30 @@ func TestAccessKeyProvisioner(t *testing.T) {
 
 func TestAccessKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, AccessKey().Importer, map[string]plugintest.ImportCase{
+		"env var TD_API_KEY": {
+			Environment: map[string]string{
+				"TD_API_KEY": "1/xxx",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.APIKey: "1/xxx",
+					},
+				},
+			},
+		},
+		"env var TREASURE_DATA_API_KEY": {
+			Environment: map[string]string{
+				"TREASURE_DATA_API_KEY": "1/xxx",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.APIKey: "1/xxx",
+					},
+				},
+			},
+		},
 		"TD config file": {
 			Files: map[string]string{
 				"~/.td/td.conf": plugintest.LoadFixture(t, "td.conf"),
@@ -32,7 +56,6 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.User:   "user@example.com",
 						fieldname.APIKey: "1/xxx",
 					},
 				},

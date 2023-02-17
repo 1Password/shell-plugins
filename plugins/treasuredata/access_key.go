@@ -2,6 +2,7 @@ package treasuredata
 
 import (
 	"context"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -18,10 +19,6 @@ func AccessKey() schema.CredentialType {
 		ManagementURL: sdk.URL("https://console.treasuredata.com/app/mp/ak"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.User,
-				MarkdownDescription: "User name specified by email",
-			},
-			{
 				Name:                fieldname.APIKey,
 				MarkdownDescription: "APIKey used to authenticate to Treasure Data.",
 				Secret:              true,
@@ -35,6 +32,12 @@ func AccessKey() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"TREASURE_DATA_API_KEY": fieldname.APIKey,
+			}),
+			TryTreasureDataConfigFile(os.Getenv("TREASURE_DATA_CONFIG_PATH")),
+			TryTreasureDataConfigFile(os.Getenv("TD_CONFIG_PATH")),
 			TryTreasureDataConfigFile("~/.td/td.conf"),
 		)}
 }
@@ -53,9 +56,6 @@ func TryTreasureDataConfigFile(path string) sdk.Importer {
 
 		fields := make(map[sdk.FieldName]string)
 		for _, section := range credentialsFile.Sections() {
-			if section.HasKey("user") && section.Key("user").Value() != "" {
-				fields[fieldname.User] = section.Key("user").Value()
-			}
 			if section.HasKey("apikey") && section.Key("apikey").Value() != "" {
 				fields[fieldname.APIKey] = section.Key("apikey").Value()
 			}
