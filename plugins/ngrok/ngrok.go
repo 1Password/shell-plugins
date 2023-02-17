@@ -20,6 +20,7 @@ func ngrokCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("update"),     // skip 1Password authentication for "ngrok update" and "ngrok update --channel=beta"
 			needsauth.NotWhenContainsArgs("completion"), // skip 1Password authentication for "ngrok completion"
 			needsauth.NotWhenContainsArgs("credits"),    // skip 1Password authentication for "ngrok credits"
+			needsauth.NotWhenContainsArgs("service"),    // skip 1Password authentication for "ngrok service" subcommands because that setup involves defining/knowing in advance the config file path, which isn't something we can handle with 1Password Shell Plugins.
 		),
 		Uses: []schema.CredentialUsage{
 			{
