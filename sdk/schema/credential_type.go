@@ -33,7 +33,7 @@ type CredentialField struct {
 	// The name of the field, e.g. "Token", "Password", or "Username".
 	Name sdk.FieldName
 
-	// Other names this field can be recognized after.
+	// Other names this field can be recognized after. The order in which these names are specified matters towards which 1Password item field will be selected.
 	AlternativeNames []sdk.FieldName
 
 	// A description of the field.
