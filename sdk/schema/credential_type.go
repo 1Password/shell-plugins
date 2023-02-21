@@ -186,7 +186,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has no separate fields that could be identified by the same name",
+		Description: "Has no duplicate field names",
 		Assertion:   hasNoDuplicateNamesAcrossFields,
 		Severity:    ValidationSeverityError,
 	})
