@@ -34,7 +34,7 @@ type CredentialField struct {
 	Name sdk.FieldName
 
 	// Other names this field can be recognized after. The order in which these names are specified matters towards which 1Password item field will be selected.
-	AlternativeNames []sdk.FieldName
+	AlternativeNames []string
 
 	// A description of the field.
 	MarkdownDescription string
