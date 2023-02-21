@@ -12,13 +12,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const ngrokAuthToken = "Authtoken"
+
 func Credentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.Credentials,
 		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                "Authtoken",
+				Name:                ngrokAuthToken,
 				AlternativeNames:    []string{fieldname.AuthToken.String()},
 				MarkdownDescription: "Auth Token used to authenticate to ngrok.",
 				Optional:            false,
@@ -61,7 +63,7 @@ func Credentials() schema.CredentialType {
 
 func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := Config{
-		AuthToken: in.ItemFields[fieldname.AuthToken],
+		AuthToken: in.ItemFields[ngrokAuthToken],
 		APIKey:    in.ItemFields[fieldname.APIKey],
 		Version:   "2", // required field for ngrok CLI to work when file-based configuration is used; automatically configured by the CLI program and is not configurable by the user
 	}
@@ -73,7 +75,7 @@ func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"NGROK_AUTHTOKEN": fieldname.AuthToken,
+	"NGROK_AUTHTOKEN": ngrokAuthToken,
 	"NGROK_API_KEY":   fieldname.APIKey,
 }
 
@@ -91,8 +93,8 @@ func TryngrokConfigFile(path string) sdk.Importer {
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.AuthToken: config.AuthToken,
-				fieldname.APIKey:    config.APIKey,
+				ngrokAuthToken:   config.AuthToken,
+				fieldname.APIKey: config.APIKey,
 			},
 		})
 	})
