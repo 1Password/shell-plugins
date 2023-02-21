@@ -144,9 +144,9 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 			hasSecretField = true
 		}
 
-		for _, name := range append(f.AlternativeNames, f.Name) {
-			if _, found := allFieldNames[name.String()]; !found {
-				allFieldNames[name.String()] = struct{}{}
+		for _, name := range append(f.AlternativeNames, f.Name.String()) {
+			if _, found := allFieldNames[name]; !found {
+				allFieldNames[name] = struct{}{}
 			} else {
 				hasNoDuplicateNamesAcrossFields = false
 				break
