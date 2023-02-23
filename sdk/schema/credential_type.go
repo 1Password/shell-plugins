@@ -121,8 +121,6 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	allFieldsInTitleCase := true
 	allCompositionsValid := true
 	hasSecretField := false
-	hasNoDuplicateNamesAcrossFields := true
-	allFieldNames := make(map[string]struct{})
 	for _, f := range c.Fields {
 		if f.Name == "" {
 			allFieldsHaveNameSet = false
@@ -142,15 +140,6 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		}
 		if f.Secret {
 			hasSecretField = true
-		}
-
-		for _, name := range append(f.AlternativeNames, f.Name.String()) {
-			if _, found := allFieldNames[name]; !found {
-				allFieldNames[name] = struct{}{}
-			} else {
-				hasNoDuplicateNamesAcrossFields = false
-				break
-			}
 		}
 
 	}
@@ -187,7 +176,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has no duplicate field names",
-		Assertion:   hasNoDuplicateNamesAcrossFields,
+		Assertion:   c.hasNoDuplicateFieldNames(),
 		Severity:    ValidationSeverityError,
 	})
 
@@ -204,4 +193,18 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	})
 
 	return report.IsValid(), report
+}
+
+func (c CredentialType) hasNoDuplicateFieldNames() bool {
+	allFieldNames := make(map[string]struct{})
+	for _, f := range c.Fields {
+		for _, name := range append(f.AlternativeNames, f.Name.String()) {
+			if _, found := allFieldNames[name]; !found {
+				allFieldNames[name] = struct{}{}
+			} else {
+				return false
+			}
+		}
+	}
+	return true
 }

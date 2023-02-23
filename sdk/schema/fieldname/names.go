@@ -17,6 +17,7 @@ const (
 	AppSecret       = sdk.FieldName("App Secret")
 	AppToken        = sdk.FieldName("App Token")
 	AuthToken       = sdk.FieldName("Auth Token")
+	Authtoken       = sdk.FieldName("Authtoken")
 	Cert            = sdk.FieldName("Cert")
 	Certificate     = sdk.FieldName("Certificate")
 	Credential      = sdk.FieldName("Credential")
