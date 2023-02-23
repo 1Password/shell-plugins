@@ -82,9 +82,6 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			return
 		}
 
-		out.AddEnvVar("AWS_ACCESS_KEY_ID", *resp.Credentials.AccessKeyId)
-		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *resp.Credentials.SecretAccessKey)
-		out.AddEnvVar("AWS_SESSION_TOKEN", *resp.Credentials.SessionToken)
 		err = out.Cache.Put(MFACacheKey, *resp.Credentials, *resp.Credentials.Expiration)
 		if err != nil {
 			out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
@@ -102,19 +99,39 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			return
 		}
 
-		temp := fmt.Sprintf("{\"Credentials\": {\"AccessKeyId\": \"%s\", \"SecretAccessKey\": \"%s\",\"SessionToken\": \"%s\", \"Expiration\": \"2023-02-14T20:20:10+00:00\"},\"AssumedRoleUser\": {\"AssumedRoleId\": \"%s\",\"Arn\": \"%s\"}}",
+		//marshal, err := json.Marshal(resp)
+		//if err != nil {
+		//	return
+		//}
+		//out.AddError(fmt.Errorf(string(marshal)))
+
+		temp := fmt.Sprintf("{\"Credentials\": {\"AccessKeyId\": \"%s\", \"SecretAccessKey\": \"%s\",\"SessionToken\": \"%s\", \"Expiration\": \"2023-02-22T20:37:49+00:00\"},\"AssumedRoleUser\": {\"AssumedRoleId\": \"%s\",\"Arn\": \"%s\"}}",
 			*resp.Credentials.AccessKeyId, *resp.Credentials.SecretAccessKey, *resp.Credentials.SessionToken, *resp.AssumedRoleUser.AssumedRoleId, *resp.AssumedRoleUser.Arn)
 
-		err = os.WriteFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), []byte(temp), 0700)
-		if err != nil {
-			return
-		}
+		//err = syscall.Mkfifo(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), 0700)
+		//if err != nil {
+		//	return
+		//}
 
+		go func() {
+			err = os.WriteFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), []byte(temp), 0700)
+			if err != nil {
+				return
+			}
+		}()
 		awsTemporaryCredentials = resp.Credentials
+
+		out.AddEnvVar("AWS_ACCESS_KEY_ID", in.ItemFields[fieldname.AccessKeyID])
+		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", in.ItemFields[fieldname.SecretAccessKey])
+		//out.AddFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), sdk.OutputFile{Contents: []byte(temp)})
+
 	}
 
 	out.AddEnvVar("AWS_DEFAULT_REGION", region)
 
+	//out.AddEnvVar("AWS_ACCESS_KEY_ID", *awsTemporaryCredentials.AccessKeyId)
+	//out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *awsTemporaryCredentials.SecretAccessKey)
+	//out.AddEnvVar("AWS_SESSION_TOKEN", *awsTemporaryCredentials.SessionToken)
 	err := out.Cache.Put("sts", *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
 	if err != nil {
 		out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
