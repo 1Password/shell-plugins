@@ -1,0 +1,129 @@
+package scaleway
+
+import (
+	"context"
+	"os"
+
+	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/importer"
+	"github.com/1Password/shell-plugins/sdk/provision"
+	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
+	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+)
+
+func APIKey() schema.CredentialType {
+	return schema.CredentialType{
+		Name:          credname.APIKey,
+		DocsURL:       sdk.URL("https://www.scaleway.com/en/docs/identity-and-access-management/iam/how-to/create-api-keys"),
+		ManagementURL: sdk.URL("https://console.scaleway.com/iam/api-keys"),
+		Fields: []schema.CredentialField{
+			{
+				Name:                fieldname.AccessKeyID,
+				MarkdownDescription: "The ID of the API Key used to authenticate to Scaleway.",
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Length: 20,
+					Prefix: "SCW",
+					Charset: schema.Charset{
+						Uppercase: true,
+						Digits:    true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.SecretAccessKey,
+				MarkdownDescription: "The secret access key used to authenticate to Scaleway.",
+				Secret:              true,
+				Composition: &schema.ValueComposition{
+					Length: 36,
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Specific:  []rune{'-'},
+					},
+				},
+			},
+			{
+				Name:                fieldname.Organization,
+				MarkdownDescription: "The default organization ID to use for this access key.",
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Length: 36,
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Specific:  []rune{'-'},
+					},
+				},
+			},
+			{
+				Name:                fieldname.DefaultRegion,
+				MarkdownDescription: "The default region to use for this access key.",
+				Optional:            true,
+			},
+		},
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryScalewayConfigFile(),
+		)}
+}
+
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"SCW_ACCESS_KEY":              fieldname.AccessKeyID,
+	"SCW_SECRET_KEY":              fieldname.SecretAccessKey,
+	"SCW_DEFAULT_ORGANIZATION_ID": fieldname.Organization,
+	"SCW_DEFAULT_REGION":          fieldname.DefaultRegion,
+}
+
+func TryScalewayConfigFile() sdk.Importer {
+	file := os.Getenv("SCW_CONFIG_PATH")
+	if file == "" {
+		file = "~/.config/scw/config.yaml"
+	}
+	return importer.TryFile(file, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToYAML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		// TODO : Handle multiple profiles
+
+		if config.AccessKey == "" || config.SecretKey == "" {
+			return
+		}
+
+		fields := make(map[sdk.FieldName]string)
+		fields[fieldname.AccessKeyID] = config.AccessKey
+		fields[fieldname.SecretAccessKey] = config.SecretKey
+		fields[fieldname.Organization] = config.DefaultOrganizationID
+		if config.DefaultRegion != "" {
+			fields[fieldname.DefaultRegion] = config.DefaultRegion
+		}
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: fields,
+		})
+	})
+}
+
+type Config struct {
+	AccessKey             string            `yaml:"access_key"`
+	SecretKey             string            `yaml:"secret_key"`
+	DefaultOrganizationID string            `yaml:"default_organization_id"`
+	DefaultProjectID      string            `yaml:"default_project_id"`
+	DefaultRegion         string            `yaml:"default_region"`
+	DefaultZone           string            `yaml:"default_zone"`
+	ActiveProfile         string            `yaml:"active_profile,omitempty"`
+	Profiles              map[string]Profil `yaml:"profiles,omitempty"`
+}
+
+type Profil struct {
+	AccessKey             string `yaml:"access_key"`
+	SecretKey             string `yaml:"secret_key"`
+	DefaultOrganizationID string `yaml:"default_organization_id"`
+	DefaultProjectID      string `yaml:"default_project_id"`
+	DefaultZone           string `yaml:"default_zone"`
+	DefaultRegion         string `yaml:"default_region"`
+}
