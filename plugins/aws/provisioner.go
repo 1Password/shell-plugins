@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"gopkg.in/ini.v1"
 	"os"
 	"strings"
 
@@ -29,17 +30,17 @@ func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	totp, hasTotp := in.ItemFields[fieldname.OneTimePassword]
 	mfaSerial, hasMFASerial := in.ItemFields[fieldname.MFASerial]
 
-	roleArn := findRoleArnIfSpecified(in, out)
+	profileWithRole := findProfileSectionWithRole(in, out)
 	if len(out.Diagnostics.Errors) > 0 {
 		return
 	}
 
-	if (hasTotp && hasMFASerial) || roleArn != "" {
+	if (hasTotp && hasMFASerial) || profileWithRole != nil {
 		p.stsProvisioner.MFASerial = mfaSerial
-		p.stsProvisioner.MFASerial = ""
+		//p.stsProvisioner.MFASerial = ""
 		p.stsProvisioner.TOTPCode = totp
-		p.stsProvisioner.TOTPCode = ""
-		p.stsProvisioner.RoleArn = roleArn
+		//p.stsProvisioner.TOTPCode = ""
+		p.stsProvisioner.ProfileWithRole = profileWithRole
 		p.stsProvisioner.Provision(ctx, in, out)
 	} else {
 		p.envVarProvisioner.Provision(ctx, in, out)
@@ -47,61 +48,63 @@ func (p awsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 }
 
 func (p awsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// Nothing to do here: environment variables get wiped automatically when the process exits.
+	p.stsProvisioner.Deprovision(ctx, in, out)
 }
 
 func (p awsProvisioner) Description() string {
 	return p.envVarProvisioner.Description()
 }
 
-func findRoleArnIfSpecified(in sdk.ProvisionInput, out *sdk.ProvisionOutput) string {
+func findProfileSectionWithRole(in sdk.ProvisionInput, out *sdk.ProvisionOutput) *ini.Section {
 	for i, arg := range out.CommandLine {
 		if arg == "--profile" {
-			// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
-			configPath := os.Getenv("AWS_CONFIG_FILE")
-			if configPath != "" {
-				if strings.HasPrefix(configPath, "~") {
-					configPath = in.FromHomeDir(configPath[1:])
-				}
-			} else {
-				configPath = in.FromHomeDir(".aws", "config") // default config file location
+			if i+1 == len(out.CommandLine) {
+				return nil
 			}
-			contents, err := os.ReadFile(configPath)
-			if os.IsNotExist(err) {
-				out.AddError(fmt.Errorf("you've specified the --profile flag but no profiles to choose from were present at: %s", configPath))
-				return ""
-			} else if err != nil {
-				out.AddError(err)
-				return ""
-			}
-
-			configFile, err := importer.FileContents(contents).ToINI()
-			if err != nil {
-				out.AddError(err)
-				return ""
-			}
-
-			if configFile != nil {
-				if i+1 == len(out.CommandLine) {
-					return ""
-				}
-				profileSection := getConfigSectionByProfile(configFile, out.CommandLine[i+1])
-				if profileSection != nil {
-					if profileSection.HasKey("role_arn") {
-						key, err := profileSection.GetKey("role_arn")
-						if err != nil {
-							out.AddError(err)
-							return ""
-						}
-
-						// remove the --profile flag so the aws cli does not use it
-						//out.CommandLine = out.CommandLine[0:i]
-						return key.Value()
-					}
-				}
-			}
-			break
+			return scanConfigFileForRole(out.CommandLine[i+1], in, out)
 		}
 	}
-	return ""
+
+	if val := os.Getenv("AWS_PROFILE"); val != "" {
+		return scanConfigFileForRole(val, in, out)
+	}
+
+	return scanConfigFileForRole("default", in, out)
+}
+
+func scanConfigFileForRole(profile string, in sdk.ProvisionInput, out *sdk.ProvisionOutput) *ini.Section {
+	// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+	configPath := os.Getenv("AWS_CONFIG_FILE")
+	if configPath != "" {
+		if strings.HasPrefix(configPath, "~") {
+			configPath = in.FromHomeDir(configPath[1:])
+		}
+	} else {
+		configPath = in.FromHomeDir(".aws", "config") // default config file location
+	}
+	contents, err := os.ReadFile(configPath)
+	if os.IsNotExist(err) {
+		out.AddError(fmt.Errorf("you've specified the --profile flag but no profiles to choose from were present at: %s", configPath))
+		return nil
+	} else if err != nil {
+		out.AddError(err)
+		return nil
+	}
+
+	configFile, err := importer.FileContents(contents).ToINI()
+	if err != nil {
+		out.AddError(err)
+		return nil
+	}
+
+	if configFile != nil {
+		profileSection := getConfigSectionByProfile(configFile, profile)
+		if profileSection != nil {
+			if profileSection.HasKey("role_arn") {
+				return profileSection
+			}
+		}
+	}
+
+	return nil
 }

@@ -1,7 +1,9 @@
 package aws
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
@@ -10,19 +12,22 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/aws/aws-sdk-go-v2/service/sts/types"
+	"gopkg.in/ini.v1"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
-	MFACacheKey               = "sts-mfa"
+	mfaCacheKey               = "sts-mfa"
+	assumeRoleCacheKey        = "sts-assume-role"
 	assumeRoleWithMFACacheKey = "sts-assume-role-mfa"
 )
 
 type STSProvisioner struct {
-	TOTPCode  string
-	MFASerial string
-	RoleArn   string
+	TOTPCode        string
+	MFASerial       string
+	ProfileWithRole *ini.Section
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
@@ -40,10 +45,14 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	config.Region = region
 
 	stsProvider := sts.NewFromConfig(*config)
-	var awsTemporaryCredentials *types.Credentials
 
-	if p.RoleArn != "" && p.MFASerial != "" && p.TOTPCode != "" {
-		if useCache := tryUsingCachedCredentials(assumeRoleWithMFACacheKey, in, out); useCache {
+	if p.ProfileWithRole != nil && p.MFASerial != "" && p.TOTPCode != "" {
+		if ok := p.tryUsingCachedCredentials(assumeRoleWithMFACacheKey, in, out); ok {
+			return
+		}
+
+		roleArn, err := p.ProfileWithRole.GetKey("role_arn")
+		if err != nil {
 			return
 		}
 
@@ -51,7 +60,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
 			SerialNumber:    aws.String(p.MFASerial),
 			TokenCode:       aws.String(p.TOTPCode),
-			RoleArn:         aws.String(p.RoleArn),
+			RoleArn:         aws.String(roleArn.Value()),
 			RoleSessionName: aws.String("1password-shell-plugin"),
 		}
 
@@ -60,14 +69,14 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			out.AddError(err)
 			return
 		}
-		out.AddEnvVar("AWS_ACCESS_KEY_ID", *resp.Credentials.AccessKeyId)
-		// TODO: write response to aws cache using file provisioner
-		err = out.Cache.Put(assumeRoleWithMFACacheKey, *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
+		provisionConfigFile(p.ProfileWithRole, in.TempDir, resp.Credentials, out)
+
+		err = out.Cache.Put(assumeRoleWithMFACacheKey, resp.Credentials, *resp.Credentials.Expiration)
 		if err != nil {
 			out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
 		}
-	} else if p.RoleArn == "" {
-		if useCache := tryUsingCachedCredentials(MFACacheKey, in, out); useCache {
+	} else if p.ProfileWithRole == nil {
+		if useCache := p.tryUsingCachedCredentials(mfaCacheKey, in, out); useCache {
 			return
 		}
 		input := &sts.GetSessionTokenInput{
@@ -81,15 +90,25 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			out.AddError(err)
 			return
 		}
-
-		err = out.Cache.Put(MFACacheKey, *resp.Credentials, *resp.Credentials.Expiration)
+		out.AddEnvVar("AWS_ACCESS_KEY_ID", *resp.Credentials.AccessKeyId)
+		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *resp.Credentials.SecretAccessKey)
+		out.AddEnvVar("AWS_SESSION_TOKEN", *resp.Credentials.SessionToken)
+		err = out.Cache.Put(mfaCacheKey, *resp.Credentials, *resp.Credentials.Expiration)
 		if err != nil {
 			out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
 		}
 	} else {
+		if ok := p.tryUsingCachedCredentials(assumeRoleCacheKey, in, out); ok {
+			return
+		}
+		roleArn, err := p.ProfileWithRole.GetKey("role_arn")
+		if err != nil {
+			return
+		}
+
 		input := &sts.AssumeRoleInput{
 			DurationSeconds: aws.Int32(900), // minimum expiration time - 15 minutes
-			RoleArn:         aws.String(p.RoleArn),
+			RoleArn:         aws.String(roleArn.Value()),
 			RoleSessionName: aws.String("1password-shell-plugin"),
 		}
 
@@ -98,52 +117,23 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 			out.AddError(err)
 			return
 		}
-
-		//marshal, err := json.Marshal(resp)
-		//if err != nil {
-		//	return
-		//}
-		//out.AddError(fmt.Errorf(string(marshal)))
-
-		temp := fmt.Sprintf("{\"Credentials\": {\"AccessKeyId\": \"%s\", \"SecretAccessKey\": \"%s\",\"SessionToken\": \"%s\", \"Expiration\": \"2023-02-22T20:37:49+00:00\"},\"AssumedRoleUser\": {\"AssumedRoleId\": \"%s\",\"Arn\": \"%s\"}}",
-			*resp.Credentials.AccessKeyId, *resp.Credentials.SecretAccessKey, *resp.Credentials.SessionToken, *resp.AssumedRoleUser.AssumedRoleId, *resp.AssumedRoleUser.Arn)
-
-		//err = syscall.Mkfifo(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), 0700)
-		//if err != nil {
-		//	return
-		//}
-
-		go func() {
-			err = os.WriteFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), []byte(temp), 0700)
-			if err != nil {
-				return
-			}
-		}()
-		awsTemporaryCredentials = resp.Credentials
-
-		out.AddEnvVar("AWS_ACCESS_KEY_ID", in.ItemFields[fieldname.AccessKeyID])
-		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", in.ItemFields[fieldname.SecretAccessKey])
-		//out.AddFile(filepath.Join(in.HomeDir, ".aws", "cli", "cache", "edeb6cd02906b10b8cf05852cb781abec6482209.json"), sdk.OutputFile{Contents: []byte(temp)})
-
+		provisionConfigFile(p.ProfileWithRole, in.TempDir, resp.Credentials, out)
 	}
 
 	out.AddEnvVar("AWS_DEFAULT_REGION", region)
-
-	//out.AddEnvVar("AWS_ACCESS_KEY_ID", *awsTemporaryCredentials.AccessKeyId)
-	//out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *awsTemporaryCredentials.SecretAccessKey)
-	//out.AddEnvVar("AWS_SESSION_TOKEN", *awsTemporaryCredentials.SessionToken)
-	err := out.Cache.Put("sts", *awsTemporaryCredentials, *awsTemporaryCredentials.Expiration)
-	if err != nil {
-		out.AddError(fmt.Errorf("failed to serialize aws sts credentials: %w", err))
-	}
 }
 
-func tryUsingCachedCredentials(cacheKey string, in sdk.ProvisionInput, out *sdk.ProvisionOutput) bool {
+func (p STSProvisioner) tryUsingCachedCredentials(cacheKey string, in sdk.ProvisionInput, out *sdk.ProvisionOutput) bool {
+	isAssumeRoleWorkflow := strings.Contains(cacheKey, assumeRoleCacheKey)
 	var cached types.Credentials
 	if ok := in.Cache.Get(cacheKey, &cached); ok {
-		out.AddEnvVar("AWS_ACCESS_KEY_ID", *cached.AccessKeyId)
-		out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *cached.SecretAccessKey)
-		out.AddEnvVar("AWS_SESSION_TOKEN", *cached.SessionToken)
+		if isAssumeRoleWorkflow {
+			provisionConfigFile(p.ProfileWithRole, in.TempDir, &cached, out)
+		} else {
+			out.AddEnvVar("AWS_ACCESS_KEY_ID", *cached.AccessKeyId)
+			out.AddEnvVar("AWS_SECRET_ACCESS_KEY", *cached.SecretAccessKey)
+			out.AddEnvVar("AWS_SESSION_TOKEN", *cached.SessionToken)
+		}
 
 		if region, ok := in.ItemFields[fieldname.DefaultRegion]; ok {
 			out.AddEnvVar("AWS_DEFAULT_REGION", region)
@@ -154,8 +144,73 @@ func tryUsingCachedCredentials(cacheKey string, in sdk.ProvisionInput, out *sdk.
 	return false
 }
 
+func provisionConfigFile(profileWithRole *ini.Section, tempDir string, tempCredentials *types.Credentials, out *sdk.ProvisionOutput) {
+	provisionedConfigFile := ini.Empty()
+	provisionedSection, err := provisionedConfigFile.NewSection(profileWithRole.Name())
+	if err != nil {
+		out.AddError(err)
+		return
+	}
+	for _, key := range profileWithRole.Keys() {
+		if key.Name() != "role_arn" && key.Name() != "credential_process" {
+			_, err = provisionedSection.NewKey(key.Name(), key.Value())
+			if err != nil {
+				out.AddError(err)
+				return
+			}
+		}
+	}
+	credentialOutput := struct {
+		Version         int
+		AccessKeyId     string
+		SecretAccessKey string
+		SessionToken    string
+	}{
+		1,
+		*tempCredentials.AccessKeyId,
+		*tempCredentials.SecretAccessKey,
+		*tempCredentials.SessionToken,
+	}
+
+	jsonCredentials, err := json.Marshal(credentialOutput)
+	if err != nil {
+		out.AddError(err)
+		return
+	}
+
+	helperFIFOPath := filepath.Join(tempDir, "helperFIFO")
+	out.AddSecretFile(helperFIFOPath, jsonCredentials)
+
+	provisioningProcess := fmt.Sprintf("cat %s", helperFIFOPath)
+
+	_, err = provisionedSection.NewKey("credential_process", provisioningProcess)
+	if err != nil {
+		out.AddError(err)
+		return
+	}
+
+	var buf bytes.Buffer
+	_, err = provisionedConfigFile.WriteTo(&buf)
+	if err != nil {
+		return
+	}
+
+	configPath := filepath.Join(tempDir, "config")
+	err = os.WriteFile(configPath, buf.Bytes(), 0777)
+	if err != nil {
+		out.AddError(err)
+		return
+	}
+	out.AddEnvVar("AWS_CONFIG_FILE", configPath)
+}
+
 func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// Nothing to do here: environment variables get wiped automatically when the process exits.
+	configPath := filepath.Join(in.TempDir, "config")
+	err := os.Remove(configPath)
+	if err != nil {
+		out.Diagnostics.Errors = append(out.Diagnostics.Errors, sdk.Error{Message: err.Error()})
+		return
+	}
 }
 
 func (p STSProvisioner) Description() string {
