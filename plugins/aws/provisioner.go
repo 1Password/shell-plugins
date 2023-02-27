@@ -39,7 +39,7 @@ func (p awsProvisioner) Description() string {
 	return "Provisions AWS with temporary credentials."
 }
 
-func (p awsProvisioner) selectCorrespondingProvisioner(itemFields map[sdk.FieldName]string, out *sdk.ProvisionOutput) sdk.Provisioner {
+func (p *awsProvisioner) selectCorrespondingProvisioner(itemFields map[sdk.FieldName]string, out *sdk.ProvisionOutput) sdk.Provisioner {
 	awsConfig := getAWSConfiguration(out)
 	if len(out.Diagnostics.Errors) > 0 {
 		return nil
