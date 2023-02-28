@@ -62,6 +62,7 @@ func ListAll() []sdk.FieldName {
 		AppSecret,
 		AppToken,
 		AuthToken,
+		Authtoken,
 		Cert,
 		Certificate,
 		Credential,

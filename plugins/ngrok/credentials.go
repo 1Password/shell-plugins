@@ -2,8 +2,6 @@ package ngrok
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -21,7 +19,7 @@ func Credentials() schema.CredentialType {
 			{
 				Name:                fieldname.Authtoken,
 				AlternativeNames:    []string{"Auth Token"},
-				MarkdownDescription: fmt.Sprintf("%s used to authenticate to ngrok.", fieldname.Authtoken),
+				MarkdownDescription: "Authtoken used to authenticate to ngrok.",
 				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
