@@ -14,7 +14,7 @@ import (
 
 func Credentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.Credentials,
+		Name:    credname.AuthToken,
 		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
@@ -47,7 +47,7 @@ func Credentials() schema.CredentialType {
 
 func CredentialsAPI() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.Credentials,
+		Name:    credname.APIKey,
 		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
