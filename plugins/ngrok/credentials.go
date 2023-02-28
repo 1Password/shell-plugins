@@ -31,6 +31,25 @@ func Credentials() schema.CredentialType {
 					},
 				},
 			},
+		},
+		DefaultCredential:  true,
+		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("config.yml"), provision.AddArgs("--config", "{{ .Path }}")),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.MacOnly(
+				TryngrokConfigFile("~/Library/Application Support/ngrok/ngrok.yml"),
+			),
+			importer.LinuxOnly(
+				TryngrokConfigFile("~/.config/ngrok/ngrok.yml"),
+			),
+		)}
+}
+
+func CredentialsAPI() schema.CredentialType {
+	return schema.CredentialType{
+		Name:    credname.Credentials,
+		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
+		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
 				MarkdownDescription: "API Key used to authenticate to ngrok API.",

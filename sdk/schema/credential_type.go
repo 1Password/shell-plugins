@@ -24,6 +24,9 @@ type CredentialType struct {
 	// (Optional) A function to scan the system for occurences of this credential type.
 	Importer sdk.Importer
 
+	// (Optional) Whether this is the type of credential to default to
+	DefaultCredential bool
+
 	// The default provisioner to use for this credential if the executable doesn't override it.
 	DefaultProvisioner sdk.Provisioner
 }

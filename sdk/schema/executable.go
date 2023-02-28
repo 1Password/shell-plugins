@@ -37,6 +37,12 @@ type CredentialUsage struct {
 	// set in the credential schema, so should only be used if this executable requires a custom configuration, that deviates
 	// from the way the credential is usually provisioned.
 	Provisioner sdk.Provisioner
+
+	// add a field for command used with the credential
+	Commands []string
+
+	// whether this is the default credential
+	Default bool
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {

@@ -14,6 +14,7 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			Credentials(),
+			CredentialsAPI(),
 		},
 		Executables: []schema.Executable{
 			ngrokCLI(),
