@@ -12,7 +12,7 @@ func TestCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
+				fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 				fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
 			},
 			CommandLine: []string{"ngrok"},
@@ -38,7 +38,7 @@ func TestCredentialsImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
+						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
 					},
 				},
@@ -52,7 +52,7 @@ func TestCredentialsImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
+						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
 					},
 				},
@@ -66,7 +66,7 @@ func TestCredentialsImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.AuthToken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
+						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
 						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
 					},
 				},
