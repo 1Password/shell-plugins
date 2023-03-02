@@ -2,14 +2,13 @@ package ngrok
 
 import (
 	"context"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"gopkg.in/yaml.v3"
 )
 
 func Credentials() schema.CredentialType {
@@ -47,7 +46,7 @@ func Credentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("config.yml"), provision.AddArgs("--config", "{{ .Path }}")),
+		DefaultProvisioner: newNgrokProvisioner(),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.MacOnly(
@@ -57,19 +56,6 @@ func Credentials() schema.CredentialType {
 				TryngrokConfigFile("~/.config/ngrok/ngrok.yml"),
 			),
 		)}
-}
-
-func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{
-		AuthToken: in.ItemFields[fieldname.Authtoken],
-		APIKey:    in.ItemFields[fieldname.APIKey],
-		Version:   "2", // required field for ngrok CLI to work when file-based configuration is used; automatically configured by the CLI program and is not configurable by the user
-	}
-	contents, err := yaml.Marshal(&config)
-	if err != nil {
-		return nil, err
-	}
-	return []byte(contents), nil
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
@@ -98,8 +84,37 @@ func TryngrokConfigFile(path string) sdk.Importer {
 	})
 }
 
+// Config this struct is exhaustive, covering all documented configurations.
 type Config struct {
-	AuthToken string `yaml:"authtoken"`
-	APIKey    string `yaml:"api_key"`
-	Version   string
+	AuthToken          string                  `yaml:"authtoken"`
+	APIKey             string                  `yaml:"api_key"`
+	Version            string                  `yaml:"version"`
+	ConnectTimeout     time.Duration           `yaml:"connect_timeout"`
+	ConsoleUI          bool                    `yaml:"console_ui"`
+	ConsoleUIColor     string                  `yaml:"console_ui_color"` // should be either "transparent" or "black"
+	DnsResolverIps     string                  `yaml:"console_ui_color"`
+	HeartbeatTolerance time.Duration           `yaml:"heartbeat_tolerance"`
+	InspectDBSize      int                     `yaml:"inspect_db_size"`
+	LogLevel           string                  `yaml:"log_level"`  // possible values are: crit, warn, error, info, and debug.
+	LogFormat          string                  `yaml:"log_format"` // can be either "logfmt", "json" or "term".
+	Log                string                  `yaml:"log"`        // can be either "stderr", "stdout", false or file path
+	Metadata           string                  `yaml:"metadata"`
+	ProxyUrl           string                  `yaml:"proxy_url"`
+	Region             string                  `yaml:"region"`
+	RemoteManagement   bool                    `yaml:"remote_management"`
+	RootCas            string                  `yaml:"root_cas"`
+	ServerAddress      string                  `yaml:"server_addr"`
+	Tunnels            map[string]TunnelConfig `yaml:"tunnels"`
+	UpdateChannel      string                  `yaml:"update_channel"`
+	UpdateCheck        bool                    `yaml:"update_check"`
+	WebAddress         string                  `yaml:"web_addr"`
+	WebAllowHosts      string                  `yaml:"web_allow_hosts"`
+}
+
+// TunnelConfig this struct is non-exhaustive. It only covers few most common fields, for now.
+type TunnelConfig struct {
+	Address  string `yaml:"addr"`
+	Metadata string `yaml:"metadata"`
+	Proto    string `yaml:"proto"`
+	HostName string `yaml:"hostname"`
 }
