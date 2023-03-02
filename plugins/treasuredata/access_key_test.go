@@ -63,3 +63,16 @@ func TestAccessKeyImporter(t *testing.T) {
 		},
 	})
 }
+
+func TestAPIKeyNeedsAuth(t *testing.T) {
+	plugintest.TestNeedsAuth(t, TreasureDataCLI().NeedsAuth, map[string]plugintest.NeedsAuthCase{
+		"no for -c": {
+			Args:              []string{"-c"},
+			ExpectedNeedsAuth: false,
+		},
+		"no for -k": {
+			Args:              []string{"-k"},
+			ExpectedNeedsAuth: false,
+		},
+	})
+}

@@ -15,6 +15,8 @@ func TreasureDataCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("-k"),
+			needsauth.NotWhenContainsArgs("-c"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
