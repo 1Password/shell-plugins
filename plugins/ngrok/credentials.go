@@ -84,7 +84,7 @@ func TryngrokConfigFile(path string) sdk.Importer {
 	})
 }
 
-// Config this struct is exhaustive, covering all documented configurations.
+// Config struct is exhaustive, covering all documented configurations.
 type Config struct {
 	AuthToken          string                  `yaml:"authtoken"`
 	APIKey             string                  `yaml:"api_key"`
@@ -92,7 +92,7 @@ type Config struct {
 	ConnectTimeout     time.Duration           `yaml:"connect_timeout"`
 	ConsoleUI          bool                    `yaml:"console_ui"`
 	ConsoleUIColor     string                  `yaml:"console_ui_color"` // should be either "transparent" or "black"
-	DnsResolverIps     string                  `yaml:"console_ui_color"`
+	DnsResolverIps     string                  `yaml:"dns_resolver_ips"`
 	HeartbeatTolerance time.Duration           `yaml:"heartbeat_tolerance"`
 	InspectDBSize      int                     `yaml:"inspect_db_size"`
 	LogLevel           string                  `yaml:"log_level"`  // possible values are: crit, warn, error, info, and debug.
@@ -111,7 +111,7 @@ type Config struct {
 	WebAllowHosts      string                  `yaml:"web_allow_hosts"`
 }
 
-// TunnelConfig this struct is non-exhaustive. It only covers few most common fields, for now.
+// TunnelConfig struct is non-exhaustive. It only covers few most common fields, for now.
 type TunnelConfig struct {
 	Address  string `yaml:"addr"`
 	Metadata string `yaml:"metadata"`
