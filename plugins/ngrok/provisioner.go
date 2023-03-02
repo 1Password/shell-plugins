@@ -3,6 +3,7 @@ package ngrok
 import (
 	"context"
 	"os"
+	"path/filepath"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -20,9 +21,9 @@ func newNgrokProvisioner() sdk.Provisioner {
 }
 
 func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	provisionedConfigFilePath := in.TempDir + "config.yml"
+	provisionedConfigFilePath := filepath.Join(in.TempDir, "config.yml")
 	var config Config
-	configFilePath := processConfigFlag(out.CommandLine, provisionedConfigFilePath)
+	configFilePath := processConfigFlag(out, provisionedConfigFilePath)
 	if configFilePath != "" {
 		existingContents, err := os.ReadFile(configFilePath)
 		if err != nil {
@@ -49,7 +50,8 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	out.AddSecretFile(provisionedConfigFilePath, newContents)
 }
 
-func processConfigFlag(args []string, newFilePath string) string {
+func processConfigFlag(out *sdk.ProvisionOutput, newFilePath string) string {
+	args := out.CommandLine
 	for i, arg := range args {
 		if arg == "--config" {
 			if i+1 != len(args) {
@@ -59,6 +61,9 @@ func processConfigFlag(args []string, newFilePath string) string {
 			}
 		}
 	}
+	args = append(args, "--config")
+	args = append(args, newFilePath)
+	out.CommandLine = args
 	return ""
 }
 
