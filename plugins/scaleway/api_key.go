@@ -45,7 +45,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Organization,
+				Name:                fieldname.DefaultOrganization,
 				MarkdownDescription: "The default organization ID to use for this access key.",
 				Secret:              false,
 				Composition: &schema.ValueComposition{
@@ -62,6 +62,11 @@ func APIKey() schema.CredentialType {
 				MarkdownDescription: "The default region to use for this access key.",
 				Optional:            true,
 			},
+			{
+				Name:                fieldname.DefaultZone,
+				MarkdownDescription: "The default zone to use for this access key.",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
@@ -73,8 +78,9 @@ func APIKey() schema.CredentialType {
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SCW_ACCESS_KEY":              fieldname.AccessKeyID,
 	"SCW_SECRET_KEY":              fieldname.SecretAccessKey,
-	"SCW_DEFAULT_ORGANIZATION_ID": fieldname.Organization,
+	"SCW_DEFAULT_ORGANIZATION_ID": fieldname.DefaultOrganization,
 	"SCW_DEFAULT_REGION":          fieldname.DefaultRegion,
+	"SCW_DEFAULT_ZONE":            fieldname.DefaultZone,
 }
 
 func TryScalewayConfigFile() sdk.Importer {
@@ -98,9 +104,12 @@ func TryScalewayConfigFile() sdk.Importer {
 		fields := make(map[sdk.FieldName]string)
 		fields[fieldname.AccessKeyID] = config.AccessKey
 		fields[fieldname.SecretAccessKey] = config.SecretKey
-		fields[fieldname.Organization] = config.DefaultOrganizationID
+		fields[fieldname.DefaultOrganization] = config.DefaultOrganizationID
 		if config.DefaultRegion != "" {
 			fields[fieldname.DefaultRegion] = config.DefaultRegion
+		}
+		if config.DefaultZone != "" {
+			fields[fieldname.DefaultZone] = config.DefaultZone
 		}
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: fields,
