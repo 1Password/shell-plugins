@@ -9,7 +9,7 @@ import (
 
 func TreasureDataCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Treasure Data Toolbelkt",
+		Name:    "Treasure Data Toolbelt",
 		Runs:    []string{"td"},
 		DocsURL: sdk.URL("https://docs.treasuredata.com/display/public/PD/TD+Toolbelt"),
 		NeedsAuth: needsauth.IfAll(
