@@ -16,7 +16,7 @@ type stsProvisioner struct {
 	profileName string
 }
 
-func newSTSProvisioner(profileName string) sdk.Provisioner {
+func NewSTSProvisioner(profileName string) sdk.Provisioner {
 	return stsProvisioner{profileName: profileName}
 }
 
@@ -28,7 +28,7 @@ func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 
 	resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig, out)
 
-	masterCreds, err := newMasterCredentialsProvider(in.ItemFields).Retrieve(ctx)
+	masterCreds, err := NewMasterCredentialsProvider(in.ItemFields).Retrieve(ctx)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -73,8 +73,8 @@ func (p stsProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
-// chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding StsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
-func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput, client *sts.Client) (aws.CredentialsProvider, *StsCacheWriter) {
+// chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
+func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput, client *sts.Client) (aws.CredentialsProvider, *stsCacheWriter) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin"
 	if awsConfig.HasSSOStartURL() {
 		out.AddError(fmt.Errorf(unsupportedMessage, "SSO Authentication"))
@@ -98,21 +98,21 @@ func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighel
 	if awsConfig.HasRole() {
 		cacheKey := getRoleCacheKey(awsConfig)
 		if in.Cache.Has(cacheKey) {
-			return newStsCacheProvider(cacheKey, in.Cache), nil
+			return NewStsCacheProvider(cacheKey, in.Cache), nil
 		}
 
-		return newAssumeRoleProvider(client, awsConfig), newStsCacheWriter(cacheKey, out.Cache)
+		return NewAssumeRoleProvider(client, awsConfig), newStsCacheWriter(cacheKey, out.Cache)
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
 		if in.Cache.Has(mfaCacheKey) {
-			return newStsCacheProvider(mfaCacheKey, in.Cache), nil
+			return NewStsCacheProvider(mfaCacheKey, in.Cache), nil
 		}
 
-		return newSessionTokenProvider(client, awsConfig), newStsCacheWriter(mfaCacheKey, out.Cache)
+		return NewSessionTokenProvider(client, awsConfig), newStsCacheWriter(mfaCacheKey, out.Cache)
 	}
 
-	return newMasterCredentialsProvider(in.ItemFields), nil
+	return NewMasterCredentialsProvider(in.ItemFields), nil
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment

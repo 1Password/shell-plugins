@@ -60,7 +60,7 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: newAwsCLIProvisioner(),
+		DefaultProvisioner: NewAwsCLIProvisioner(),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryEnvVarPair(map[string]sdk.FieldName{

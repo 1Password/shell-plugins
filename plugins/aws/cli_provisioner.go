@@ -13,7 +13,7 @@ const defaultProfileName = "default"
 type awsCLIProvisioner struct {
 }
 
-func newAwsCLIProvisioner() sdk.Provisioner {
+func NewAwsCLIProvisioner() sdk.Provisioner {
 	return awsCLIProvisioner{}
 }
 
@@ -25,7 +25,7 @@ func (p awsCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput,
 	} else if profile := os.Getenv("AWS_PROFILE"); profile != "" {
 		profileName = profile
 	}
-	newSTSProvisioner(profileName).Provision(ctx, in, out)
+	NewSTSProvisioner(profileName).Provision(ctx, in, out)
 }
 
 func stripAndReturnProfileFlag(out *sdk.ProvisionOutput) *string {

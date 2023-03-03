@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
-func newAssumeRoleProvider(client *sts.Client, awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func NewAssumeRoleProvider(client *sts.Client, awsConfig *confighelpers.Config) aws.CredentialsProvider {
 	return &confighelpers.AssumeRoleProvider{
 		StsClient:         client,
 		RoleARN:           awsConfig.RoleARN,
@@ -25,7 +25,7 @@ func newAssumeRoleProvider(client *sts.Client, awsConfig *confighelpers.Config) 
 	}
 }
 
-func newSessionTokenProvider(client *sts.Client, awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func NewSessionTokenProvider(client *sts.Client, awsConfig *confighelpers.Config) aws.CredentialsProvider {
 	return &confighelpers.SessionTokenProvider{
 		StsClient: client,
 		Duration:  awsConfig.NonChainedGetSessionTokenDuration,
@@ -33,18 +33,18 @@ func newSessionTokenProvider(client *sts.Client, awsConfig *confighelpers.Config
 	}
 }
 
-func newStsCacheProvider(key string, cache sdk.CacheState) aws.CredentialsProvider {
-	return StsCacheProvider{
+func NewStsCacheProvider(key string, cache sdk.CacheState) aws.CredentialsProvider {
+	return stsCacheProvider{
 		awsCacheKey: key,
 		cache:       cache,
 	}
 }
 
-type MasterAwsCredentialsProvider struct {
+type masterAwsCredentialsProvider struct {
 	itemFields map[sdk.FieldName]string
 }
 
-func (p MasterAwsCredentialsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+func (p masterAwsCredentialsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	secret, hasSecretKey := p.itemFields[fieldname.SecretAccessKey]
 	keyId, hasKeyId := p.itemFields[fieldname.AccessKeyID]
 
@@ -58,6 +58,6 @@ func (p MasterAwsCredentialsProvider) Retrieve(ctx context.Context) (aws.Credent
 	}, nil
 }
 
-func newMasterCredentialsProvider(itemFields map[sdk.FieldName]string) aws.CredentialsProvider {
-	return MasterAwsCredentialsProvider{itemFields: itemFields}
+func NewMasterCredentialsProvider(itemFields map[sdk.FieldName]string) aws.CredentialsProvider {
+	return masterAwsCredentialsProvider{itemFields: itemFields}
 }

@@ -14,28 +14,29 @@ const (
 	assumeRoleCacheKey = "sts-assume-role"
 )
 
-type StsCacheWriter struct {
+// stsCacheWriter writes aws temp credentials to cache using the awsCacheKey
+type stsCacheWriter struct {
 	awsCacheKey string
 	cache       sdk.CacheOperations
 }
 
-func (c StsCacheWriter) persist(credentials aws.Credentials) error {
+func (c stsCacheWriter) persist(credentials aws.Credentials) error {
 	return c.cache.Put(c.awsCacheKey, credentials, credentials.Expires)
 }
 
-func newStsCacheWriter(key string, cache sdk.CacheOperations) *StsCacheWriter {
-	return &StsCacheWriter{
+func newStsCacheWriter(key string, cache sdk.CacheOperations) *stsCacheWriter {
+	return &stsCacheWriter{
 		awsCacheKey: key,
 		cache:       cache,
 	}
 }
 
-type StsCacheProvider struct {
+type stsCacheProvider struct {
 	awsCacheKey string
 	cache       sdk.CacheState
 }
 
-func (c StsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+func (c stsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	var cached aws.Credentials
 	if ok := c.cache.Get(c.awsCacheKey, &cached); ok {
 		return cached, nil
