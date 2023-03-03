@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
@@ -65,11 +66,11 @@ func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 }
 
 func (p stsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-
+	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
 func (p stsProvisioner) Description() string {
-	return "Provisions AWS with temporary credentials."
+	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding StsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
@@ -146,7 +147,7 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 
 	// Give priority to the mfa serial specified in 1Password
 	if hasMFASerial && awsConfig.HasMfaSerial() && awsConfig.MfaSerial != mfaSerial {
-		out.AddError(fmt.Errorf("your local AWS configuration has a different MFA serial than the one specified in 1Password"))
+		out.AddError(fmt.Errorf("your local AWS configuration (config file or environment variable) has a different MFA serial than the one specified in 1Password"))
 	}
 	if !awsConfig.HasMfaSerial() {
 		awsConfig.MfaSerial = mfaSerial
@@ -154,7 +155,7 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 
 	// Give priority to the region specified in 1Password
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
-		out.AddError(fmt.Errorf("your local AWS configuration has a different default region than the one specified in 1Password"))
+		out.AddError(fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password"))
 	} else if awsConfig.Region == "" {
 		awsConfig.Region = region
 	}

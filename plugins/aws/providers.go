@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
@@ -22,30 +23,6 @@ func newAssumeRoleProvider(client *sts.Client, awsConfig *confighelpers.Config) 
 		SourceIdentity:    awsConfig.SourceIdentity,
 		Mfa:               confighelpers.NewMfa(awsConfig),
 	}
-
-	//return stscreds.NewAssumeRoleProvider(client, awsConfig.RoleARN, func(options *stscreds.AssumeRoleOptions) {
-	//	options.SerialNumber = aws.String(awsConfig.MfaSerial)
-	//	options.TokenProvider = func() (string, error) {
-	//		return awsConfig.MfaToken, nil
-	//	}
-	//	options.RoleARN = awsConfig.RoleARN
-	//	options.RoleSessionName = awsConfig.RoleSessionName // gets substituted by randomly generated string if empty
-	//	options.Duration = awsConfig.AssumeRoleDuration     // gets substituted by 15min if empty
-	//	options.ExternalID = aws.String(awsConfig.ExternalID)
-	//	options.SourceIdentity = aws.String(awsConfig.SourceIdentity)
-	//	if len(awsConfig.SessionTags) > 0 {
-	//		tags := make([]types.Tag, 0)
-	//		for key, value := range awsConfig.SessionTags {
-	//			tag := types.Tag{
-	//				Key:   aws.String(key),
-	//				Value: aws.String(value),
-	//			}
-	//			tags = append(tags, tag)
-	//		}
-	//		options.Tags = tags
-	//	}
-	//	options.TransitiveTagKeys = awsConfig.TransitiveSessionTags
-	//})
 }
 
 func newSessionTokenProvider(client *sts.Client, awsConfig *confighelpers.Config) aws.CredentialsProvider {

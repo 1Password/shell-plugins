@@ -50,9 +50,9 @@ func removeProfileFlagFromArgs(argIndex int, args []string) []string {
 }
 
 func (p awsCLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// nothing to do here: 1Password CLI removes env vars
+	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
 func (p awsCLIProvisioner) Description() string {
-	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
+	return "Provision environment variables with master credentials or temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
