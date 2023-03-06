@@ -8,10 +8,6 @@ import (
 )
 
 func ngrokCLI() schema.Executable {
-
-	var cmds []string
-	cmds = append(cmds, "api")
-
 	return schema.Executable{
 		Name:    "ngrok CLI",
 		Runs:    []string{"ngrok"},
@@ -26,12 +22,11 @@ func ngrokCLI() schema.Executable {
 
 		Uses: []schema.CredentialUsage{
 			{
-				Name:    credname.AuthToken,
-				Default: true,
+				Name: credname.AuthToken,
 			},
 			{
-				Name:     credname.APIKey,
-				Commands: cmds,
+				Name:      credname.APIKey,
+				NeedsAuth: needsauth.ForCommand("api"),
 			},
 		},
 	}

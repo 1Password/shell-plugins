@@ -13,8 +13,8 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://ngrok.com"),
 		},
 		Credentials: []schema.CredentialType{
-			Credentials(),
-			CredentialsAPI(),
+			AuthCredentials(),
+			APICredentials(),
 		},
 		Executables: []schema.Executable{
 			ngrokCLI(),

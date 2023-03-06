@@ -38,11 +38,8 @@ type CredentialUsage struct {
 	// from the way the credential is usually provisioned.
 	Provisioner sdk.Provisioner
 
-	// add a field for command used with the credential
-	Commands []string
-
-	// whether this is the default credential
-	Default bool
+	// (Optional) Whether the credential is specific to a specific argument
+	NeedsAuth sdk.NeedsAuthentication
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {
