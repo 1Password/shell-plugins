@@ -20,7 +20,7 @@ func AccessKey() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
-				MarkdownDescription: "APIKey used to authenticate to Treasure Data.",
+				MarkdownDescription: "API Key used to authenticate to Treasure Data.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
