@@ -15,7 +15,7 @@ import (
 func AccessKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AccessKey,
-		DocsURL:       sdk.URL("https://docs.treasuredata.com/display/public/PD/TD+Toolbelt"),
+		DocsURL:       sdk.URL("https://docs.treasuredata.com/display/public/PD/Configuring+Authentication+for+TD+Using+the+TD+Toolbelt"),
 		ManagementURL: sdk.URL("https://console.treasuredata.com/app/mp/ak"),
 		Fields: []schema.CredentialField{
 			{
