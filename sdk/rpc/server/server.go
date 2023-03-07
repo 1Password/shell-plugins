@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"runtime/debug"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -46,8 +47,7 @@ func newServer(p schema.Plugin) *RPCServer {
 		credentials[proto.CredentialID(i)] = &p.Credentials[i]
 	}
 	for i := range p.Executables {
-		s.needsAuth[proto.ExecutableID(i)] = p.Executables[i].NeedsAuth
-		p.Executables[i].NeedsAuth = nil
+		globalNeedsAuth := p.Executables[i].NeedsAuth
 		for usageID, credentialUse := range p.Executables[i].Uses {
 			executableID := proto.ExecutableID(i)
 			s.provisioners[proto.ProvisionerID{
@@ -58,7 +58,10 @@ func newServer(p schema.Plugin) *RPCServer {
 				},
 			}] = credentialUse.Provisioner
 			p.Executables[i].Uses[usageID].Provisioner = nil
+			globalNeedsAuth = needsauth.IfAll(globalNeedsAuth, credentialUse.NeedsAuth)
 		}
+		s.needsAuth[proto.ExecutableID(i)] = globalNeedsAuth
+		p.Executables[i].NeedsAuth = nil
 	}
 
 	for id, c := range credentials {
