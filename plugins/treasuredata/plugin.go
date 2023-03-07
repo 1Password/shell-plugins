@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://www.treasuredata.com/"),
 		},
 		Credentials: []schema.CredentialType{
-			AccessKey(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
 			TreasureDataCLI(),

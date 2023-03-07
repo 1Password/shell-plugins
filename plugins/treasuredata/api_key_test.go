@@ -8,8 +8,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestAccessKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestAPIKeyProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey: "1/xxx",
@@ -23,8 +23,8 @@ func TestAccessKeyProvisioner(t *testing.T) {
 	})
 }
 
-func TestAccessKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, AccessKey().Importer, map[string]plugintest.ImportCase{
+func TestAPIKeyImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"env var TD_API_KEY": {
 			Environment: map[string]string{
 				"TD_API_KEY": "1/xxx",

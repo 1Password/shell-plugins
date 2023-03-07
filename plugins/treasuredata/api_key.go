@@ -12,9 +12,9 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func AccessKey() schema.CredentialType {
+func APIKey() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.AccessKey,
+		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://docs.treasuredata.com/display/public/PD/Configuring+Authentication+for+TD+Using+the+TD+Toolbelt"),
 		ManagementURL: sdk.URL("https://console.treasuredata.com/app/mp/ak"),
 		Fields: []schema.CredentialField{
