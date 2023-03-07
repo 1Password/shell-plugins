@@ -2,8 +2,6 @@ package ngrok
 
 import (
 	"context"
-	"time"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
@@ -86,35 +84,7 @@ func TryngrokConfigFile(path string) sdk.Importer {
 
 // Config struct is exhaustive, covering all documented configurations.
 type Config struct {
-	AuthToken          string                  `yaml:"authtoken"`
-	APIKey             string                  `yaml:"api_key"`
-	Version            string                  `yaml:"version"`
-	ConnectTimeout     time.Duration           `yaml:"connect_timeout"`
-	ConsoleUI          bool                    `yaml:"console_ui"`
-	ConsoleUIColor     string                  `yaml:"console_ui_color"` // should be either "transparent" or "black"
-	DnsResolverIps     string                  `yaml:"dns_resolver_ips"`
-	HeartbeatTolerance time.Duration           `yaml:"heartbeat_tolerance"`
-	InspectDBSize      int                     `yaml:"inspect_db_size"`
-	LogLevel           string                  `yaml:"log_level"`  // possible values are: crit, warn, error, info, and debug.
-	LogFormat          string                  `yaml:"log_format"` // can be either "logfmt", "json" or "term".
-	Log                string                  `yaml:"log"`        // can be either "stderr", "stdout", false or file path
-	Metadata           string                  `yaml:"metadata"`
-	ProxyUrl           string                  `yaml:"proxy_url"`
-	Region             string                  `yaml:"region"`
-	RemoteManagement   bool                    `yaml:"remote_management"`
-	RootCas            string                  `yaml:"root_cas"`
-	ServerAddress      string                  `yaml:"server_addr"`
-	Tunnels            map[string]TunnelConfig `yaml:"tunnels"`
-	UpdateChannel      string                  `yaml:"update_channel"`
-	UpdateCheck        bool                    `yaml:"update_check"`
-	WebAddress         string                  `yaml:"web_addr"`
-	WebAllowHosts      string                  `yaml:"web_allow_hosts"`
-}
-
-// TunnelConfig struct is non-exhaustive. It only covers few most common fields, for now.
-type TunnelConfig struct {
-	Address  string `yaml:"addr"`
-	Metadata string `yaml:"metadata"`
-	Proto    string `yaml:"proto"`
-	HostName string `yaml:"hostname"`
+	AuthToken string `yaml:"authtoken"`
+	APIKey    string `yaml:"api_key"`
+	Version   string `yaml:"version"`
 }

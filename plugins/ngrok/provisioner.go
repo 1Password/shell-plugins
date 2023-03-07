@@ -11,7 +11,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const version = "2"
+const (
+	version           = "2"
+	apiKeyYamlName    = "api_key"
+	authTokenYamlName = "authtoken"
+	versionYamlName   = "version"
+)
 
 type fileProvisioner struct {
 }
@@ -22,7 +27,7 @@ func newNgrokProvisioner() sdk.Provisioner {
 
 func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	provisionedConfigFilePath := filepath.Join(in.TempDir, "config.yml")
-	var config Config
+	config := make(map[string]interface{})
 	configFilePath := processConfigFlag(out, provisionedConfigFilePath)
 	if configFilePath != "" {
 		existingContents, err := os.ReadFile(configFilePath)
@@ -37,9 +42,9 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 		}
 	}
 
-	config.AuthToken = in.ItemFields[fieldname.Authtoken]
-	config.APIKey = in.ItemFields[fieldname.APIKey]
-	config.Version = version
+	config[authTokenYamlName] = in.ItemFields[fieldname.Authtoken]
+	config[apiKeyYamlName] = in.ItemFields[fieldname.APIKey]
+	config[versionYamlName] = version
 
 	newContents, err := yaml.Marshal(&config)
 	if err != nil {
@@ -68,9 +73,9 @@ func processConfigFlag(out *sdk.ProvisionOutput, newFilePath string) string {
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-
+	// nothing to do here: files get deleted automatically by the CLI
 }
 
 func (f fileProvisioner) Description() string {
-	return "Config file aware provisioner"
+	return "Config file aware provisioner. It will first check if an already existing config file is present."
 }
