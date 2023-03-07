@@ -23,6 +23,9 @@ type Executable struct {
 
 	// (Optional) Whether the exectuable needs authentication for certain args.
 	NeedsAuth sdk.NeedsAuthentication
+
+	// (Optional) words to prompt about a credential
+	AuthPrompt string
 }
 
 type CredentialUsage struct {
