@@ -19,7 +19,7 @@ func ngrokCLI() schema.Executable {
 			needsauth.NotForExactArgs("config"),
 			needsauth.NotForExactArgs("update"),
 		),
-		AuthPrompt: "ngrok uses an Authtoken for most commands, and the api command requires an API Token to be configured.",
+		AuthPrompt: "ngrok uses an Authtoken for most commands, and an API token for `ngrok api` commands.",
 
 		Uses: []schema.CredentialUsage{
 			{
