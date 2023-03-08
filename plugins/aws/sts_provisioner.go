@@ -8,8 +8,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type stsProvisioner struct {
@@ -27,16 +25,11 @@ func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 
 	resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig, out)
-
-	masterCreds, err := NewMasterCredentialsProvider(in.ItemFields).Retrieve(ctx)
-	if err != nil {
-		out.AddError(err)
+	if len(out.Diagnostics.Errors) > 0 {
 		return
 	}
 
-	stsClient := getSTSClient(awsConfig.Region, masterCreds.AccessKeyID, masterCreds.SecretAccessKey)
-
-	tempCredentialsProvider, stsCacheWriter := p.chooseTemporaryCredentialsProvider(awsConfig, in, out, stsClient)
+	tempCredentialsProvider := p.chooseTemporaryCredentialsProvider(awsConfig, in, out)
 	if len(out.Diagnostics.Errors) > 0 {
 		return
 	}
@@ -45,14 +38,6 @@ func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	if err != nil {
 		out.AddError(err)
 		return
-	}
-
-	if stsCacheWriter != nil {
-		err := stsCacheWriter.persist(tempCredentials)
-		if err != nil {
-			out.AddError(err)
-			return
-		}
 	}
 
 	out.AddEnvVar("AWS_ACCESS_KEY_ID", tempCredentials.AccessKeyID)
@@ -74,7 +59,7 @@ func (p stsProvisioner) Description() string {
 }
 
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
-func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput, client *sts.Client) (aws.CredentialsProvider, *stsCacheWriter) {
+func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin"
 	if awsConfig.HasSSOStartURL() {
 		out.AddError(fmt.Errorf(unsupportedMessage, "SSO Authentication"))
@@ -96,23 +81,14 @@ func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighel
 	}
 
 	if awsConfig.HasRole() {
-		cacheKey := getRoleCacheKey(awsConfig)
-		if in.Cache.Has(cacheKey) {
-			return NewStsCacheProvider(cacheKey, in.Cache), nil
-		}
-
-		return NewAssumeRoleProvider(client, awsConfig), newStsCacheWriter(cacheKey, out.Cache)
+		return NewAssumeRoleProvider(awsConfig, in, out)
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		if in.Cache.Has(mfaCacheKey) {
-			return NewStsCacheProvider(mfaCacheKey, in.Cache), nil
-		}
-
-		return NewSessionTokenProvider(client, awsConfig), newStsCacheWriter(mfaCacheKey, out.Cache)
+		return NewMFASessionTokenProvider(awsConfig, in, out)
 	}
 
-	return NewMasterCredentialsProvider(in.ItemFields), nil
+	return NewMasterCredentialsProvider(in.ItemFields)
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
@@ -168,13 +144,4 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	if hasOTP {
 		awsConfig.MfaToken = totp
 	}
-
-}
-
-func getSTSClient(region string, keyId string, secretKey string) *sts.Client {
-	clientConfig := aws.Config{
-		Region:      region,
-		Credentials: credentials.NewStaticCredentialsProvider(keyId, secretKey, ""),
-	}
-	return sts.NewFromConfig(clientConfig)
 }

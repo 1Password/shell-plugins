@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/1Password/shell-plugins/sdk"
-	confighelpers "github.com/99designs/aws-vault/v7/vault"
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
 
@@ -24,8 +23,8 @@ func (c stsCacheWriter) persist(credentials aws.Credentials) error {
 	return c.cache.Put(c.awsCacheKey, credentials, credentials.Expires)
 }
 
-func newStsCacheWriter(key string, cache sdk.CacheOperations) *stsCacheWriter {
-	return &stsCacheWriter{
+func NewStsCacheWriter(key string, cache sdk.CacheOperations) stsCacheWriter {
+	return stsCacheWriter{
 		awsCacheKey: key,
 		cache:       cache,
 	}
@@ -45,6 +44,6 @@ func (c stsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error)
 	return aws.Credentials{}, fmt.Errorf("did not find cached credentials")
 }
 
-func getRoleCacheKey(awsConfig *confighelpers.Config) string {
-	return assumeRoleCacheKey + awsConfig.RoleARN
+func getRoleCacheKey(roleArn string) string {
+	return assumeRoleCacheKey + roleArn
 }
