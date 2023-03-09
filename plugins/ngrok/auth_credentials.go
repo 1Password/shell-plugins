@@ -18,8 +18,9 @@ func AuthCredentials() schema.CredentialType {
 		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.AuthToken,
-				MarkdownDescription: "Auth Token used to authenticate to ngrok.",
+				Name:                fieldname.Authtoken,
+				AlternativeNames:    []string{"Auth Token"},
+				MarkdownDescription: "Authtoken used to authenticate to ngrok.",
 				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
