@@ -36,6 +36,7 @@ const (
 	Organization    = sdk.FieldName("Organization")
 	Password        = sdk.FieldName("Password")
 	Port            = sdk.FieldName("Port")
+	PublicKey       = sdk.FieldName("Public Key")
 	PrivateKey      = sdk.FieldName("Private Key")
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
@@ -81,6 +82,7 @@ func ListAll() []sdk.FieldName {
 		Organization,
 		Password,
 		Port,
+		PublicKey,
 		PrivateKey,
 		Region,
 		Secret,
