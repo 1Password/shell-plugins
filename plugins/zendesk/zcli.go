@@ -9,9 +9,9 @@ import (
 
 func ZendeskCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Zendesk CLI", // TODO: Check if this is correct
-		Runs:      []string{"zcli"},
-		DocsURL:   sdk.URL("https://zendesk.com/docs/cli"), // TODO: Replace with actual URL
+		Name:    "Zendesk CLI",
+		Runs:    []string{"zcli"},
+		DocsURL: sdk.URL("https://developer.zendesk.com/documentation/apps/getting-started/using-zcli/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

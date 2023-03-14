@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "zendesk",
 		Platform: schema.PlatformInfo{
 			Name:     "Zendesk",
-			Homepage: sdk.URL("https://zendesk.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://www.zendesk.com/"),
 		},
 		Credentials: []schema.CredentialType{
 			APIToken(),

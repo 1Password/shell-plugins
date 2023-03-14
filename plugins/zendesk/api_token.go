@@ -13,9 +13,8 @@ import (
 
 func APIToken() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://zendesk.com/docs/api_token"), // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.zendesk.com/user/security/tokens"), // TODO: Replace with actual URL
+		Name:    credname.APIToken,
+		DocsURL: sdk.URL("https://developer.zendesk.com/api-reference/introduction/security-and-auth/#api-token"), // TODO: Replace with actual URL
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
