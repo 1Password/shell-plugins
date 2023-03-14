@@ -73,7 +73,7 @@ func processConfigFlag(out *sdk.ProvisionOutput, newFilePath string) string {
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// nothing to do here: files get deleted automatically by the CLI
+	// nothing to do here: files get deleted automatically by 1Password CLI
 }
 
 func (f fileProvisioner) Description() string {
