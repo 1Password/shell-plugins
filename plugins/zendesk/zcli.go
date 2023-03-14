@@ -15,7 +15,10 @@ func ZendeskCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("profiles"),
+			needsauth.NotWhenContainsArgs("login"),
 			needsauth.NotWhenContainsArgs("logout"),
+			needsauth.NotWhenContainsArgs("autocomplete"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
