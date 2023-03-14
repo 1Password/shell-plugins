@@ -1,8 +1,6 @@
 package zendesk
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -14,11 +12,40 @@ import (
 func APIToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.APIToken,
-		DocsURL: sdk.URL("https://developer.zendesk.com/api-reference/introduction/security-and-auth/#api-token"), // TODO: Replace with actual URL
+		DocsURL: sdk.URL("https://developer.zendesk.com/api-reference/introduction/security-and-auth/#api-token"),
 		Fields: []schema.CredentialField{
 			{
+				Name:                fieldname.OrgURL,
+				MarkdownDescription: "Subdomain of Zendesk account, often found in the account's URL.",
+				Optional:            false,
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Uppercase: true,
+						Lowercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.Username,
+				MarkdownDescription: "Email used to authenticate to Zendesk.",
+				Optional:            false,
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Uppercase: true,
+						Lowercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
 				Name:                fieldname.Token,
-				MarkdownDescription: "Token used to authenticate to Zendesk.",
+				MarkdownDescription: "API token used to authenticate to Zendesk.",
+				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 40,
@@ -26,6 +53,7 @@ func APIToken() schema.CredentialType {
 						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
+						Symbols:   true,
 					},
 				},
 			},
@@ -33,37 +61,11 @@ func APIToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryZendeskConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"ZENDESK_TOKEN": fieldname.Token, // TODO: Check if this is correct
+	"ZENDESK_SUBDOMAIN": fieldname.OrgURL,
+	"ZENDESK_EMAIL":     fieldname.Username,
+	"ZENDESK_API_TOKEN": fieldname.Token,
 }
-
-// TODO: Check if the platform stores the API Token in a local config file, and if so,
-// implement the function below to add support for importing it.
-func TryZendeskConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
-
-		// if config.Token == "" {
-		// 	return
-		// }
-
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.Token: config.Token,
-		// 	},
-		// })
-	})
-}
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	Token string
-// }
