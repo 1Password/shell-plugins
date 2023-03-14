@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "gitea",
 		Platform: schema.PlatformInfo{
 			Name:     "Gitea",
-			Homepage: sdk.URL("https://gitea.com/"),
+			Homepage: sdk.URL("https://gitea.io/"),
 		},
 		Credentials: []schema.CredentialType{
 			PersonalAccessToken(),
