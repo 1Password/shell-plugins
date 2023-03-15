@@ -3,12 +3,8 @@ package aws
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"github.com/1Password/shell-plugins/sdk"
 )
-
-const defaultProfileName = "default"
 
 type awsCLIProvisioner struct {
 }
@@ -18,30 +14,29 @@ func NewAwsCLIProvisioner() sdk.Provisioner {
 }
 
 func (p awsCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	profileName := defaultProfileName
-
-	if profile := stripAndReturnProfileFlag(out); profile != nil {
-		profileName = *profile
-	} else if profile := os.Getenv("AWS_PROFILE"); profile != "" {
-		profileName = profile
+	profile, err := stripAndReturnProfileFlag(&out.CommandLine)
+	if err != nil {
+		out.AddError(err)
+		return
 	}
-	NewSTSProvisioner(profileName).Provision(ctx, in, out)
+
+	NewSTSProvisioner(profile).Provision(ctx, in, out)
 }
 
-func stripAndReturnProfileFlag(out *sdk.ProvisionOutput) *string {
-	for i, arg := range out.CommandLine {
+func stripAndReturnProfileFlag(args *[]string) (string, error) {
+	for i, arg := range *args {
 		if arg == "--profile" {
-			if i+1 == len(out.CommandLine) {
-				out.AddError(fmt.Errorf("--profile flag was specified without a value"))
-				return nil
+			if i+1 == len(*args) {
+				return "", fmt.Errorf("--profile flag was specified without a value")
+
 			}
-			profile := out.CommandLine[i+1]
+			profile := (*args)[i+1]
 			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			out.CommandLine = removeProfileFlagFromArgs(i, out.CommandLine)
-			return &profile
+			*args = removeProfileFlagFromArgs(i, *args)
+			return profile, nil
 		}
 	}
-	return nil
+	return "", nil
 }
 
 func removeProfileFlagFromArgs(argIndex int, args []string) []string {

@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	mfaCacheKey        = "sts-mfa"
-	assumeRoleCacheKey = "sts-assume-role"
+	mfaCacheKeyID        = "sts-mfa"
+	assumeRoleCacheKeyID = "sts-assume-role"
 )
 
 // stsCacheWriter writes aws temp credentials to cache using the awsCacheKey
@@ -44,6 +44,10 @@ func (c stsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error)
 	return aws.Credentials{}, fmt.Errorf("did not find cached credentials")
 }
 
-func getRoleCacheKey(roleArn string) string {
-	return assumeRoleCacheKey + roleArn
+func getRoleCacheKey(roleArn string, accessKeyID string) string {
+	return assumeRoleCacheKeyID + accessKeyID + roleArn
+}
+
+func getMfaCacheKey(accessKeyID string) string {
+	return mfaCacheKeyID + accessKeyID
 }

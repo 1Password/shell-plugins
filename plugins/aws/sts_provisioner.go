@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -10,27 +11,40 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
 
+const defaultProfileName = "default"
+
 type stsProvisioner struct {
 	profileName string
 }
 
 func NewSTSProvisioner(profileName string) sdk.Provisioner {
-	return stsProvisioner{profileName: profileName}
+	if profileName != "" {
+		return stsProvisioner{profileName: profileName}
+	}
+
+	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
+		return stsProvisioner{profileName: profile}
+	}
+
+	return stsProvisioner{profileName: defaultProfileName}
 }
 
 func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	awsConfig := getAWSAuthConfigurationForProfile(p.profileName, out)
-	if len(out.Diagnostics.Errors) > 0 {
+	awsConfig, err := getAWSAuthConfigurationForProfile(p.profileName, out)
+	if err != nil {
+		out.AddError(err)
 		return
 	}
 
-	resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig, out)
-	if len(out.Diagnostics.Errors) > 0 {
+	err = resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig)
+	if err != nil {
+		out.AddError(err)
 		return
 	}
 
-	tempCredentialsProvider := p.chooseTemporaryCredentialsProvider(awsConfig, in, out)
-	if len(out.Diagnostics.Errors) > 0 {
+	tempCredentialsProvider, err := p.chooseTemporaryCredentialsProvider(awsConfig, in, out)
+	if err != nil {
+		out.AddError(err)
 		return
 	}
 
@@ -59,45 +73,44 @@ func (p stsProvisioner) Description() string {
 }
 
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
-func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
+func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin"
 	if awsConfig.HasSSOStartURL() {
-		out.AddError(fmt.Errorf(unsupportedMessage, "SSO Authentication"))
+		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication")
 	}
 
 	if awsConfig.HasWebIdentity() {
-		out.AddError(fmt.Errorf(unsupportedMessage, "Web Identity Authentication"))
+		return nil, fmt.Errorf(unsupportedMessage, "Web Identity Authentication")
 
 	}
 
 	if awsConfig.HasCredentialProcess() {
-		out.AddError(fmt.Errorf(unsupportedMessage, "Credential Process Authentication"))
+		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication")
 
 	}
 
 	if awsConfig.HasSourceProfile() {
-		out.AddError(fmt.Errorf(unsupportedMessage, "Sourcing profiles"))
+		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles")
 
 	}
 
 	if awsConfig.HasRole() {
-		return NewAssumeRoleProvider(awsConfig, in, out)
+		return NewAssumeRoleProvider(awsConfig, in, out), nil
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return NewMFASessionTokenProvider(awsConfig, in, out)
+		return NewMFASessionTokenProvider(awsConfig, in, out), nil
 	}
 
-	return NewMasterCredentialsProvider(in.ItemFields)
+	return NewAccessKeysProvider(in.ItemFields), nil
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
-func getAWSAuthConfigurationForProfile(profile string, out *sdk.ProvisionOutput) *confighelpers.Config {
+func getAWSAuthConfigurationForProfile(profile string, out *sdk.ProvisionOutput) (*confighelpers.Config, error) {
 	// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
 	configFile, err := confighelpers.LoadConfigFromEnv()
 	if err != nil {
-		out.AddError(err)
-		return nil
+		return nil, err
 	}
 
 	configLoader := confighelpers.ConfigLoader{
@@ -108,40 +121,49 @@ func getAWSAuthConfigurationForProfile(profile string, out *sdk.ProvisionOutput)
 	// loads configuration from both environment and config file
 	configuration, err := configLoader.LoadFromProfile(profile)
 	if err != nil {
-		out.AddError(err)
-		return nil
+		return nil, err
 	}
 
-	return configuration
+	return configuration, nil
 }
 
-// resolveLocalAnd1PasswordConfigurations goes over configurations present in both local settings and 1Password and resolves conflicts.
-func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string, awsConfig *confighelpers.Config, out *sdk.ProvisionOutput) {
+// resolveLocalAnd1PasswordConfigurations goes over configurations present in both local settings and 1Password and resolves conflicts using the following rules:
+// - if a certain configuration is present only in 1Password, use that one.
+// - if a certain configuration is present only in local configs, use that one.
+// - if a certain configuration is present in both places, validate that its value is consistent between the two and use it, otherwise return an error
+func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string, awsConfig *confighelpers.Config) error {
 	mfaSerial, hasMFASerial := itemFields[fieldname.MFASerial]
 	totp, hasOTP := itemFields[fieldname.OneTimePassword]
 	region, hasRegion := itemFields[fieldname.DefaultRegion]
 
-	// Give priority to the mfa serial specified in 1Password
-	if hasMFASerial && awsConfig.HasMfaSerial() && awsConfig.MfaSerial != mfaSerial {
-		out.AddError(fmt.Errorf("your local AWS configuration (config file or environment variable) has a different MFA serial than the one specified in 1Password"))
+	// only 1Password OTPs are supported
+	if awsConfig.MfaToken != "" || awsConfig.MfaProcess != "" || awsConfig.MfaPromptMethod != "" {
+		return fmt.Errorf("only 1Password-backed OTP authentication is supported by the MFA worklfow of the AWS shell plugin")
 	}
-	if !awsConfig.HasMfaSerial() {
+	// make sure 1Password OTP is used
+	if hasOTP {
+		awsConfig.MfaToken = totp
+	}
+
+	if hasMFASerial && awsConfig.HasMfaSerial() && awsConfig.MfaSerial != mfaSerial {
+		return fmt.Errorf("your local AWS configuration (config file or environment variable) has a different MFA serial than the one specified in 1Password")
+	} else if !awsConfig.HasMfaSerial() {
 		awsConfig.MfaSerial = mfaSerial
 	}
 
-	// Give priority to the region specified in 1Password
+	if awsConfig.HasMfaSerial() && awsConfig.MfaToken == "" {
+		return fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password")
+	}
+
+	if !awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
+		return fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial")
+	}
+
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
-		out.AddError(fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password"))
+		return fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password")
 	} else if awsConfig.Region == "" {
 		awsConfig.Region = region
 	}
 
-	// only 1Password OTPs are supported
-	if awsConfig.MfaToken != "" || awsConfig.MfaProcess != "" || awsConfig.MfaPromptMethod != "" {
-		out.AddError(fmt.Errorf("only 1Password-backed OTP authentication is supported by the MFA worklfow of the AWS shell plugin"))
-	}
-	// set 1P OTP
-	if hasOTP {
-		awsConfig.MfaToken = totp
-	}
+	return nil
 }

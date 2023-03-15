@@ -32,41 +32,37 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 }
 
 func NewAssumeRoleProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
-	roleCacheKey := getRoleCacheKey(awsConfig.RoleARN)
+	roleCacheKey := getRoleCacheKey(awsConfig.RoleARN, in.ItemFields[fieldname.AccessKeyID])
 	if in.Cache.Has(roleCacheKey) {
 		return NewStsCacheProvider(roleCacheKey, in.Cache)
 	}
 
+	cacheWriter := NewStsCacheWriter(roleCacheKey, out.Cache)
+
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return &assumeRoleProvider{
-			AssumeRoleProvider: confighelpers.AssumeRoleProvider{
-				StsClient:         getSTSClient(awsConfig.Region, NewMFASessionTokenProvider(awsConfig, in, out)),
-				RoleARN:           awsConfig.RoleARN,
-				RoleSessionName:   awsConfig.RoleSessionName,
-				ExternalID:        awsConfig.ExternalID,
-				Duration:          900 * time.Second, // minimum duration of 15 minutes
-				Tags:              awsConfig.SessionTags,
-				TransitiveTagKeys: awsConfig.TransitiveSessionTags,
-				SourceIdentity:    awsConfig.SourceIdentity,
-				Mfa:               &confighelpers.Mfa{},
-			},
-			stsCacheWriter: NewStsCacheWriter(roleCacheKey, out.Cache),
-		}
+		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, NewMFASessionTokenProvider(awsConfig, in, out)), cacheWriter)
 	}
 
+	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, NewAccessKeysProvider(in.ItemFields)), cacheWriter)
+}
+
+func initAssumeRoleProvider(awsConfig *confighelpers.Config, stsClient *sts.Client, cacheWriter stsCacheWriter) *assumeRoleProvider {
+	if awsConfig.AssumeRoleDuration == 0 {
+		awsConfig.AssumeRoleDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+	}
 	return &assumeRoleProvider{
 		AssumeRoleProvider: confighelpers.AssumeRoleProvider{
-			StsClient:         getSTSClient(awsConfig.Region, NewMasterCredentialsProvider(in.ItemFields)),
+			StsClient:         stsClient,
 			RoleARN:           awsConfig.RoleARN,
 			RoleSessionName:   awsConfig.RoleSessionName,
 			ExternalID:        awsConfig.ExternalID,
-			Duration:          900 * time.Second, // minimum duration of 15 minutes
+			Duration:          awsConfig.AssumeRoleDuration,
 			Tags:              awsConfig.SessionTags,
 			TransitiveTagKeys: awsConfig.TransitiveSessionTags,
 			SourceIdentity:    awsConfig.SourceIdentity,
 			Mfa:               &confighelpers.Mfa{},
 		},
-		stsCacheWriter: NewStsCacheWriter(roleCacheKey, out.Cache),
+		stsCacheWriter: cacheWriter,
 	}
 }
 
@@ -90,14 +86,19 @@ func (p mfaSessionTokenProvider) Retrieve(ctx context.Context) (aws.Credentials,
 }
 
 func NewMFASessionTokenProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
+	mfaCacheKey := getMfaCacheKey(in.ItemFields[fieldname.AccessKeyID])
 	if in.Cache.Has(mfaCacheKey) {
 		return NewStsCacheProvider(mfaCacheKey, in.Cache)
 	}
 
+	if awsConfig.NonChainedGetSessionTokenDuration == 0 {
+		awsConfig.NonChainedGetSessionTokenDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+	}
+
 	return &mfaSessionTokenProvider{
 		SessionTokenProvider: confighelpers.SessionTokenProvider{
-			StsClient: getSTSClient(awsConfig.Region, NewMasterCredentialsProvider(in.ItemFields)),
-			Duration:  900 * time.Second, // minimum duration of 15 minutes,
+			StsClient: getSTSClient(awsConfig.Region, NewAccessKeysProvider(in.ItemFields)),
+			Duration:  awsConfig.NonChainedGetSessionTokenDuration,
 			Mfa:       confighelpers.NewMfa(awsConfig),
 		},
 		stsCacheWriter: NewStsCacheWriter(mfaCacheKey, out.Cache),
@@ -111,16 +112,16 @@ func NewStsCacheProvider(key string, cache sdk.CacheState) aws.CredentialsProvid
 	}
 }
 
-type masterAwsCredentialsProvider struct {
+type accessKeysProvider struct {
 	itemFields map[sdk.FieldName]string
 }
 
-func (p masterAwsCredentialsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+func (p accessKeysProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	secret, hasSecretKey := p.itemFields[fieldname.SecretAccessKey]
 	keyId, hasKeyId := p.itemFields[fieldname.AccessKeyID]
 
 	if !hasKeyId || !hasSecretKey {
-		return aws.Credentials{}, fmt.Errorf("no master credentials found. Please add your Access Key Id and Secret Access Key to your 1Password item's fields")
+		return aws.Credentials{}, fmt.Errorf("no long lived access key pair found. Please add your Access Key Id and Secret Access Key to your 1Password item's fields")
 	}
 
 	return aws.Credentials{
@@ -129,8 +130,8 @@ func (p masterAwsCredentialsProvider) Retrieve(ctx context.Context) (aws.Credent
 	}, nil
 }
 
-func NewMasterCredentialsProvider(itemFields map[sdk.FieldName]string) aws.CredentialsProvider {
-	return masterAwsCredentialsProvider{itemFields: itemFields}
+func NewAccessKeysProvider(itemFields map[sdk.FieldName]string) aws.CredentialsProvider {
+	return accessKeysProvider{itemFields: itemFields}
 }
 
 func getSTSClient(region string, credsProvider aws.CredentialsProvider) *sts.Client {
