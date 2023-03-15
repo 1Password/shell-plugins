@@ -17,8 +17,8 @@ var configPath string = "~/.config/tea/config.yml"
 func PersonalAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.PersonalAccessToken,
-		DocsURL:       sdk.URL("https://gitea.com/user/settings/applications"),
-		ManagementURL: nil,
+		DocsURL:       sdk.URL("https://docs.gitea.io/en-us/api-usage/#generating-and-listing-api-tokens"),
+		ManagementURL: sdk.URL("https://gitea.com/user/settings/applications"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
