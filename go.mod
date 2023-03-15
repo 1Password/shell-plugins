@@ -7,13 +7,13 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/BurntSushi/toml v1.2.1
 	github.com/aws/aws-sdk-go-v2 v1.17.5
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.15
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.5
 	github.com/fatih/color v1.13.0
 	github.com/hashicorp/go-plugin v1.4.6
 	github.com/stretchr/testify v1.8.1
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -43,11 +43,10 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect
-	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/term v0.5.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/term v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55 // indirect
 	google.golang.org/grpc v1.27.1 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
