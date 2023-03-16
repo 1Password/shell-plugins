@@ -17,9 +17,9 @@ type stsProvisioner struct {
 	profileName string
 }
 
-func NewSTSProvisioner(profileName string) sdk.Provisioner {
-	if profileName != "" {
-		return stsProvisioner{profileName: profileName}
+func NewSTSProvisioner(profileName ...string) sdk.Provisioner {
+	if len(profileName) != 0 {
+		return stsProvisioner{profileName: profileName[0]}
 	}
 
 	if profile := os.Getenv("AWS_PROFILE"); profile != "" {

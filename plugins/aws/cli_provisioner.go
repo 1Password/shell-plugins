@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
+	"strings"
 )
 
 type awsCLIProvisioner struct {
@@ -25,6 +26,11 @@ func (p awsCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput,
 
 func stripAndReturnProfileFlag(args *[]string) (string, error) {
 	for i, arg := range *args {
+		// if `--profile` is used after `--`, it should not be interpreted as a flag
+		if arg == "--" {
+			break
+		}
+
 		if arg == "--profile" {
 			if i+1 == len(*args) {
 				return "", fmt.Errorf("--profile flag was specified without a value")
@@ -32,15 +38,24 @@ func stripAndReturnProfileFlag(args *[]string) (string, error) {
 			}
 			profile := (*args)[i+1]
 			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			*args = removeProfileFlagFromArgs(i, *args)
+			*args = removeArgSequenceFromArgList(i, i+1, *args)
+			return profile, nil
+		} else if strings.Contains(arg, "--profile=") {
+			split := strings.Split(arg, "=")
+			if len(split) != 2 {
+				return "", fmt.Errorf("--profile flag was specified without a value")
+			}
+			profile := split[1]
+			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
+			*args = removeArgSequenceFromArgList(i, i, *args)
 			return profile, nil
 		}
 	}
 	return "", nil
 }
 
-func removeProfileFlagFromArgs(argIndex int, args []string) []string {
-	result := append(args[0:argIndex], args[argIndex+2:]...)
+func removeArgSequenceFromArgList(startIndex, endIndex int, args []string) []string {
+	result := append(args[0:startIndex], args[endIndex+1:]...)
 	return result
 }
 
