@@ -3,8 +3,9 @@ package aws
 import (
 	"context"
 	"fmt"
-	"github.com/1Password/shell-plugins/sdk"
 	"strings"
+
+	"github.com/1Password/shell-plugins/sdk"
 )
 
 type awsCLIProvisioner struct {
