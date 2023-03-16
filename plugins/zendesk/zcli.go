@@ -19,6 +19,10 @@ func ZendeskCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("login"),
 			needsauth.NotWhenContainsArgs("logout"),
 			needsauth.NotWhenContainsArgs("autocomplete"),
+			needsauth.NotWhenContainsArgs("apps:bump"),
+			needsauth.NotWhenContainsArgs("apps:clean"),
+			needsauth.NotWhenContainsArgs("apps:new"),
+			needsauth.NotWhenContainsArgs("apps:server"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
