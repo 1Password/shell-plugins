@@ -45,9 +45,9 @@ func (c stsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error)
 }
 
 func getRoleCacheKey(roleArn string, accessKeyID string) string {
-	return assumeRoleCacheKeyID + accessKeyID + roleArn
+	return fmt.Sprintf("%s|%s|%s", assumeRoleCacheKeyID, accessKeyID, roleArn)
 }
 
 func getMfaCacheKey(accessKeyID string) string {
-	return mfaCacheKeyID + accessKeyID
+	return fmt.Sprintf("%s|%s", assumeRoleCacheKeyID, accessKeyID)
 }

@@ -19,7 +19,7 @@ func AWSCLI() schema.Executable {
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.AccessKey,
-				Provisioner: NewAwsCLIProvisioner(),
+				Provisioner: CLIProvisioner{},
 			},
 		},
 	}

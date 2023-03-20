@@ -13,24 +13,14 @@ import (
 
 const defaultProfileName = "default"
 
-type stsProvisioner struct {
+type StsProvisioner struct {
 	profileName string
 }
 
-func NewSTSProvisioner(profileName ...string) sdk.Provisioner {
-	if len(profileName) != 0 {
-		return stsProvisioner{profileName: profileName[0]}
-	}
+func (p StsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	profile := p.getProfile()
 
-	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
-		return stsProvisioner{profileName: profile}
-	}
-
-	return stsProvisioner{profileName: defaultProfileName}
-}
-
-func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	awsConfig, err := getAWSAuthConfigurationForProfile(p.profileName, out)
+	awsConfig, err := getAWSAuthConfigurationForProfile(profile, out)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -64,33 +54,46 @@ func (p stsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 }
 
-func (p stsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p StsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p stsProvisioner) Description() string {
+func (p StsProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
+// getProfile returns the profile to be used on this run based on specified profile information
+func (p StsProvisioner) getProfile() string {
+	if len(p.profileName) != 0 {
+		return p.profileName
+	}
+
+	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
+		return profile
+	}
+
+	return defaultProfileName
+}
+
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
-func (p *stsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) (aws.CredentialsProvider, error) {
-	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin"
+func (p *StsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) (aws.CredentialsProvider, error) {
+	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
 	if awsConfig.HasSSOStartURL() {
-		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication")
+		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
 	}
 
 	if awsConfig.HasWebIdentity() {
-		return nil, fmt.Errorf(unsupportedMessage, "Web Identity Authentication")
+		return nil, fmt.Errorf(unsupportedMessage, "Web Identity Authentication", "https://github.com/1Password/shell-plugins/issues/209")
 
 	}
 
 	if awsConfig.HasCredentialProcess() {
-		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication")
+		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
 
 	}
 
 	if awsConfig.HasSourceProfile() {
-		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles")
+		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles", "https://github.com/1Password/shell-plugins/issues/212")
 
 	}
 

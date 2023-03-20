@@ -8,51 +8,50 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
-type awsCLIProvisioner struct {
+type CLIProvisioner struct {
 }
 
-func NewAwsCLIProvisioner() sdk.Provisioner {
-	return awsCLIProvisioner{}
-}
-
-func (p awsCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	profile, err := stripAndReturnProfileFlag(&out.CommandLine)
+func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	profile, editedCommandLine, err := stripAndReturnProfileFlag(out.CommandLine)
 	if err != nil {
 		out.AddError(err)
 		return
 	}
-
-	NewSTSProvisioner(profile).Provision(ctx, in, out)
+	out.CommandLine = editedCommandLine
+	stsProvisioner := StsProvisioner{profileName: profile}
+	stsProvisioner.Provision(ctx, in, out)
 }
 
-func stripAndReturnProfileFlag(args *[]string) (string, error) {
-	for i, arg := range *args {
+func stripAndReturnProfileFlag(args []string) (string, []string, error) {
+	for i, arg := range args {
 		// if `--profile` is used after `--`, it should not be interpreted as a flag
 		if arg == "--" {
 			break
 		}
 
 		if arg == "--profile" {
-			if i+1 == len(*args) {
-				return "", fmt.Errorf("--profile flag was specified without a value")
+			if i+1 == len(args) {
+				return "", nil, fmt.Errorf("--profile flag was specified without a value")
+			}
+			profile := args[i+1]
 
-			}
-			profile := (*args)[i+1]
 			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			*args = removeArgSequenceFromArgList(i, i+1, *args)
-			return profile, nil
-		} else if strings.Contains(arg, "--profile=") {
-			split := strings.Split(arg, "=")
-			if len(split) != 2 {
-				return "", fmt.Errorf("--profile flag was specified without a value")
+			args = append(args[0:i], args[i+2:]...)
+
+			return profile, args, nil
+		} else if strings.HasPrefix(arg, "--profile=") {
+			profile := strings.TrimPrefix(arg, "--profile=")
+			if profile == "" {
+				return "", nil, fmt.Errorf("--profile flag was specified without a value")
 			}
-			profile := split[1]
+
 			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			*args = removeArgSequenceFromArgList(i, i, *args)
-			return profile, nil
+			args = append(args[0:i], args[i+1:]...)
+
+			return profile, args, nil
 		}
 	}
-	return "", nil
+	return "", nil, nil
 }
 
 func removeArgSequenceFromArgList(startIndex, endIndex int, args []string) []string {
@@ -60,10 +59,10 @@ func removeArgSequenceFromArgList(startIndex, endIndex int, args []string) []str
 	return result
 }
 
-func (p awsCLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p CLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p awsCLIProvisioner) Description() string {
+func (p CLIProvisioner) Description() string {
 	return "Provision environment variables with master credentials or temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
