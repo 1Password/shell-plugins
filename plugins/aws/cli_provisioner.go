@@ -54,11 +54,6 @@ func stripAndReturnProfileFlag(args []string) (string, []string, error) {
 	return "", nil, nil
 }
 
-func removeArgSequenceFromArgList(startIndex, endIndex int, args []string) []string {
-	result := append(args[0:startIndex], args[endIndex+1:]...)
-	return result
-}
-
 func (p CLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
