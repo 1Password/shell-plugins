@@ -3,7 +3,6 @@ package aws
 import (
 	"context"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"os"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 const defaultProfileName = "default"
