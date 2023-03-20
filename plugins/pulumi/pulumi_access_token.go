@@ -2,6 +2,7 @@ package pulumi
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -40,16 +41,13 @@ func PulumiAccessToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			importer.TryEnvVarPair(map[string]sdk.FieldName{
-				"PULUMI_BACKEND_URL":  fieldname.Host,
-				"PULUMI_ACCESS_TOKEN": fieldname.Token,
-			}),
 			TryPulumiConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"PULUMI_ACCESS_TOKEN": fieldname.Token,
+	"PULUMI_BACKEND_URL":  fieldname.Host,
 }
 
 // Duplicated from:
@@ -74,8 +72,6 @@ type Credentials struct {
 
 // --- END
 
-// TODO: Check if the platform stores the Access Token in a local config file, and if so,
-// implement the function below to add support for importing it.
 func TryPulumiConfigFile() sdk.Importer {
 	return importer.TryFile("~/.pulumi/credentials.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Credentials
@@ -84,10 +80,24 @@ func TryPulumiConfigFile() sdk.Importer {
 			return
 		}
 
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.Token: config.Token,
-		// 	},
-		// })
+		for backendUrl, accessToken := range config.AccessTokens {
+			u, err := url.Parse(backendUrl)
+			if err != nil {
+				out.AddError(err)
+			}
+			if u.Scheme == "http" || u.Scheme == "https" {
+				candidateFields := map[sdk.FieldName]string{
+					fieldname.Token: accessToken,
+				}
+				// Only add the host when it differs from the default hosted Pulumi Service
+				if u.Host != "api.pulumi.com" {
+					candidateFields[fieldname.Host] = backendUrl
+				}
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields: candidateFields,
+				})
+			}
+
+		}
 	})
 }

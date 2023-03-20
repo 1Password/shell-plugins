@@ -11,12 +11,24 @@ import (
 func TestAccessTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, PulumiAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"PULUMI_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+					"PULUMI_ACCESS_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+				},
+			},
+		},
+		"with-backend": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+				fieldname.Host:  "https://api.pulumi.selfhosted.com",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"PULUMI_ACCESS_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+					"PULUMI_BACKEND_URL":  "https://api.pulumi.selfhosted.com",
 				},
 			},
 		},
@@ -26,8 +38,8 @@ func TestAccessTokenProvisioner(t *testing.T) {
 func TestAccessTokenImporter(t *testing.T) {
 	plugintest.TestImporter(t, PulumiAccessToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
-			Environment: map[string]string{ // TODO: Check if this is correct
-				"PULUMI_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+			Environment: map[string]string{
+				"PULUMI_ACCESS_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
@@ -37,18 +49,36 @@ func TestAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
-		// TODO: If you implemented a config file importer, add a test file example in pulumi/test-fixtures
-		// and fill the necessary details in the test template below.
-		"config file": {
-			Files: map[string]string{
-				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
+		"environment-with-backend": {
+			Environment: map[string]string{
+				"PULUMI_ACCESS_TOKEN": "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+				"PULUMI_BACKEND_URL":  "https://api.pulumi.selfhosted.com",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-				// 	{
-				// 		Fields: map[sdk.FieldName]string{
-				// 			fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
-				// 		},
-				// 	},
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+						fieldname.Host:  "https://api.pulumi.selfhosted.com",
+					},
+				},
+			},
+		},
+		"config file": {
+			Files: map[string]string{
+				"~/.pulumi/credentials.json": plugintest.LoadFixture(t, "credentials.json"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+					},
+				},
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
+						fieldname.Host:  "http://localhost:8080",
+					},
+				},
 			},
 		},
 	})
