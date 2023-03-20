@@ -21,16 +21,6 @@ type Plugin struct {
 	Executables []Executable
 }
 
-// Return the default credential for a plugin, or the first one in the list if it isn't set
-func (p Plugin) DefaultCredentialType() CredentialType {
-	for _, q := range p.Credentials {
-		if q.DefaultCredential {
-			return q
-		}
-	}
-	return p.Credentials[0]
-}
-
 // PlatformInfo provides information on the platform of the shell plugin.
 type PlatformInfo struct {
 	// The display name of the platform, e.g. "AWS" or "GitHub".
