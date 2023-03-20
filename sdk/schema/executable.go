@@ -24,7 +24,7 @@ type Executable struct {
 	// (Optional) Whether the exectuable needs authentication for certain args.
 	NeedsAuth sdk.NeedsAuthentication
 
-	// (Optional) words to prompt about a credential
+	// (Optional) Prompt to explain what credentials are for when there are multiple.
 	AuthPrompt string
 }
 
@@ -41,7 +41,7 @@ type CredentialUsage struct {
 	// from the way the credential is usually provisioned.
 	Provisioner sdk.Provisioner
 
-	// (Optional) Whether the credential is specific to a specific argument
+	// (Optional) Whether the credential is needed for authentication with a specific argument
 	NeedsAuth sdk.NeedsAuthentication
 }
 
