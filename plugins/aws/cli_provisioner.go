@@ -18,7 +18,7 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 	out.CommandLine = editedCommandLine
-	stsProvisioner := StsProvisioner{profileName: profile}
+	stsProvisioner := STSProvisioner{profileName: profile}
 	stsProvisioner.Provision(ctx, in, out)
 }
 

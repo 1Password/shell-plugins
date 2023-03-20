@@ -3,7 +3,9 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"os"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -13,11 +15,11 @@ import (
 
 const defaultProfileName = "default"
 
-type StsProvisioner struct {
+type STSProvisioner struct {
 	profileName string
 }
 
-func (p StsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	profile := p.getProfile()
 
 	awsConfig, err := getAWSAuthConfigurationForProfile(profile, out)
@@ -54,16 +56,16 @@ func (p StsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 }
 
-func (p StsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p STSProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p StsProvisioner) Description() string {
+func (p STSProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
 // getProfile returns the profile to be used on this run based on specified profile information
-func (p StsProvisioner) getProfile() string {
+func (p STSProvisioner) getProfile() string {
 	if len(p.profileName) != 0 {
 		return p.profileName
 	}
@@ -76,7 +78,7 @@ func (p StsProvisioner) getProfile() string {
 }
 
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
-func (p *StsProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) (aws.CredentialsProvider, error) {
+func (p *STSProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
 	if awsConfig.HasSSOStartURL() {
 		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
@@ -169,4 +171,152 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	}
 
 	return nil
+}
+
+// assumeRoleProvider retrieves temporary STS credentials for an assumed role, using the plugin encrypted cache as caching layer.
+type assumeRoleProvider struct {
+	confighelpers.AssumeRoleProvider
+	stsCacheWriter
+}
+
+func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	credentials, err := p.AssumeRoleProvider.Retrieve(ctx)
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	err = p.stsCacheWriter.persist(credentials)
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	return credentials, nil
+}
+
+func NewAssumeRoleProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
+	roleCacheKey := getRoleCacheKey(awsConfig.RoleARN, in.ItemFields[fieldname.AccessKeyID])
+	if in.Cache.Has(roleCacheKey) {
+		return NewStsCacheProvider(roleCacheKey, in.Cache)
+	}
+
+	cacheWriter := NewStsCacheWriter(roleCacheKey, out.Cache)
+
+	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
+		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, NewMFASessionTokenProvider(awsConfig, in, out)), cacheWriter)
+	}
+
+	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, NewAccessKeysProvider(in.ItemFields)), cacheWriter)
+}
+
+func initAssumeRoleProvider(awsConfig *confighelpers.Config, stsClient *sts.Client, cacheWriter stsCacheWriter) *assumeRoleProvider {
+	if awsConfig.AssumeRoleDuration == 0 {
+		awsConfig.AssumeRoleDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+	}
+	return &assumeRoleProvider{
+		AssumeRoleProvider: confighelpers.AssumeRoleProvider{
+			StsClient:         stsClient,
+			RoleARN:           awsConfig.RoleARN,
+			RoleSessionName:   awsConfig.RoleSessionName,
+			ExternalID:        awsConfig.ExternalID,
+			Duration:          awsConfig.AssumeRoleDuration,
+			Tags:              awsConfig.SessionTags,
+			TransitiveTagKeys: awsConfig.TransitiveSessionTags,
+			SourceIdentity:    awsConfig.SourceIdentity,
+			Mfa:               &confighelpers.Mfa{},
+		},
+		stsCacheWriter: cacheWriter,
+	}
+}
+
+// mfaSessionTokenProvider retrieves temporary STS credentials for the MFA workflow, using the plugin encrypted cache as caching layer.
+type mfaSessionTokenProvider struct {
+	confighelpers.SessionTokenProvider
+	stsCacheWriter
+}
+
+func (p mfaSessionTokenProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	credentials, err := p.SessionTokenProvider.Retrieve(ctx)
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	err = p.stsCacheWriter.persist(credentials)
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	return credentials, nil
+}
+
+func NewMFASessionTokenProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInput, out *sdk.ProvisionOutput) aws.CredentialsProvider {
+	mfaCacheKey := getMfaCacheKey(in.ItemFields[fieldname.AccessKeyID])
+	if in.Cache.Has(mfaCacheKey) {
+		return NewStsCacheProvider(mfaCacheKey, in.Cache)
+	}
+
+	if awsConfig.NonChainedGetSessionTokenDuration == 0 {
+		awsConfig.NonChainedGetSessionTokenDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+	}
+
+	return &mfaSessionTokenProvider{
+		SessionTokenProvider: confighelpers.SessionTokenProvider{
+			StsClient: getSTSClient(awsConfig.Region, NewAccessKeysProvider(in.ItemFields)),
+			Duration:  awsConfig.NonChainedGetSessionTokenDuration,
+			Mfa:       confighelpers.NewMfa(awsConfig),
+		},
+		stsCacheWriter: NewStsCacheWriter(mfaCacheKey, out.Cache),
+	}
+}
+
+// stsCacheProvider retrieves temporary STS credentials from cache, given a certain key.
+type stsCacheProvider struct {
+	awsCacheKey string
+	cache       sdk.CacheState
+}
+
+func (c stsCacheProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	var cached aws.Credentials
+	if ok := c.cache.Get(c.awsCacheKey, &cached); ok {
+		return cached, nil
+	}
+
+	return aws.Credentials{}, fmt.Errorf("did not find cached credentials")
+}
+
+func NewStsCacheProvider(key string, cache sdk.CacheState) aws.CredentialsProvider {
+	return stsCacheProvider{
+		awsCacheKey: key,
+		cache:       cache,
+	}
+}
+
+// stsCacheProvider retrieves the long-lived access key pair.
+type accessKeysProvider struct {
+	itemFields map[sdk.FieldName]string
+}
+
+func (p accessKeysProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	secret, hasSecretKey := p.itemFields[fieldname.SecretAccessKey]
+	keyId, hasKeyId := p.itemFields[fieldname.AccessKeyID]
+
+	if !hasKeyId || !hasSecretKey {
+		return aws.Credentials{}, fmt.Errorf("no long lived access key pair found. Please add your Access Key Id and Secret Access Key to your 1Password item's fields")
+	}
+
+	return aws.Credentials{
+		AccessKeyID:     keyId,
+		SecretAccessKey: secret,
+	}, nil
+}
+
+func NewAccessKeysProvider(itemFields map[sdk.FieldName]string) aws.CredentialsProvider {
+	return accessKeysProvider{itemFields: itemFields}
+}
+
+func getSTSClient(region string, credsProvider aws.CredentialsProvider) *sts.Client {
+	clientConfig := aws.Config{
+		Region:      region,
+		Credentials: credsProvider,
+	}
+	return sts.NewFromConfig(clientConfig)
 }
