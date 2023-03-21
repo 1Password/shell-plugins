@@ -94,7 +94,8 @@ func TryPulumiConfigFile() sdk.Importer {
 					candidateFields[fieldname.Host] = backendUrl
 				}
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: candidateFields,
+					Fields:   candidateFields,
+					NameHint: u.Host,
 				})
 			}
 
