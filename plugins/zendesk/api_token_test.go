@@ -12,9 +12,9 @@ func TestAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.OrgURL:   "subdomain",
-				fieldname.Username: "wendy@appleseed.com",
-				fieldname.Token:    "TPPmg1SEWr4fDGQhaUHsxETCUrBEIJKm0EXAMPLE",
+				fieldname.Subdomain: "subdomain",
+				fieldname.Email:     "wendy@appleseed.com",
+				fieldname.Token:     "TPPmg1SEWr4fDGQhaUHsxETCUrBEIJKm0EXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -38,9 +38,9 @@ func TestAPITokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.OrgURL:   "subdomain",
-						fieldname.Username: "wendy@appleseed.com",
-						fieldname.Token:    "TPPmg1SEWr4fDGQhaUHsxETCUrBEIJKm0EXAMPLE",
+						fieldname.Subdomain: "subdomain",
+						fieldname.Email:     "wendy@appleseed.com",
+						fieldname.Token:     "TPPmg1SEWr4fDGQhaUHsxETCUrBEIJKm0EXAMPLE",
 					},
 				},
 			},

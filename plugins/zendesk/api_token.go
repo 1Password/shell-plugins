@@ -15,7 +15,7 @@ func APIToken() schema.CredentialType {
 		DocsURL: sdk.URL("https://developer.zendesk.com/api-reference/introduction/security-and-auth/#api-token"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.OrgURL,
+				Name:                fieldname.Subdomain,
 				MarkdownDescription: "Subdomain of Zendesk account, often found in the account's URL.",
 				Optional:            false,
 				Secret:              false,
@@ -29,7 +29,7 @@ func APIToken() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Username,
+				Name:                fieldname.Email,
 				MarkdownDescription: "Email used to authenticate to Zendesk.",
 				Optional:            false,
 				Secret:              false,
@@ -65,7 +65,7 @@ func APIToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"ZENDESK_SUBDOMAIN": fieldname.OrgURL,
-	"ZENDESK_EMAIL":     fieldname.Username,
+	"ZENDESK_SUBDOMAIN": fieldname.Subdomain,
+	"ZENDESK_EMAIL":     fieldname.Email,
 	"ZENDESK_API_TOKEN": fieldname.Token,
 }
