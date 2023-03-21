@@ -1,6 +1,7 @@
 package ngrok
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -73,4 +74,23 @@ func TestCredentialsImporter(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestGetAndReplaceConfigFlag(t *testing.T) {
+
+	config, args := getConfigValueAndNewArgs([]string{}, "")
+	assert.Equal(t, "", config)
+	assert.Nil(t, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--session", "asdefg345reger"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "", config)
+	assert.Nil(t, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--config", "/path/to/file.json"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "/path/to/file.json", config)
+	assert.Equal(t, []string{"--cache", "false", "--config", "/newPath/to/newFile.json"}, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--config=/path/to/file.json", "--session", "asdefg345reger"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "/path/to/file.json", config)
+	assert.Equal(t, []string{"--config=/newPath/to/newFile.json", "--session", "asdefg345reger"}, args)
 }

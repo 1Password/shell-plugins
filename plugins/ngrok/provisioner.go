@@ -2,11 +2,14 @@ package ngrok
 
 import (
 	"context"
+	"fmt"
+	"github.com/1Password/shell-plugins/sdk/importer"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
-	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"gopkg.in/yaml.v3"
 )
@@ -28,14 +31,29 @@ func newNgrokProvisioner() sdk.Provisioner {
 func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	provisionedConfigFilePath := filepath.Join(in.TempDir, "config.yml")
 	config := make(map[string]interface{})
-	configFilePath := processConfigFlag(out, provisionedConfigFilePath)
-	if configFilePath != "" {
-		existingContents, err := os.ReadFile(configFilePath)
-		if err != nil {
+
+	var existingConfigFilePath string
+	// use default locations, depending on the OS
+	switch runtime.GOOS {
+	case "darwin":
+		existingConfigFilePath = filepath.Join(in.HomeDir, "/Library/Application Support/ngrok/ngrok.yml")
+	case "linux":
+		existingConfigFilePath = filepath.Join(in.HomeDir, "/.config/ngrok/ngrok.yml")
+	}
+
+	flagConfigFilePath, newArgs := getConfigValueAndNewArgs(out.CommandLine, provisionedConfigFilePath)
+	if flagConfigFilePath != "" {
+		out.CommandLine = newArgs
+		existingConfigFilePath = flagConfigFilePath
+	}
+
+	existingContents, err := os.ReadFile(existingConfigFilePath)
+	if err != nil {
+		if err != os.ErrNotExist {
 			out.AddError(err)
 			return
 		}
-
+	} else {
 		if err := importer.FileContents(existingContents).ToYAML(&config); err != nil {
 			out.AddError(err)
 			return
@@ -55,21 +73,21 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	out.AddSecretFile(provisionedConfigFilePath, newContents)
 }
 
-func processConfigFlag(out *sdk.ProvisionOutput, newFilePath string) string {
-	args := out.CommandLine
+// getConfigValueAndNewArgs returns the value of the original config flag if specified, and the arguments with the file path replaced by the newFilePath.
+func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []string) {
 	for i, arg := range args {
-		if arg == "--config" {
-			if i+1 != len(args) {
-				existingFilePath := args[i+1]
-				args[i+1] = newFilePath
-				return existingFilePath
-			}
+		if arg == "--config" && i+1 != len(args) {
+			existingFilePath := args[i+1]
+			args[i+1] = newFilePath
+			return existingFilePath, args
+
+		} else if strings.HasPrefix(arg, "--config=") {
+			existingFilePath := strings.TrimPrefix(arg, "--config=")
+			args[i] = fmt.Sprintf("--config=%s", newFilePath)
+			return existingFilePath, args
 		}
 	}
-	args = append(args, "--config")
-	args = append(args, newFilePath)
-	out.CommandLine = args
-	return ""
+	return "", nil
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
