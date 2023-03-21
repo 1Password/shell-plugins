@@ -3,13 +3,13 @@ package ngrok
 import (
 	"context"
 	"fmt"
-	"github.com/1Password/shell-plugins/sdk/importer"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"gopkg.in/yaml.v3"
 )
@@ -43,13 +43,14 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 
 	flagConfigFilePath, newArgs := getConfigValueAndNewArgs(out.CommandLine, provisionedConfigFilePath)
 	if flagConfigFilePath != "" {
-		out.CommandLine = newArgs
+
 		existingConfigFilePath = flagConfigFilePath
 	}
+	out.CommandLine = newArgs
 
 	existingContents, err := os.ReadFile(existingConfigFilePath)
 	if err != nil {
-		if err != os.ErrNotExist {
+		if !os.IsNotExist(err) {
 			out.AddError(err)
 			return
 		}
@@ -76,10 +77,14 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 // getConfigValueAndNewArgs returns the value of the original config flag if specified, and the arguments with the file path replaced by the newFilePath.
 func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []string) {
 	for i, arg := range args {
-		if arg == "--config" && i+1 != len(args) {
-			existingFilePath := args[i+1]
-			args[i+1] = newFilePath
-			return existingFilePath, args
+		if arg == "--config" {
+			if i+1 < len(args) {
+				existingFilePath := args[i+1]
+				args[i+1] = newFilePath
+				return existingFilePath, args
+			} else {
+				return "", append(args, newFilePath)
+			}
 
 		} else if strings.HasPrefix(arg, "--config=") {
 			existingFilePath := strings.TrimPrefix(arg, "--config=")
@@ -87,7 +92,7 @@ func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []stri
 			return existingFilePath, args
 		}
 	}
-	return "", nil
+	return "", append(args, fmt.Sprintf("--config=%s", newFilePath))
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
