@@ -86,6 +86,10 @@ func TestGetAndReplaceConfigFlag(t *testing.T) {
 	assert.Equal(t, "", config)
 	assert.Nil(t, args)
 
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--config"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "", config)
+	assert.Nil(t, args)
+
 	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--config", "/path/to/file.json"}, "/newPath/to/newFile.json")
 	assert.Equal(t, "/path/to/file.json", config)
 	assert.Equal(t, []string{"--cache", "false", "--config", "/newPath/to/newFile.json"}, args)
