@@ -78,6 +78,7 @@ func TestAccessTokenImporter(t *testing.T) {
 						fieldname.Token: "pul-8s9b3qf8rx7x8x8pn03ibkemilm1zfs10example",
 						fieldname.Host:  "http://localhost:8080",
 					},
+					NameHint: "localhost:8080",
 				},
 			},
 		},

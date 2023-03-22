@@ -84,19 +84,26 @@ func TryPulumiConfigFile() sdk.Importer {
 			u, err := url.Parse(backendUrl)
 			if err != nil {
 				out.AddError(err)
+				continue
 			}
 			if u.Scheme == "http" || u.Scheme == "https" {
-				candidateFields := map[sdk.FieldName]string{
-					fieldname.Token: accessToken,
-				}
 				// Only add the host when it differs from the default hosted Pulumi Service
 				if u.Host != "api.pulumi.com" {
-					candidateFields[fieldname.Host] = backendUrl
+					out.AddCandidate(sdk.ImportCandidate{
+						Fields: map[sdk.FieldName]string{
+							fieldname.Token: accessToken,
+							fieldname.Host:  backendUrl,
+						},
+						NameHint: u.Host,
+					})
+				} else {
+					out.AddCandidate(sdk.ImportCandidate{
+						Fields: map[sdk.FieldName]string{
+							fieldname.Token: accessToken,
+						},
+					})
+
 				}
-				out.AddCandidate(sdk.ImportCandidate{
-					Fields:   candidateFields,
-					NameHint: u.Host,
-				})
 			}
 
 		}
