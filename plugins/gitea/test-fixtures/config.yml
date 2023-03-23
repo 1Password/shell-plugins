@@ -1,0 +1,14 @@
+logins:
+- name: https://git.example.com
+  url: https://git.example.com
+  token: oyyfsny27bgphldmhvffxhhlmqvdkzjrfslrsj9f
+  default: true
+  ssh_host: ""
+  ssh_key: ""
+  insecure: false
+  ssh_certificate_principal: ""
+  ssh_agent: false
+  ssh_key_agent_pub: ""
+  version_check: false
+  user: example
+  created: 0
