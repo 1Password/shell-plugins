@@ -17,7 +17,6 @@
   <a href="https://developer.1password.com/docs/cli/shell-plugins/contribute"><img alt="Build" src="https://user-images.githubusercontent.com/45081667/226941089-473be407-5417-48e3-8710-55b2d4ec761a.png" height="37" /></a>
 </p>
 <br/>
-<br/>
 
 ---
 
@@ -27,7 +26,7 @@ Eliminate plaintext credentials in your home directory. Automatically authentica
 <p align="center">
   <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/45081667/227191964-9629476d-a49e-475d-b8cb-2115c302025d.gif">
-   <img src="https://user-images.githubusercontent.com/45081667/227188952-0196a3dd-4f1c-4ae7-970d-1a7708e5fdbb.gif" alt="Example of 1Password Shell Plugins with AWS: user runs an `aws` command, a Touch ID prompt shows up, and `aws` is automatically authenticated" style="max-width: 100%; display: inline-block;" />
+   <img src="https://user-images.githubusercontent.com/45081667/227197994-6fdb2cad-c240-4cb7-ba4c-77f2483606ab.gif" alt="Example of 1Password Shell Plugins with AWS: user runs an `aws` command, a Touch ID prompt shows up, and `aws` is automatically authenticated" style="max-width: 100%; display: inline-block;" />
 </picture>
 </p>
 
@@ -43,7 +42,7 @@ Eliminate plaintext credentials in your home directory. Automatically authentica
 <a href="https://developer.1password.com/docs/cli/shell-plugins">
     <p align="center">See all...</p>
   </a>
-
+<br/>
 
 ## 🔩 Don’t see yours? Contribute! <sup><b><a href="#-beta-notice">[BETA]</a></b></sup>
 Is your favorite CLI not listed yet? Learn [how to build a new plugin](https://developer.1password.com/docs/cli/shell-plugins/contribute) yourself and then open a PR on this repository to get it added to 1Password!
