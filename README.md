@@ -1,5 +1,5 @@
 <picture align="center">
-  <img src="https://blog.1password.com/posts/2023/shell-plugins-roundup/header.png" alt="Header" >
+  <img src="https://user-images.githubusercontent.com/45081667/227194559-57c73a9e-51df-4d42-b9f0-8b6dd011ae7b.png" alt="Header" >
 </picture>
 
 <p align="center">
@@ -41,7 +41,7 @@ Eliminate plaintext credentials in your home directory. Automatically authentica
 </p>
 
 <a href="https://developer.1password.com/docs/cli/shell-plugins">
-    <h4 align="center">See all...</h4>
+    <p align="center">See all...</p>
   </a>
 
 
