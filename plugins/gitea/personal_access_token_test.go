@@ -18,7 +18,7 @@ func TestPersonalAccessTokenProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Files: map[string]sdk.OutputFile{
-					"~/.config/tea/config.yml": {
+					ConfigPath(): {
 						Contents: []byte(plugintest.LoadFixture(t, "config.yml")),
 					},
 				},
@@ -32,7 +32,7 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 
 		"config file": {
 			Files: map[string]string{
-				"~/.config/tea/config.yml": plugintest.LoadFixture(t, "import_config.yml"),
+				ConfigPath(): plugintest.LoadFixture(t, "import_config.yml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
