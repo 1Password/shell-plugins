@@ -14,15 +14,10 @@ func main() {
 	xdgConfigHome, _ := os.LookupEnv("XDG_CONFIG_HOME")
 	home, _ := homedir.Dir()
 
-	// This logic is based on the following order of precedence
-	// (for more context, refer to the documentation: https://developer.1password.com/docs/cli/config-directories):
-	// ${OP_CONFIG_DIR}
-	// ${HOME}/.op (legacy)
-	// ${XDG_CONFIG_HOME}/.op (legacy)
-	// ${HOME}/.config/op
-	// ${XDG_CONFIG_HOME}/op
-	// Note: At the moment, if the --config flag is being used to specify the config directory
-	// then this script does not search in that location
+	// This logic is based on the order of precedence outlined in the CLI documentation:
+	// https://developer.1password.com/docs/cli/config-directories
+	// Note: At the moment, if the --config flag is being used to specify the config
+	// directory then this script does not search in that location
 	configDirPaths := []string{}
 	if opConfigDir != "" {
 		configDirPaths = append(configDirPaths, opConfigDir)
