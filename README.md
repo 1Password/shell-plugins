@@ -4,12 +4,12 @@
 
 <p align="center">
   <a href="https://1password.com">
-      <h2 align="center">1Password Shell Plugins</h2>
+      <h3 align="center">1Password Shell Plugins</h3>
   </a>
 </p>
 
 <p align="center">
- <h4 align="center"> Authenticate any CLI with your fingerprint </h4>
+ <h5 align="center"> Authenticate any CLI with your fingerprint </h5>
 </p>
 
 <p align="center">
