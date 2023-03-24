@@ -21,7 +21,7 @@ func main() {
 	// ${XDG_CONFIG_HOME}/.op (legacy)
 	// ${HOME}/.config/op
 	// ${XDG_CONFIG_HOME}/op
-	// Note: At the moment, if the --config flag is used to specify the config directory
+	// Note: At the moment, if the --config flag is being used to specify the config directory
 	// then this script does not search in that location
 	configDirPaths := []string{}
 	if opConfigDir != "" {
