@@ -94,3 +94,7 @@ If you need help, found a bug, or have an idea for an awesome plugin that you'd 
 
 * Create an [issue](https://github.com/1Password/shell-plugins/issues) in this repo.
 * Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA).
+
+## 📣 Contributions Beta Notice
+
+The 1Password Shell Plugins ecosystem is still in beta. In practice, this means that if you're building your own plugins locally, you'll likely have to recompile them on occasion to keep up with the latest updates of the 1Password CLI.
