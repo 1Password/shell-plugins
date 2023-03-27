@@ -28,7 +28,7 @@ const (
 type fileProvisioner struct {
 }
 
-func newNgrokProvisioner() sdk.Provisioner {
+func ngrokProvisioner() sdk.Provisioner {
 	cmd := exec.Command("ngrok", "--version")
 	versionByte, err := cmd.Output()
 	if err != nil {
