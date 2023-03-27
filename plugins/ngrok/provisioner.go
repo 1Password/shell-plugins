@@ -3,19 +3,23 @@ package ngrok
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
+	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"github.com/hashicorp/go-version"
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	version           = "2"
+	ngrokVersion      = "2"
 	apiKeyYamlName    = "api_key"
 	authTokenYamlName = "authtoken"
 	versionYamlName   = "version"
@@ -25,6 +29,38 @@ type fileProvisioner struct {
 }
 
 func newNgrokProvisioner() sdk.Provisioner {
+	cmd := exec.Command("ngrok", "--version")
+	versionByte, err := cmd.Output()
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
+	versionString := strings.TrimPrefix(string(versionByte), "ngrok version ")
+
+	// Example: "3.1.1\n" to "3.1.1"
+	versionString = strings.Trim(versionString, "\n")
+
+	// NGROK_API_KEY is supported only from ngrok 3.2.1
+	// NGROK_AUTH_TOKEN has already been supported
+	requiredVersion, err := version.NewVersion("3.2.1")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	currentVersion, err := version.NewVersion(versionString)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
+	// If the current ngrok CLI version is 3.2.1 or higher,
+	// use environment variables to provision the Shell Plugin credentials
+	if currentVersion.GreaterThan(requiredVersion) || currentVersion.Equal(requiredVersion) {
+		return provision.EnvVars(defaultEnvVarMapping)
+	}
+
+	// If the current ngrok CLI version less than 3.2.1,
+	// use configuration files to provision the credentials
 	return fileProvisioner{}
 }
 
@@ -63,7 +99,7 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 
 	config[authTokenYamlName] = in.ItemFields[fieldname.Authtoken]
 	config[apiKeyYamlName] = in.ItemFields[fieldname.APIKey]
-	config[versionYamlName] = version
+	config[versionYamlName] = ngrokVersion
 
 	newContents, err := yaml.Marshal(&config)
 	if err != nil {

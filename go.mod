@@ -40,6 +40,7 @@ require (
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/hashicorp/go-hclog v0.14.1 // indirect
+	github.com/hashicorp/go-version v1.6.0
 	github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
