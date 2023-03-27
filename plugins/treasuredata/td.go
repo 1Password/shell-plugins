@@ -20,7 +20,7 @@ func TreasureDataCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AccessKey,
+				Name: credname.APIKey,
 			},
 		},
 	}
