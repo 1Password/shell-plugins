@@ -23,6 +23,8 @@ func (p noOp) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk
 	// No op
 }
 
-func (p noOp) Description() string {
-	return "No op"
+func (p noOp) Info() sdk.ProvisionerInfo {
+	return sdk.ProvisionerInfo{
+		Description: "No op",
+	}
 }

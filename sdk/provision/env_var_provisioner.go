@@ -2,8 +2,6 @@ package provision
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 )
@@ -35,11 +33,14 @@ func (p EnvVarProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionIn
 	// Nothing to do here: environment variables get wiped automatically when the process exits.
 }
 
-func (p EnvVarProvisioner) Description() string {
+func (p EnvVarProvisioner) Info() sdk.ProvisionerInfo {
 	var envVarNames []string
 	for envVarName := range p.Schema {
 		envVarNames = append(envVarNames, envVarName)
 	}
 
-	return fmt.Sprintf("Provision environment variables: %s", strings.Join(envVarNames, ", "))
+	return sdk.ProvisionerInfo{
+		Description:       "Provisions item values directly as environment variables",
+		ProvisionsEnvVars: envVarNames,
+	}
 }

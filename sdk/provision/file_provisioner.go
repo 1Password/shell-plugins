@@ -167,8 +167,35 @@ func (p FileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInpu
 	// Nothing to do here: deleting the files gets taken care of.
 }
 
-func (p FileProvisioner) Description() string {
-	return "Provision secret file"
+func (p FileProvisioner) Info() sdk.ProvisionerInfo {
+	var file string
+	if p.outpathFixed != "" {
+		file = p.outpathFixed
+	} else if p.outfileName != "" {
+		file = p.outfileName
+	} else {
+		file = "<randomly generated filename>"
+	}
+
+	var envVars []string
+	if p.outpathEnvVar != "" {
+		envVars = append(envVars, p.outpathEnvVar)
+	}
+	if p.outdirEnvVar != "" {
+		envVars = append(envVars, p.outdirEnvVar)
+	}
+
+	var args []string
+	if p.setOutpathAsArg {
+		args = append(args, p.outpathArgTemplates...)
+	}
+
+	return sdk.ProvisionerInfo{
+		Description:       "Provisions secrets into a temporary file",
+		ProvisionsFiles:   []string{file},
+		ProvisionsEnvVars: envVars,
+		ProvisionsArgs:    args,
+	}
 }
 
 func randomFilename() (string, error) {

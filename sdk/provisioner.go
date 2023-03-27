@@ -10,8 +10,8 @@ import (
 // Provisioner provides hooks before and after the plugin's executable runs to provision
 // and deprovision secrets or other means of authentication required for the executable to run.
 type Provisioner interface {
-	// Description describes what this provisioner does.
-	Description() string
+	// Info describes what this provisioner does.
+	Info() ProvisionerInfo
 
 	// Provision gets called before running the plugin's executable to provision the necessary fields
 	// from the 1Password item in a way that the executable understands.
@@ -22,8 +22,35 @@ type Provisioner interface {
 	Deprovision(ctx context.Context, input DeprovisionInput, output *DeprovisionOutput)
 }
 
+type ProvisionerInfo struct {
+	// Description briefly describes what the provisioner does.
+	Description string
+
+	// ProvisionsEnvVars is a list of environment variable names that the provisioner sets or may set.
+	ProvisionsEnvVars []string
+
+	// ProvisionsArgs is a list of args that the provisioner sets or may set.
+	ProvisionsArgs []string
+
+	// ProvisionsFiles is a list of files that the provisioner sets or may set. Expects file names or
+	// full paths in case of fixed locations.
+	ProvisionsFiles []string
+
+	// NeedsCache determines whether the provisioner needs the cache to be available.
+	NeedsCache bool
+
+	// NeedsVersion determines whether the provisioner needs the executable's version info to be present.
+	// Expects the command args that return the version string (e.g. ["--version"]). When set, this command
+	// will be executed before each authenticated run and will result in the merged output of stdout and stderr
+	// to be passed to the ProvisionInput's VersionString value.
+	NeedsVersion []string
+}
+
 // ProvisionInput contains info that provisioners can use to provision credentials.
 type ProvisionInput struct {
+	// ItemFields contains the field names and their corresponding (sensitive) values.
+	ItemFields map[FieldName]string
+
 	// HomeDir is the path to current user's home directory.
 	HomeDir string
 
@@ -35,10 +62,13 @@ type ProvisionInput struct {
 	DryRun bool
 
 	// Cache can contain data that got added in the provision step from previous runs for this credential.
+	// Note: The cache is only available if NeedsCache is set in the provisioner's Info output.
 	Cache CacheState
 
-	// ItemFields contains the field names and their corresponding (sensitive) values.
-	ItemFields map[FieldName]string
+	// VersionString contains the output string of the version command (stdout and stderr merged)
+	// if NeedsVersion is set in the provisioner's Info output. This can be used to execute different
+	// behavior based on the executable's version. Best effort: empty if the version command fails.
+	VersionString string
 }
 
 // DeprovisionInput contains info that provisioners can use to deprovision credentials.
@@ -65,6 +95,7 @@ type ProvisionOutput struct {
 	// Cache can be used to make data generated in this provision step available to the provision step of consecutive runs for this credential.
 	// The data added to the cache will be encrypted and stored locally on disk, so it can be used to store sensitive data. To access the cached
 	// data from previous runs, use Cache on ProvisionInput.
+	// Note: The cache is only available if NeedsCache is set in the provisioner's Info output.
 	Cache CacheOperations
 
 	// Diagnostics can be used to report errors.
