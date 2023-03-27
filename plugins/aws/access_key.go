@@ -79,6 +79,7 @@ func AccessKey() schema.CredentialType {
 				"AWS_DEFAULT_REGION": fieldname.DefaultRegion,
 			}),
 			TryCredentialsFile(),
+			TryAwsVaultCredentials(),
 		),
 	}
 }
