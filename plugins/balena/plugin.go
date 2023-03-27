@@ -1,4 +1,4 @@
-package example
+package balena
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,16 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "example",
+		Name: "balena",
 		Platform: schema.PlatformInfo{
-			Name:     "Example",
-			Homepage: sdk.URL("https://example.com"),
+			Name:     "Balena",
+			Homepage: sdk.URL("https://www.balena.io"),
 		},
 		Credentials: []schema.CredentialType{
-			APIToken(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
-			ExampleCLI(),
+			BalenaCLI(),
 		},
 	}
 }

@@ -1,8 +1,9 @@
 package plugins
 
 import (
-	"github.com/1Password/shell-plugins/sdk/schema"
 	"testing"
+
+	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
 func TestValidatePlugins(t *testing.T) {
