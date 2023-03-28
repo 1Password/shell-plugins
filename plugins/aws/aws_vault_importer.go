@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
 	"gopkg.in/ini.v1"
 
 	"github.com/99designs/aws-vault/v7/cli"
@@ -18,11 +17,10 @@ import (
 )
 
 func TryAwsVaultCredentials() sdk.Importer {
-	// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
+	// Read config file from the location set in AWS_CONFIG_FILE env var or from ~/.aws/config
 	configPath := os.Getenv("AWS_CONFIG_FILE")
 	if configPath == "" {
-		home, _ := homedir.Dir()
-		configPath = filepath.Join(home, ".aws", "config") // default config file location
+		configPath = "~/.aws/config"
 	}
 
 	return importer.TryFile(configPath, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
@@ -43,7 +41,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 			return
 		}
 
-		// Use the aws-vault CredentialKeyring struct to retrieve vaulting backend credentials
+		// Use the CredentialKeyring struct from aws-vault to retrieve vaulting backend credentials
 		credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
 
 		var configFile *ini.File
