@@ -40,6 +40,17 @@ func TryAwsVaultCredentials() sdk.Importer {
 			return
 		}
 
+		// Get the region specified for the "default" profile
+		var defaultRegion string
+		for _, section := range configFile.Sections() {
+			if section.Name() == "default" {
+				if section.HasKey("region") && section.Key("region").Value() != "" {
+					defaultRegion = section.Key("region").Value()
+					break
+				}
+			}
+		}
+
 		// Iterate through the profiles in the AWS config file and
 		// import any matching credentials stored in the vaulting backend
 		for _, section := range configFile.Sections() {
@@ -53,6 +64,8 @@ func TryAwsVaultCredentials() sdk.Importer {
 
 					if section.HasKey("region") && section.Key("region").Value() != "" {
 						fields[fieldname.DefaultRegion] = section.Key("region").Value()
+					} else if defaultRegion != "" {
+						fields[fieldname.DefaultRegion] = defaultRegion
 					}
 
 					// Only add candidates with required credential fields
