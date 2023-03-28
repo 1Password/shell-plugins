@@ -75,10 +75,6 @@ func (p STSProvisioner) getProfile() (string, error) {
 	}
 
 	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
-		err := os.Unsetenv("AWS_PROFILE")
-		if err != nil {
-			return "", err
-		}
 		return profile, nil
 	}
 
