@@ -243,8 +243,29 @@ func TestAccessKeyImporter(t *testing.T) {
 	})
 }
 
-func TestAccessKeyProvisioner(t *testing.T) {
+func TestAccessKeyDefaultProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+}
+
+func TestAccessKeyCLIProvisioner(t *testing.T) {
+	err := os.Unsetenv("AWS_PROFILE")
+	require.NoError(t, err)
+	plugintest.TestProvisioner(t, CLIProvisioner{}, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
