@@ -2,15 +2,15 @@ package aws
 
 import (
 	"fmt"
-	confighelpers "github.com/99designs/aws-vault/v7/vault"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	confighelpers "github.com/99designs/aws-vault/v7/vault"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccessKeyImporter(t *testing.T) {

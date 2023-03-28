@@ -34,5 +34,5 @@ func getRoleCacheKey(roleArn string, accessKeyID string) string {
 }
 
 func getMfaCacheKey(accessKeyID string) string {
-	return fmt.Sprintf("%s|%s", assumeRoleCacheKeyID, accessKeyID)
+	return fmt.Sprintf("%s|%s", mfaCacheKeyID, accessKeyID)
 }
