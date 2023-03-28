@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"gopkg.in/ini.v1"
 )
@@ -19,4 +20,11 @@ func getConfigSectionByProfile(configFile *ini.File, profileName string) *ini.Se
 	}
 
 	return nil
+}
+
+func getConfigSectionProfileName(sectionName string) string {
+	if strings.HasPrefix(sectionName, "profile ") {
+		return strings.TrimPrefix(sectionName, "profile ")
+	}
+	return sectionName
 }
