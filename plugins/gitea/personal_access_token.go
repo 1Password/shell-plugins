@@ -2,6 +2,7 @@ package gitea
 
 import (
 	"context"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -12,7 +13,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var configPath string = "~/.config/tea/config.yml"
+func ConfigPath() string {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		return "~/.config/tea/config.yml"
+	}
+	return configDir + "/tea/config.yml"
+}
 
 func PersonalAccessToken() schema.CredentialType {
 	return schema.CredentialType{
@@ -52,10 +59,11 @@ func PersonalAccessToken() schema.CredentialType {
 				Secret:              false,
 			},
 		},
-		DefaultProvisioner: provision.TempFile(giteaConfig, provision.AtFixedPath(configPath)),
+		DefaultProvisioner: provision.TempFile(giteaConfig, provision.AtFixedPath(ConfigPath())),
 		Importer: importer.TryAll(
 			TryGiteaConfigFile(),
-		)}
+		),
+	}
 }
 
 func giteaConfig(in sdk.ProvisionInput) ([]byte, error) {
@@ -78,7 +86,7 @@ func giteaConfig(in sdk.ProvisionInput) ([]byte, error) {
 }
 
 func TryGiteaConfigFile() sdk.Importer {
-	return importer.TryFile(configPath, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return importer.TryFile(ConfigPath(), func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
