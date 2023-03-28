@@ -1,0 +1,23 @@
+logins:
+- name: git.example.com
+  url: https://git.example.com
+  token: oyyfsny27bgphldmhvffxhhlmqvdkzjrfslrsj9f
+  default: false
+  ssh_host: git.example.com
+  ssh_key: ~/.ssh/id_ed25519
+  insecure: false
+  user: example
+  created: 1479340800000
+- name: gitea.com
+  url: https://gitea.com
+  token: enjkarzu2ca5ffcnvzaczxncuczeoq9utlpqqrzs
+  default: false
+  ssh_host: git.example.com
+  ssh_key: ~/.ssh/id_ed25519
+  insecure: true
+  user: example@example.com
+  created: 1479340800000
+preferences:
+  editor: false
+  flag_defaults:
+    remote: ""

@@ -84,6 +84,12 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	report.AddCheck(ValidationCheck{
+		Description: "Credentials referenced in executables are included in the same plugin definition",
+		Assertion:   CredentialReferencesInCredentialList(p),
+		Severity:    ValidationSeverityError,
+	})
+
 	return report.IsValid(), report
 }
 

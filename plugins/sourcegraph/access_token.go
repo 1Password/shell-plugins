@@ -18,6 +18,7 @@ func AccessToken() schema.CredentialType {
 				Name:                fieldname.Endpoint,
 				MarkdownDescription: "Base URL for your Sourcegraph instance.",
 				Secret:              false,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,

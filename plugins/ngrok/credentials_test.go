@@ -6,6 +6,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCredentialsProvisioner(t *testing.T) {
@@ -17,7 +18,7 @@ func TestCredentialsProvisioner(t *testing.T) {
 			},
 			CommandLine: []string{"ngrok"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"ngrok", "--config", "/tmp/config.yml"},
+				CommandLine: []string{"ngrok", "--config=/tmp/config.yml"},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/config.yml": {
 						Contents: []byte(plugintest.LoadFixture(t, "config.yml")),
@@ -73,4 +74,27 @@ func TestCredentialsImporter(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestGetAndReplaceConfigFlag(t *testing.T) {
+
+	config, args := getConfigValueAndNewArgs([]string{}, "/newPath/to/newFile.json")
+	assert.Equal(t, "", config)
+	assert.Equal(t, []string{"--config=/newPath/to/newFile.json"}, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--session", "asdefg345reger"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "", config)
+	assert.Equal(t, []string{"--cache", "false", "--session", "asdefg345reger", "--config=/newPath/to/newFile.json"}, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--config"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "", config)
+	assert.Equal(t, []string{"--cache", "false", "--config", "/newPath/to/newFile.json"}, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--cache", "false", "--config", "/path/to/file.json"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "/path/to/file.json", config)
+	assert.Equal(t, []string{"--cache", "false", "--config", "/newPath/to/newFile.json"}, args)
+
+	config, args = getConfigValueAndNewArgs([]string{"--config=/path/to/file.json", "--session", "asdefg345reger"}, "/newPath/to/newFile.json")
+	assert.Equal(t, "/path/to/file.json", config)
+	assert.Equal(t, []string{"--config=/newPath/to/newFile.json", "--session", "asdefg345reger"}, args)
 }
