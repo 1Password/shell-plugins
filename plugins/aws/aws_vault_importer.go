@@ -55,6 +55,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 						fields[fieldname.DefaultRegion] = section.Key("region").Value()
 					}
 
+					// Only add candidates with required credential fields
 					if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
 						out.AddCandidate(sdk.ImportCandidate{
 							Fields:   fields,
