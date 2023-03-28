@@ -20,9 +20,13 @@ type STSProvisioner struct {
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	profile := p.getProfile()
+	profile, err := p.getProfile()
+	if err != nil {
+		out.AddError(err)
+		return
+	}
 
-	awsConfig, err := getAWSAuthConfigurationForProfile(profile, out)
+	awsConfig, err := getAWSAuthConfigurationForProfile(profile)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -65,16 +69,20 @@ func (p STSProvisioner) Description() string {
 }
 
 // getProfile returns the profile to be used on this run based on specified profile information
-func (p STSProvisioner) getProfile() string {
+func (p STSProvisioner) getProfile() (string, error) {
 	if len(p.profileName) != 0 {
-		return p.profileName
+		return p.profileName, nil
 	}
 
 	if profile := os.Getenv("AWS_PROFILE"); profile != "" {
-		return profile
+		err := os.Unsetenv("AWS_PROFILE")
+		if err != nil {
+			return "", err
+		}
+		return profile, nil
 	}
 
-	return defaultProfileName
+	return defaultProfileName, nil
 }
 
 // chooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
@@ -111,7 +119,7 @@ func (p *STSProvisioner) chooseTemporaryCredentialsProvider(awsConfig *confighel
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
-func getAWSAuthConfigurationForProfile(profile string, out *sdk.ProvisionOutput) (*confighelpers.Config, error) {
+func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, error) {
 	// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
 	configFile, err := confighelpers.LoadConfigFromEnv()
 	if err != nil {
@@ -139,7 +147,13 @@ func getAWSAuthConfigurationForProfile(profile string, out *sdk.ProvisionOutput)
 func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string, awsConfig *confighelpers.Config) error {
 	mfaSerial, hasMFASerial := itemFields[fieldname.MFASerial]
 	totp, hasOTP := itemFields[fieldname.OneTimePassword]
-	region, hasRegion := itemFields[fieldname.DefaultRegion]
+	region, hasRegularRegion := itemFields[fieldname.Region]
+	defaultRegion, hasDefaultRegion := itemFields[fieldname.DefaultRegion]
+	if hasDefaultRegion {
+		region = defaultRegion
+	}
+
+	hasRegion := hasDefaultRegion || hasRegularRegion
 
 	// only 1Password OTPs are supported
 	if awsConfig.MfaToken != "" || awsConfig.MfaProcess != "" || awsConfig.MfaPromptMethod != "" {
@@ -185,7 +199,7 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 		return aws.Credentials{}, err
 	}
 
-	err = p.stsCacheWriter.persist(credentials)
+	err = p.stsCacheWriter.Put(credentials)
 	if err != nil {
 		return aws.Credentials{}, err
 	}
@@ -199,7 +213,7 @@ func NewAssumeRoleProvider(awsConfig *confighelpers.Config, in sdk.ProvisionInpu
 		return NewStsCacheProvider(roleCacheKey, in.Cache)
 	}
 
-	cacheWriter := NewStsCacheWriter(roleCacheKey, out.Cache)
+	cacheWriter := NewSTSCacheWriter(roleCacheKey, out.Cache)
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
 		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, NewMFASessionTokenProvider(awsConfig, in, out)), cacheWriter)
@@ -240,7 +254,7 @@ func (p mfaSessionTokenProvider) Retrieve(ctx context.Context) (aws.Credentials,
 		return aws.Credentials{}, err
 	}
 
-	err = p.stsCacheWriter.persist(credentials)
+	err = p.stsCacheWriter.Put(credentials)
 	if err != nil {
 		return aws.Credentials{}, err
 	}
@@ -264,7 +278,7 @@ func NewMFASessionTokenProvider(awsConfig *confighelpers.Config, in sdk.Provisio
 			Duration:  awsConfig.NonChainedGetSessionTokenDuration,
 			Mfa:       confighelpers.NewMfa(awsConfig),
 		},
-		stsCacheWriter: NewStsCacheWriter(mfaCacheKey, out.Cache),
+		stsCacheWriter: NewSTSCacheWriter(mfaCacheKey, out.Cache),
 	}
 }
 

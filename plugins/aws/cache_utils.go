@@ -18,11 +18,11 @@ type stsCacheWriter struct {
 	cache       sdk.CacheOperations
 }
 
-func (c stsCacheWriter) persist(credentials aws.Credentials) error {
+func (c stsCacheWriter) Put(credentials aws.Credentials) error {
 	return c.cache.Put(c.awsCacheKey, credentials, credentials.Expires)
 }
 
-func NewStsCacheWriter(key string, cache sdk.CacheOperations) stsCacheWriter {
+func NewSTSCacheWriter(key string, cache sdk.CacheOperations) stsCacheWriter {
 	return stsCacheWriter{
 		awsCacheKey: key,
 		cache:       cache,

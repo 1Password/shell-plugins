@@ -17,41 +17,38 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		out.AddError(err)
 		return
 	}
-	out.CommandLine = editedCommandLine
+	if editedCommandLine != nil {
+		out.CommandLine = editedCommandLine
+	}
 	stsProvisioner := STSProvisioner{profileName: profile}
 	stsProvisioner.Provision(ctx, in, out)
 }
 
 func stripAndReturnProfileFlag(args []string) (string, []string, error) {
+	var profileValue string
+	var newArgs []string
+	commandOptionsEnded := false
 	for i, arg := range args {
 		// if `--profile` is used after `--`, it should not be interpreted as a flag
 		if arg == "--" {
-			break
+			commandOptionsEnded = true
 		}
-
-		if arg == "--profile" {
+		if !commandOptionsEnded && arg == "--profile" {
 			if i+1 == len(args) {
 				return "", nil, fmt.Errorf("--profile flag was specified without a value")
 			}
-			profile := args[i+1]
-
-			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			args = append(args[0:i], args[i+2:]...)
-
-			return profile, args, nil
-		} else if strings.HasPrefix(arg, "--profile=") {
-			profile := strings.TrimPrefix(arg, "--profile=")
-			if profile == "" {
+			profileValue = args[i+1]
+		} else if !commandOptionsEnded && strings.HasPrefix(arg, "--profile=") {
+			profileValue = strings.TrimPrefix(arg, "--profile=")
+			if profileValue == "" {
 				return "", nil, fmt.Errorf("--profile flag was specified without a value")
 			}
-
-			// Remove --profile flag so aws cli doesn't attempt to assume role by itself
-			args = append(args[0:i], args[i+1:]...)
-
-			return profile, args, nil
+		} else if commandOptionsEnded || arg != profileValue {
+			// make sure only profile specification args are removed from the command line so that aws cli does not attempt to assume a role by itself.
+			newArgs = append(newArgs, arg)
 		}
 	}
-	return "", nil, nil
+	return profileValue, newArgs, nil
 }
 
 func (p CLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
