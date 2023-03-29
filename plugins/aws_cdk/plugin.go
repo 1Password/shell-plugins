@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "aws_cdk",
 		Platform: schema.PlatformInfo{
 			Name:     "AWS CDK",
-			Homepage: sdk.URL("https://aws_cdk.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://aws.amazon.com/cdk/"),
 		},
 		Credentials: []schema.CredentialType{
 			AccessKey(),
