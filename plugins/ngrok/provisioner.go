@@ -3,7 +3,6 @@ package ngrok
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,7 +31,7 @@ func ngrokProvisioner() sdk.Provisioner {
 	cmd := exec.Command("ngrok", "--version")
 	ngrokVersion, err := cmd.Output()
 	if err != nil {
-		log.Fatalf(err.Error())
+		return fileProvisioner{}
 	}
 
 	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
