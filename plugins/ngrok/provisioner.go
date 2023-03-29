@@ -14,12 +14,12 @@ import (
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"github.com/hashicorp/go-version"
+	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	ngrokVersion      = "2"
+	version           = "2"
 	apiKeyYamlName    = "api_key"
 	authTokenYamlName = "authtoken"
 	versionYamlName   = "version"
@@ -30,32 +30,31 @@ type fileProvisioner struct {
 
 func ngrokProvisioner() sdk.Provisioner {
 	cmd := exec.Command("ngrok", "--version")
-	versionByte, err := cmd.Output()
+	ngrokVersion, err := cmd.Output()
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
 
 	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
-	versionString := strings.TrimPrefix(string(versionByte), "ngrok version ")
+	currentVersion := strings.TrimPrefix(string(ngrokVersion), "ngrok version ")
 
 	// Example: "3.1.1\n" to "3.1.1"
-	versionString = strings.Trim(versionString, "\n")
+	currentVersion = strings.Trim(currentVersion, "\n")
+
+	// Example: "3.1.1" to "v3.1.1" as that's the format
+	// the package semver expects
+	currentVersion = "v" + currentVersion
 
 	// NGROK_API_KEY is supported only from ngrok 3.2.1
-	// NGROK_AUTH_TOKEN has already been supported
-	requiredVersion, err := version.NewVersion("3.2.1")
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
-
-	currentVersion, err := version.NewVersion(versionString)
-	if err != nil {
-		log.Fatalf(err.Error())
-	}
+	// NGROK_AUTH_TOKEN was already supported
+	requiredVersion := "v3.2.1"
 
 	// If the current ngrok CLI version is 3.2.1 or higher,
 	// use environment variables to provision the Shell Plugin credentials
-	if currentVersion.GreaterThan(requiredVersion) || currentVersion.Equal(requiredVersion) {
+	//
+	// semver.Compare resulting in 0 means 3.2.1 is in use
+	// semver.Compare resulting in +1 means >3.2.1 is in use
+	if semver.Compare(currentVersion, requiredVersion) == 0 || semver.Compare(currentVersion, requiredVersion) == +1 {
 		return provision.EnvVars(defaultEnvVarMapping)
 	}
 
@@ -99,7 +98,7 @@ func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 
 	config[authTokenYamlName] = in.ItemFields[fieldname.Authtoken]
 	config[apiKeyYamlName] = in.ItemFields[fieldname.APIKey]
-	config[versionYamlName] = ngrokVersion
+	config[versionYamlName] = version
 
 	newContents, err := yaml.Marshal(&config)
 	if err != nil {
