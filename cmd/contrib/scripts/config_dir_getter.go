@@ -16,8 +16,6 @@ func main() {
 
 	// This logic is based on the order of precedence outlined in the CLI documentation:
 	// https://developer.1password.com/docs/cli/config-directories
-	// Note: At the moment, if the --config flag is being used to specify the config
-	// directory then this script does not search in that location
 	configDirPaths := []string{}
 	if opConfigDir != "" {
 		configDirPaths = append(configDirPaths, opConfigDir)

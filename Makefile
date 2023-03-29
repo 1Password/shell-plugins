@@ -1,4 +1,4 @@
-config_dir := $(shell go run cmd/contrib/scripts/main.go)
+config_dir := $(shell go run cmd/contrib/scripts/config_dir_getter.go)
 plugins_dir := ${config_dir}/plugins/local
 
 .PHONY: new-plugin registry %/example-secrets %/validate %/build test
