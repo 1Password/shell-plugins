@@ -1,13 +1,13 @@
-package aws_cdk
+package awscdk
 
 import (
 	"testing"
-	
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
-	
+
 func TestAccessKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
@@ -37,18 +37,18 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 			},
 		},
-		// TODO: If you implemented a config file importer, add a test file example in aws_cdk/test-fixtures
+		// TODO: If you implemented a config file importer, add a test file example in awscdk/test-fixtures
 		// and fill the necessary details in the test template below.
 		"config file": {
 			Files: map[string]string{
 				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-			// 	{
-			// 		Fields: map[sdk.FieldName]string{
-			// 			fieldname.Token: "YV4DFI6DLBV9KEXAMPLE",
-			// 		},
-			// 	},
+				// 	{
+				// 		Fields: map[sdk.FieldName]string{
+				// 			fieldname.Token: "YV4DFI6DLBV9KEXAMPLE",
+				// 		},
+				// 	},
 			},
 		},
 	})

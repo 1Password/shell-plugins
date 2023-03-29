@@ -1,4 +1,4 @@
-package aws_cdk
+package awscdk
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
