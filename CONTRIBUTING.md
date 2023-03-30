@@ -88,6 +88,13 @@ make <plugin>/example-secrets
 ```
 
 <!----><a name="get-in-touch"></a>
+
+## 📄 Documentation
+
+No documentation work is required on your end. If your plugin is accepted, a technical writer on our team will publish [a guide to using your plugin](https://developer.1password.com/docs/cli/shell-plugins) when the plugin is added to 1Password CLI. You can help the technical writing team by:
+- Making note in your PR of anything unique to your shell plugin that might need to be documented beyond our standard template.
+- Including an example command that requires authentication for us to use in our testing and screenshots.
+
 ## 💬 Get In Touch
 
 If you need help, found a bug, or have an idea for an awesome plugin that you'd like to discuss with us first, you can reach out to us here:
