@@ -79,7 +79,7 @@ func Credentials() schema.CredentialType {
 				"--section", "default",
 			)),
 		Importer: importer.TryAll(
-		// TryAkamaiConfigFile(),
+			TryAkamaiConfigFile(),
 		)}
 }
 
@@ -101,28 +101,41 @@ func configFile(in sdk.ProvisionInput) ([]byte, error) {
 	return []byte(contents), nil
 }
 
-// TODO: Check if the platform stores the Credentials in a local config file, and if so,
-// implement the function below to add support for importing it.
+// Load credentials from the ~/.edgerc file.
+// Import separate credentials into 1Password based on the sections in the ~/.edgerc file.
 func TryAkamaiConfigFile() sdk.Importer {
 	return importer.TryFile("~/.edgerc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
+		configFile, err := contents.ToINI()
+		if err != nil {
+			out.AddError(err)
+			return
+		}
 
-		// if config.Default.ClientSecret == "" || config.Default.Host == "" || config.Default.AccessToken == "" || config.Default.ClientToken == "" {
-		// 	return
-		// }
+		for _, section := range configFile.Sections() {
+			profileName := section.Name()
 
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.ClientSecret: config.Default.ClientSecret,
-		// 		fieldname.Host:         config.Default.Host,
-		// 		fieldname.AccessToken:  config.Default.AccessToken,
-		// 		fieldname.ClientToken:  config.Default.ClientToken,
-		// 	},
-		// })
+			fields := make(map[sdk.FieldName]string)
+			if section.HasKey("client_secret") && section.Key("client_secret").Value() != "" {
+				fields[fieldname.ClientSecret] = section.Key("client_secret").Value()
+			}
+			if section.HasKey("host") && section.Key("host").Value() != "" {
+				fields[fieldname.Host] = section.Key("host").Value()
+			}
+			if section.HasKey("access_token") && section.Key("access_token").Value() != "" {
+				fields[fieldname.AccessToken] = section.Key("access_token").Value()
+			}
+			if section.HasKey("client_token") && section.Key("client_token").Value() != "" {
+				fields[fieldname.ClientToken] = section.Key("client_token").Value()
+			}
+
+			// add candidates that contain all required credential fields
+			if fields[fieldname.ClientSecret] != "" && fields[fieldname.Host] != "" && fields[fieldname.AccessToken] != "" && fields[fieldname.ClientToken] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					NameHint: importer.SanitizeNameHint(profileName),
+					Fields:   fields,
+				})
+			}
+		}
 	})
 }
 
