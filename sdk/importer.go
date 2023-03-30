@@ -33,8 +33,9 @@ func (c *ImportCandidate) Equal(other ImportCandidate) bool {
 }
 
 type ImportSource struct {
-	Env   []string
-	Files []string
+	Env      []string
+	Files    []string
+	AWSVault bool
 }
 
 type ImportInput struct {

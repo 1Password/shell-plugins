@@ -14,12 +14,13 @@ import (
 
 func TryAwsVaultCredentials() sdk.Importer {
 	// Read config file from the location set in AWS_CONFIG_FILE env var or from ~/.aws/config
+	// config, _ := vault.LoadConfigFromEnv()
 	configPath := os.Getenv("AWS_CONFIG_FILE")
 	if configPath == "" {
 		configPath = "~/.aws/config"
 	}
 
-	return importer.TryFile(configPath, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return importer.TryVault(configPath, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		// Determine the vaulting backend through AWS_VAULT_BACKEND or based on the OS
 		awsVault := &cli.AwsVault{}
 		if awsVaultBackend := os.Getenv("AWS_VAULT_BACKEND"); awsVaultBackend != "" {
@@ -72,7 +73,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 					if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
 						out.AddCandidate(sdk.ImportCandidate{
 							Fields:   fields,
-							NameHint: importer.SanitizeNameHint("aws-vault - " + profileName),
+							NameHint: importer.SanitizeNameHint(profileName),
 						})
 					}
 				}
