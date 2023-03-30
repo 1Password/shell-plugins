@@ -13,7 +13,7 @@ import (
 
 // TryAwsVaultCredentials looks for the access key in the user's vaulting backend through AWS Vault.
 func TryAwsVaultCredentials() sdk.Importer {
-	return TryVault(func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return TryAWSVault(func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		// Determine the vaulting backend through AWS_VAULT_BACKEND or based on the OS
 		awsVault := &cli.AwsVault{}
 		if awsVaultBackend := os.Getenv("AWS_VAULT_BACKEND"); awsVaultBackend != "" {
@@ -78,7 +78,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 	})
 }
 
-func TryVault(result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
+func TryAWSVault(result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
 		attempt := out.NewAttempt(sdk.ImportSource{AWSVault: true})
 		result(ctx, in, attempt)
