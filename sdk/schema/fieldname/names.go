@@ -9,6 +9,7 @@ const (
 	APIKeyID        = sdk.FieldName("API Key ID")
 	APISecret       = sdk.FieldName("API Secret")
 	AccessKeyID     = sdk.FieldName("Access Key ID")
+	AccessToken     = sdk.FieldName("Access Token")
 	Account         = sdk.FieldName("Account")
 	AccountID       = sdk.FieldName("Account ID")
 	AccountSID      = sdk.FieldName("Account SID")
@@ -20,6 +21,8 @@ const (
 	Authtoken       = sdk.FieldName("Authtoken")
 	Cert            = sdk.FieldName("Cert")
 	Certificate     = sdk.FieldName("Certificate")
+	ClientSecret    = sdk.FieldName("Client Secret")
+	ClientToken     = sdk.FieldName("Client Token")
 	Credential      = sdk.FieldName("Credential")
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
@@ -54,6 +57,7 @@ func ListAll() []sdk.FieldName {
 		APIKeyID,
 		APISecret,
 		AccessKeyID,
+		AccessToken,
 		Account,
 		AccountID,
 		AccountSID,
@@ -65,6 +69,8 @@ func ListAll() []sdk.FieldName {
 		Authtoken,
 		Cert,
 		Certificate,
+		ClientSecret,
+		ClientToken,
 		Credential,
 		Credentials,
 		Database,
