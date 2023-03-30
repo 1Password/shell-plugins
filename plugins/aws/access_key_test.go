@@ -2,6 +2,7 @@ package aws
 
 import (
 	"fmt"
+	"gopkg.in/ini.v1"
 	"os"
 	"testing"
 
@@ -263,15 +264,59 @@ func TestAccessKeyDefaultProvisioner(t *testing.T) {
 }
 
 func TestAccessKeyCLIProvisioner(t *testing.T) {
-	err := os.Unsetenv("AWS_PROFILE")
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_CONFIG_FILE", t.TempDir()+"awsConfig")
+
+	// setup profiles in config file
+	file := &ini.File{}
+	profileDev, err := file.NewSection("profile dev")
 	require.NoError(t, err)
+	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	require.NoError(t, err)
+	profileProd, err := file.NewSection("profile prod")
+	require.NoError(t, err)
+	_, err = profileProd.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	require.NoError(t, err)
+	err = file.SaveTo(t.TempDir() + "awsConfig")
+	require.NoError(t, err)
+
 	plugintest.TestProvisioner(t, CLIProvisioner{}, map[string]plugintest.ProvisionCase{
-		"default": {
+		"WithAccessKeysProvider": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 				fieldname.DefaultRegion:   "us-central-1",
 			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+		"WithAssumeRoleProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+			},
+			CommandLine: []string{"aws", "s3", "ls", "--profile", "dev"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+		"WithMFAProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+			},
+			CommandLine: []string{"aws", "s3", "ls", "--profile", "prod"},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
