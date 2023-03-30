@@ -28,6 +28,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 		// Use the CredentialKeyring struct from aws-vault to retrieve vaulting backend credentials
 		credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
 
+		// Load the AWS config file (default location at ~/.aws/config)
 		awsConfigFile, err := awsVault.AwsConfigFile()
 		if err != nil {
 			out.AddError(err)
