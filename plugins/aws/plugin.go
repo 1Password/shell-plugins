@@ -17,7 +17,7 @@ func New() schema.Plugin {
 		},
 		Executables: []schema.Executable{
 			AWSCLI(),
-			AWSCDKCLI(),
+			AWSCDKToolkit(),
 		},
 	}
 }
