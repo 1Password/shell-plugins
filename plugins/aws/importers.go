@@ -85,13 +85,14 @@ func TryCredentialsFile() sdk.Importer {
 // TryAwsVaultCredentials looks for the access key in the user's vaulting backend through AWS Vault.
 func TryAwsVaultCredentials() sdk.Importer {
 	// Backend types from aws-vault and their respective user-friendly display names
+	// Descriptions can be found at https://pkg.go.dev/github.com/99designs/keyring@v1.2.2#section-readme
 	backendNames := map[keyring.BackendType]string{
 		keyring.SecretServiceBackend: "Secret Service (Gnome Keyring, KWallet)",
 		keyring.KeychainBackend:      "macOS Keychain",
-		keyring.KeyCtlBackend:        "keyctl",
+		keyring.KeyCtlBackend:        "KeyCtl",
 		keyring.KWalletBackend:       "KWallet",
 		keyring.WinCredBackend:       "Windows Credential Manager",
-		keyring.FileBackend:          "Encrypted file",
+		keyring.FileBackend:          "Encrypted file (JWT)",
 		keyring.PassBackend:          "Pass",
 	}
 
@@ -139,34 +140,32 @@ func TryAwsVaultCredentials() sdk.Importer {
 		// Iterate through the profiles in the AWS config file and
 		// import any matching credentials stored in the vaulting backend
 		for _, profileName := range awsConfigFile.ProfileNames() {
-			if profileName != "default" {
-				creds, err := credentialKeyring.Get(profileName)
-				if err == nil {
-					fields := make(map[sdk.FieldName]string)
-					fields[fieldname.AccessKeyID] = creds.AccessKeyID
-					fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
+			creds, err := credentialKeyring.Get(profileName)
+			if err == nil {
+				fields := make(map[sdk.FieldName]string)
+				fields[fieldname.AccessKeyID] = creds.AccessKeyID
+				fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
 
-					profileConfig, err := configLoader.GetProfileConfig(profileName)
-					if err != nil {
-						out.AddError(err)
-						return
-					}
+				profileConfig, err := configLoader.GetProfileConfig(profileName)
+				if err != nil {
+					out.AddError(err)
+					return
+				}
 
-					// If a region is specified for the AWS profile, use it.
-					// Otherwise, use the "default" profile region if it's specified
-					if profileConfig.Region != "" {
-						fields[fieldname.DefaultRegion] = profileConfig.Region
-					} else if defaultRegion != "" {
-						fields[fieldname.DefaultRegion] = defaultRegion
-					}
+				// If a region is specified for the AWS profile, use it.
+				// Otherwise, use the "default" profile region if it's specified
+				if profileConfig.Region != "" {
+					fields[fieldname.DefaultRegion] = profileConfig.Region
+				} else if defaultRegion != "" {
+					fields[fieldname.DefaultRegion] = defaultRegion
+				}
 
-					// Only add candidates with required credential fields
-					if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
-						out.AddCandidate(sdk.ImportCandidate{
-							Fields:   fields,
-							NameHint: importer.SanitizeNameHint(profileName),
-						})
-					}
+				// Only add candidates with required credential fields
+				if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+					out.AddCandidate(sdk.ImportCandidate{
+						Fields:   fields,
+						NameHint: importer.SanitizeNameHint(profileName),
+					})
 				}
 			}
 		}
