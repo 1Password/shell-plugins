@@ -109,10 +109,10 @@ func TryAwsVaultCredentials() sdk.Importer {
 			break
 		}
 	}
-	awsVault := &cli.AwsVault{}
-	awsVault.KeyringBackend = string(awsVaultBackend)
 
 	return TryAWSVault(backendNames[awsVaultBackend], func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		awsVault := &cli.AwsVault{}
+		awsVault.KeyringBackend = string(awsVaultBackend)
 		keyring, err := awsVault.Keyring()
 		if err != nil {
 			out.AddError(err)
@@ -175,7 +175,12 @@ func TryAwsVaultCredentials() sdk.Importer {
 
 func TryAWSVault(keyringBackend string, result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		if keyringBackend == "" {
+			return
+		}
+
 		attempt := out.NewAttempt(importer.SourceOther(keyringBackend))
+
 		result(ctx, in, attempt)
 	}
 }
