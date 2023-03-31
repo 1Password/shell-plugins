@@ -147,15 +147,15 @@ func TryAwsVaultCredentials() sdk.Importer {
 				continue
 			}
 
-			fields := make(map[sdk.FieldName]string)
-			fields[fieldname.AccessKeyID] = creds.AccessKeyID
-			fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
-
 			profileConfig, err := configLoader.GetProfileConfig(profileName)
 			if err != nil {
 				out.AddError(err)
 				continue
 			}
+
+			fields := make(map[sdk.FieldName]string)
+			fields[fieldname.AccessKeyID] = creds.AccessKeyID
+			fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
 
 			// If a region is specified for the AWS profile, use it.
 			// Otherwise, use the "default" profile region if it's specified
