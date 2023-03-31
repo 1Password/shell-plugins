@@ -144,6 +144,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 			creds, err := credentialKeyring.Get(profileName)
 			if err != nil {
 				out.AddError(fmt.Errorf("could not retrieve credentials for %s from vaulting backend", profileName))
+				continue
 			}
 
 			fields := make(map[sdk.FieldName]string)
@@ -153,6 +154,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 			profileConfig, err := configLoader.GetProfileConfig(profileName)
 			if err != nil {
 				out.AddError(err)
+				continue
 			}
 
 			// If a region is specified for the AWS profile, use it.
