@@ -15,6 +15,7 @@ func StackStormCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotForSt2ConfigFile(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
