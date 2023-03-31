@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -141,32 +142,33 @@ func TryAwsVaultCredentials() sdk.Importer {
 		// import any matching credentials stored in the vaulting backend
 		for _, profileName := range awsConfigFile.ProfileNames() {
 			creds, err := credentialKeyring.Get(profileName)
-			if err == nil {
-				fields := make(map[sdk.FieldName]string)
-				fields[fieldname.AccessKeyID] = creds.AccessKeyID
-				fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
+			if err != nil {
+				out.AddError(fmt.Errorf("could not retrieve credentials for %s from vaulting backend", profileName))
+			}
 
-				profileConfig, err := configLoader.GetProfileConfig(profileName)
-				if err != nil {
-					out.AddError(err)
-					return
-				}
+			fields := make(map[sdk.FieldName]string)
+			fields[fieldname.AccessKeyID] = creds.AccessKeyID
+			fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
 
-				// If a region is specified for the AWS profile, use it.
-				// Otherwise, use the "default" profile region if it's specified
-				if profileConfig.Region != "" {
-					fields[fieldname.DefaultRegion] = profileConfig.Region
-				} else if defaultRegion != "" {
-					fields[fieldname.DefaultRegion] = defaultRegion
-				}
+			profileConfig, err := configLoader.GetProfileConfig(profileName)
+			if err != nil {
+				out.AddError(err)
+			}
 
-				// Only add candidates with required credential fields
-				if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
-					out.AddCandidate(sdk.ImportCandidate{
-						Fields:   fields,
-						NameHint: importer.SanitizeNameHint(profileName),
-					})
-				}
+			// If a region is specified for the AWS profile, use it.
+			// Otherwise, use the "default" profile region if it's specified
+			if profileConfig.Region != "" {
+				fields[fieldname.DefaultRegion] = profileConfig.Region
+			} else if defaultRegion != "" {
+				fields[fieldname.DefaultRegion] = defaultRegion
+			}
+
+			// Only add candidates with required credential fields
+			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields:   fields,
+					NameHint: importer.SanitizeNameHint(profileName),
+				})
 			}
 		}
 	})
