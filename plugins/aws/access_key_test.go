@@ -276,11 +276,21 @@ func TestSTSProvisioner(t *testing.T) {
 	file := ini.Empty()
 	profileDev, err := file.NewSection("profile dev")
 	require.NoError(t, err)
-	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole2")
 	require.NoError(t, err)
 	profileProd, err := file.NewSection("profile prod")
 	require.NoError(t, err)
 	_, err = profileProd.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	require.NoError(t, err)
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	_, err = profileDefault.NewKey("region", "us-central-1")
+	require.NoError(t, err)
+	profileTest, err := file.NewSection("profile test")
+	require.NoError(t, err)
+	_, err = profileTest.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	_, err = profileTest.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
 	require.NoError(t, err)
 	err = file.SaveTo(configPath)
 	require.NoError(t, err)
@@ -294,11 +304,14 @@ func TestSTSProvisioner(t *testing.T) {
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
-					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					"AWS_DEFAULT_REGION":    "us-central-1",
 				},
 			},
@@ -312,7 +325,6 @@ func TestSTSProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
-				fieldname.DefaultRegion:   "us-central-1",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -334,7 +346,27 @@ func TestSTSProvisioner(t *testing.T) {
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 				fieldname.OneTimePassword: "908789",
-				fieldname.DefaultRegion:   "us-central-1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName:     "test",
+		providerFactory: &mockProviderManager{},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAssumeRoleAndMFAProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.OneTimePassword: "908789",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
