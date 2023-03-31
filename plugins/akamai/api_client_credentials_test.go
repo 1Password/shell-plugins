@@ -8,8 +8,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestAPIClientCredentialsProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, APIClientCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.ClientSecret: "abcdE23FNkBxy456z25qx9Yp5CPUxlEfQeTDkfh4QA=I",
@@ -27,8 +27,8 @@ func TestCredentialsProvisioner(t *testing.T) {
 	})
 }
 
-func TestCredentialsImporter(t *testing.T) {
-	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
+func TestAPIClientCredentialsImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIClientCredentials().Importer, map[string]plugintest.ImportCase{
 		"config file with single credential": {
 			Files: map[string]string{
 				"~/.edgerc": plugintest.LoadFixture(t, ".edgerc-single"),

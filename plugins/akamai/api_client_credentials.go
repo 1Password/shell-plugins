@@ -11,9 +11,9 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func Credentials() schema.CredentialType {
+func APIClientCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.Credentials,
+		Name:          credname.APIClientCredentials,
 		DocsURL:       sdk.URL("https://techdocs.akamai.com/developer/docs/set-up-authentication-credentials"),
 		ManagementURL: sdk.URL("https://control.akamai.com/apps/identity-management/#/tabs/users/list"),
 		Fields: []schema.CredentialField{

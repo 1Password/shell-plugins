@@ -26,7 +26,7 @@ func AkamaiCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name: credname.APIClientCredentials,
 			},
 		},
 	}

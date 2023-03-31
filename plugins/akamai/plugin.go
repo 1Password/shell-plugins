@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://akamai.com"),
 		},
 		Credentials: []schema.CredentialType{
-			Credentials(),
+			APIClientCredentials(),
 		},
 		Executables: []schema.Executable{
 			AkamaiCLI(),
