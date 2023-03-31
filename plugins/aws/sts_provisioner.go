@@ -91,7 +91,7 @@ func (p STSProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
-// ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration, alongside the corresponding stsCacheWriter for encrypting temporary credentials to disk to be used in next runs.
+// ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
 func (p STSProvisioner) ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
 	if awsConfig.HasSSOStartURL() {
@@ -131,6 +131,7 @@ type STSProviderFactory interface {
 	NewAccessKeysProvider() aws.CredentialsProvider
 }
 
+// CacheProviderFactory 's functions return AWS providers that are also handling reading and writing from shell plugin's encrypted cache
 type CacheProviderFactory struct {
 	InCache    sdk.CacheState
 	OutCache   sdk.CacheOperations
