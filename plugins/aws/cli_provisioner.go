@@ -20,10 +20,11 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	if editedCommandLine != nil {
 		out.CommandLine = editedCommandLine
 	}
-	stsProvisioner := STSProvisioner{profileName: profile}
+	stsProvisioner := NewSTSProvisioner(profile)
 	stsProvisioner.Provision(ctx, in, out)
 }
 
+// stripAndReturnProfileFlag strips all occurrences of the `--profile` flag and returns the last occurrence's value.
 func stripAndReturnProfileFlag(args []string) (string, []string, error) {
 	var profileValue string
 	var newArgs []string

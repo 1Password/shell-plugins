@@ -1,10 +1,14 @@
 package aws
 
 import (
+	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"gopkg.in/ini.v1"
 	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
@@ -263,12 +267,13 @@ func TestAccessKeyDefaultProvisioner(t *testing.T) {
 	})
 }
 
-func TestAccessKeyCLIProvisioner(t *testing.T) {
+func TestSTSProvisioner(t *testing.T) {
 	t.Setenv("AWS_PROFILE", "")
-	t.Setenv("AWS_CONFIG_FILE", t.TempDir()+"awsConfig")
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
 
 	// setup profiles in config file
-	file := &ini.File{}
+	file := ini.Empty()
 	profileDev, err := file.NewSection("profile dev")
 	require.NoError(t, err)
 	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
@@ -277,10 +282,13 @@ func TestAccessKeyCLIProvisioner(t *testing.T) {
 	require.NoError(t, err)
 	_, err = profileProd.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
 	require.NoError(t, err)
-	err = file.SaveTo(t.TempDir() + "awsConfig")
+	err = file.SaveTo(configPath)
 	require.NoError(t, err)
 
-	plugintest.TestProvisioner(t, CLIProvisioner{}, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName:     "",
+		providerFactory: &mockProviderManager{},
+	}, map[string]plugintest.ProvisionCase{
 		"WithAccessKeysProvider": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
@@ -295,32 +303,44 @@ func TestAccessKeyCLIProvisioner(t *testing.T) {
 				},
 			},
 		},
+	})
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName:     "dev",
+		providerFactory: &mockProviderManager{},
+	}, map[string]plugintest.ProvisionCase{
 		"WithAssumeRoleProvider": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 				fieldname.DefaultRegion:   "us-central-1",
 			},
-			CommandLine: []string{"aws", "s3", "ls", "--profile", "dev"},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
-					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					"AWS_DEFAULT_REGION":    "us-central-1",
 				},
 			},
 		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName:     "prod",
+		providerFactory: &mockProviderManager{},
+	}, map[string]plugintest.ProvisionCase{
 		"WithMFAProvider": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.OneTimePassword: "908789",
 				fieldname.DefaultRegion:   "us-central-1",
 			},
-			CommandLine: []string{"aws", "s3", "ls", "--profile", "prod"},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
-					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
 					"AWS_DEFAULT_REGION":    "us-central-1",
 				},
 			},
@@ -570,4 +590,30 @@ func TestGetProfile(t *testing.T) {
 	profile, err = stsProvisioner.getProfile()
 	require.NoError(t, err)
 	assert.Equal(t, "default", profile)
+}
+
+type mockAwsProvider struct {
+}
+
+func (p mockAwsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	return aws.Credentials{
+		AccessKeyID:     "AKIAHPIZFMD5EEXSTS",
+		SecretAccessKey: "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+		SessionToken:    "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+		Source:          "",
+		CanExpire:       false,
+		Expires:         time.Time{},
+	}, nil
+}
+
+type mockProviderManager struct {
+	CacheProviderFactory
+}
+
+func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+	return mockAwsProvider{}
+}
+
+func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+	return mockAwsProvider{}
 }
