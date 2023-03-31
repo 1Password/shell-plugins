@@ -15,3 +15,7 @@ func SourceEnvName(envVarName string) sdk.ImportSource {
 func SourceFile(filename string) sdk.ImportSource {
 	return sdk.ImportSource{Files: []string{filename}}
 }
+
+func SourceOther(sourceValue string) sdk.ImportSource {
+	return sdk.ImportSource{Other: []string{sourceValue}}
+}

@@ -10,8 +10,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+
 	"github.com/99designs/aws-vault/v7/cli"
 	"github.com/99designs/aws-vault/v7/vault"
+	"github.com/99designs/keyring"
 )
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
@@ -82,12 +84,35 @@ func TryCredentialsFile() sdk.Importer {
 
 // TryAwsVaultCredentials looks for the access key in the user's vaulting backend through AWS Vault.
 func TryAwsVaultCredentials() sdk.Importer {
-	return TryAWSVault(func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// Determine the vaulting backend through AWS_VAULT_BACKEND or based on the OS
-		awsVault := &cli.AwsVault{}
-		if awsVaultBackend := os.Getenv("AWS_VAULT_BACKEND"); awsVaultBackend != "" {
-			awsVault.KeyringBackend = awsVaultBackend
+	// Backend types from aws-vault and their respective user-friendly display names
+	backendNames := map[keyring.BackendType]string{
+		keyring.SecretServiceBackend: "Secret Service (Gnome Keyring, KWallet)",
+		keyring.KeychainBackend:      "macOS Keychain",
+		keyring.KeyCtlBackend:        "keyctl",
+		keyring.KWalletBackend:       "KWallet",
+		keyring.WinCredBackend:       "Windows Credential Manager",
+		keyring.FileBackend:          "Encrypted file",
+		keyring.PassBackend:          "Pass",
+	}
+
+	// Determine the vaulting backend through AWS_VAULT_BACKEND or from those available on the current OS
+	var awsVaultBackend keyring.BackendType
+	awsVaultBackendEnvVar := keyring.BackendType(os.Getenv("AWS_VAULT_BACKEND"))
+	for i, backendType := range keyring.AvailableBackends() {
+		// Default to the first available backend
+		if i == 0 {
+			awsVaultBackend = backendType
 		}
+		// If AWS_VAULT_BACKEND matches one of the available backends, use it
+		if backendType == awsVaultBackendEnvVar {
+			awsVaultBackend = awsVaultBackendEnvVar
+			break
+		}
+	}
+	awsVault := &cli.AwsVault{}
+	awsVault.KeyringBackend = string(awsVaultBackend)
+
+	return TryAWSVault(backendNames[awsVaultBackend], func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		keyring, err := awsVault.Keyring()
 		if err != nil {
 			out.AddError(err)
@@ -148,9 +173,9 @@ func TryAwsVaultCredentials() sdk.Importer {
 	})
 }
 
-func TryAWSVault(result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
+func TryAWSVault(keyringBackend string, result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
-		attempt := out.NewAttempt(sdk.ImportSource{AWSVault: true})
+		attempt := out.NewAttempt(importer.SourceOther(keyringBackend))
 		result(ctx, in, attempt)
 	}
 }
