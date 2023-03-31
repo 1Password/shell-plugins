@@ -15,7 +15,7 @@ func AuthToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AuthToken,
 		DocsURL:       sdk.URL("https://docs.stackstorm.com/authentication.html"),
-		ManagementURL: sdk.URL("https://docs.stackstorm.com/authentication.html"),
+		ManagementURL: nil,
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
