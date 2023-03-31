@@ -72,6 +72,7 @@ func Credentials() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.TempFile(configFile,
+			provision.Filename(".edgerc"),
 			provision.AddArgs(
 				"--edgerc", "{{ .Path }}",
 				"--section", "default",

@@ -8,6 +8,25 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
+func TestCredentialsProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+		"default": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.ClientSecret: "abcdE23FNkBxy456z25qx9Yp5CPUxlEfQeTDkfh4QA=I",
+				fieldname.Host:         "akab-lmn789n2k53w7qrs-nfkxaa4lfk3kd6ym.luna.akamaiapis.net",
+				fieldname.AccessToken:  "akab-zyx987xa6osbli4k-e7jf5ikib5jknes3",
+				fieldname.ClientToken:  "akab-nomoflavjuc4422e-fa2xznerxrm3teg7",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				CommandLine: []string{"--edgerc", "/tmp/.edgerc", "--section", "default"},
+				Files: map[string]sdk.OutputFile{
+					"/tmp/.edgerc": {Contents: []byte(plugintest.LoadFixture(t, ".edgerc-single"))},
+				},
+			},
+		},
+	})
+}
+
 func TestCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
 		"config file with single credential": {
