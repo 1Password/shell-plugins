@@ -3,8 +3,6 @@ package akamai
 import (
 	"context"
 
-	"github.com/subpop/go-ini"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -84,18 +82,22 @@ func Credentials() schema.CredentialType {
 }
 
 func configFile(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{
-		Section: Section{
-			ClientSecret: in.ItemFields[fieldname.ClientSecret],
-			Host:         in.ItemFields[fieldname.Host],
-			AccessToken:  in.ItemFields[fieldname.AccessToken],
-			ClientToken:  in.ItemFields[fieldname.ClientToken],
-		},
+	contents := "[default]\n"
+
+	if clientsecret, ok := in.ItemFields[fieldname.ClientSecret]; ok {
+		contents += "client_secret = " + clientsecret + "\n"
 	}
 
-	contents, err := ini.Marshal(config)
-	if err != nil {
-		return nil, err
+	if host, ok := in.ItemFields[fieldname.Host]; ok {
+		contents += "host = " + host + "\n"
+	}
+
+	if accesstoken, ok := in.ItemFields[fieldname.AccessToken]; ok {
+		contents += "access_token = " + accesstoken + "\n"
+	}
+
+	if clienttoken, ok := in.ItemFields[fieldname.ClientToken]; ok {
+		contents += "client_token = " + clienttoken + "\n"
 	}
 
 	return []byte(contents), nil
@@ -137,15 +139,4 @@ func TryAkamaiConfigFile() sdk.Importer {
 			}
 		}
 	})
-}
-
-type Config struct {
-	Section `ini:"default"`
-}
-
-type Section struct {
-	ClientSecret string `ini:"client_secret"`
-	Host         string `ini:"host"`
-	AccessToken  string `ini:"access_token"`
-	ClientToken  string `ini:"client_token"`
 }
