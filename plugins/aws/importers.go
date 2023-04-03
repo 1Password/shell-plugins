@@ -82,121 +82,105 @@ func TryCredentialsFile() sdk.Importer {
 	})
 }
 
-// TryAwsVaultCredentials looks for the access key in the user's vaulting backend through AWS Vault.
-func TryAwsVaultCredentials() sdk.Importer {
-	// Backend types from aws-vault and their respective user-friendly display names
-	// Details can be found at https://pkg.go.dev/github.com/99designs/keyring@v1.2.2#section-readme
-	backendNames := map[keyring.BackendType]string{
-		keyring.SecretServiceBackend: "Secret Service: GNOME Keyring, KWallet",
-		keyring.KeychainBackend:      "macOS Keychain",
-		keyring.KeyCtlBackend:        "KeyCtl",
-		keyring.KWalletBackend:       "KWallet",
-		keyring.WinCredBackend:       "Windows Credential Manager",
-		keyring.FileBackend:          "Encrypted file",
-		keyring.PassBackend:          "Pass",
-	}
-
-	// Determine the vaulting backend through AWS_VAULT_BACKEND or from those available on the current OS
-	var awsVaultBackend keyring.BackendType
-	awsVaultBackendEnvVar := keyring.BackendType(os.Getenv("AWS_VAULT_BACKEND"))
-	for i, backendType := range keyring.AvailableBackends() {
-		// Default to the first available backend
-		if i == 0 {
-			awsVaultBackend = backendType
-		}
-		// If AWS_VAULT_BACKEND matches one of the available backends, use it
-		if backendType == awsVaultBackendEnvVar {
-			awsVaultBackend = awsVaultBackendEnvVar
-			break
-		}
-	}
-
-	return TryAWSVault(backendNames[awsVaultBackend], func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		var keyringConfigDefaults = keyring.Config{
-			ServiceName:              "aws-vault",
-			LibSecretCollectionName:  "awsvault",
-			KWalletAppID:             "aws-vault",
-			KWalletFolder:            "aws-vault",
-			KeychainTrustApplication: true,
-			WinCredPrefix:            "aws-vault",
-			KeychainName:             "aws-vault",
-			FileDir:                  "~/.awsvault/keys/",
-		}
-
-		awsVault := &cli.AwsVault{KeyringConfig: keyringConfigDefaults}
-		awsVault.KeyringBackend = string(awsVaultBackend)
-		keyring, err := awsVault.Keyring()
-		if err != nil {
-			out.AddError(err)
-			return
-		}
-
-		// Use the CredentialKeyring struct from aws-vault to retrieve vaulting backend credentials
-		credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
-
-		// Load the AWS config file (default location at ~/.aws/config)
-		awsConfigFile, err := awsVault.AwsConfigFile()
-		if err != nil {
-			out.AddError(err)
-			return
-		}
-		configLoader := &vault.ConfigLoader{File: awsConfigFile}
-
-		// Get the region specified for the "default" profile
-		var defaultRegion string
-		if defaultSection, ok := awsConfigFile.ProfileSection("default"); ok {
-			defaultRegion = defaultSection.Region
-		}
-
-		// Iterate through the profiles in the AWS config file and
-		// import any matching credentials stored in the vaulting backend
-		for _, profileName := range awsConfigFile.ProfileNames() {
-			profileFound, _ := credentialKeyring.Has(profileName)
-			if !profileFound {
-				continue
-			}
-
-			creds, err := credentialKeyring.Get(profileName)
-			if err != nil {
-				continue
-			}
-
-			profileConfig, err := configLoader.GetProfileConfig(profileName)
-			if err != nil {
-				continue
-			}
-
-			fields := make(map[sdk.FieldName]string)
-			fields[fieldname.AccessKeyID] = creds.AccessKeyID
-			fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
-
-			// If a region is specified for the AWS profile, use it.
-			// Otherwise, use the "default" profile region if it's specified
-			if profileConfig.Region != "" {
-				fields[fieldname.DefaultRegion] = profileConfig.Region
-			} else if defaultRegion != "" {
-				fields[fieldname.DefaultRegion] = defaultRegion
-			}
-
-			// Only add candidates with required credential fields
-			if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
-				out.AddCandidate(sdk.ImportCandidate{
-					Fields:   fields,
-					NameHint: importer.SanitizeNameHint(profileName),
-				})
-			}
-		}
-	})
+// Backend types from aws-vault and their respective user-friendly display names
+// Details can be found at https://pkg.go.dev/github.com/99designs/keyring@v1.2.2#section-readme
+var backendNames = map[keyring.BackendType]string{
+	keyring.SecretServiceBackend: "Secret Service: GNOME Keyring, KWallet",
+	keyring.KeychainBackend:      "macOS Keychain",
+	keyring.KeyCtlBackend:        "KeyCtl",
+	keyring.KWalletBackend:       "KWallet",
+	keyring.WinCredBackend:       "Windows Credential Manager",
+	keyring.FileBackend:          "Encrypted file",
+	keyring.PassBackend:          "Pass",
 }
 
-func TryAWSVault(keyringBackend string, result func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt)) sdk.Importer {
+// Default keyring config details used when initializing the AWSVault struct
+var keyringConfigDefaults = keyring.Config{
+	ServiceName:              "aws-vault",
+	LibSecretCollectionName:  "awsvault",
+	KWalletAppID:             "aws-vault",
+	KWalletFolder:            "aws-vault",
+	KeychainTrustApplication: true,
+	WinCredPrefix:            "aws-vault",
+	KeychainName:             "aws-vault",
+	FileDir:                  "~/.awsvault/keys/",
+}
+
+// TryAWSVaultBackends looks for the access key in the user's vaulting backends, using functionality provided by AWS Vault.
+func TryAWSVaultBackends() sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
-		if keyringBackend == "" {
+		// Retrieve all available vaulting backends based on the current OS
+		availableBackends := keyring.AvailableBackends()
+		if len(availableBackends) == 0 {
 			return
 		}
 
-		attempt := out.NewAttempt(importer.SourceOther(keyringBackend, ""))
+		// Search through each available vaulting backend for AWS credentials
+		for _, backendType := range availableBackends {
+			attempt := out.NewAttempt(importer.SourceOther(backendNames[backendType], ""))
 
-		result(ctx, in, attempt)
+			awsVault := &cli.AwsVault{KeyringConfig: keyringConfigDefaults}
+			awsVault.KeyringBackend = string(backendType)
+
+			keyring, err := awsVault.Keyring()
+			if err != nil {
+				return
+			}
+
+			// Use the CredentialKeyring struct from aws-vault to retrieve vaulting backend credentials
+			credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
+
+			// Load the AWS config file (default location at ~/.aws/config)
+			awsConfigFile, err := awsVault.AwsConfigFile()
+			if err != nil {
+				return
+			}
+			configLoader := &vault.ConfigLoader{File: awsConfigFile}
+
+			// Get the region specified for the "default" profile
+			var defaultRegion string
+			if defaultSection, ok := awsConfigFile.ProfileSection("default"); ok {
+				defaultRegion = defaultSection.Region
+			}
+
+			// Iterate through the profiles in the AWS config file and
+			// import any matching credentials stored in the vaulting backend
+			for _, profileName := range awsConfigFile.ProfileNames() {
+				profileFound, _ := credentialKeyring.Has(profileName)
+				if !profileFound {
+					continue
+				}
+
+				creds, err := credentialKeyring.Get(profileName)
+				if err != nil {
+					continue
+				}
+
+				profileConfig, err := configLoader.GetProfileConfig(profileName)
+				if err != nil {
+					continue
+				}
+
+				fields := make(map[sdk.FieldName]string)
+				fields[fieldname.AccessKeyID] = creds.AccessKeyID
+				fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
+
+				// If a region is specified for the AWS profile, use it.
+				// Otherwise, use the "default" profile region if it's specified
+				if profileConfig.Region != "" {
+					fields[fieldname.DefaultRegion] = profileConfig.Region
+				} else if defaultRegion != "" {
+					fields[fieldname.DefaultRegion] = defaultRegion
+				}
+
+				// Only add candidates with required credential fields
+				if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
+					attempt.AddCandidate(sdk.ImportCandidate{
+						Fields:   fields,
+						NameHint: importer.SanitizeNameHint(profileName),
+					})
+				}
+			}
+		}
 	}
 }
