@@ -151,6 +151,11 @@ func TryAwsVaultCredentials() sdk.Importer {
 		// Iterate through the profiles in the AWS config file and
 		// import any matching credentials stored in the vaulting backend
 		for _, profileName := range awsConfigFile.ProfileNames() {
+			profileFound, _ := credentialKeyring.Has(profileName)
+			if !profileFound {
+				continue
+			}
+
 			creds, err := credentialKeyring.Get(profileName)
 			if err != nil {
 				continue
