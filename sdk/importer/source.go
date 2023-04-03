@@ -16,6 +16,6 @@ func SourceFile(filename string) sdk.ImportSource {
 	return sdk.ImportSource{Files: []string{filename}}
 }
 
-func SourceOther(sourceValue string) sdk.ImportSource {
-	return sdk.ImportSource{Other: []string{sourceValue}}
+func SourceOther(sourceType string, sourceValue string) sdk.ImportSource {
+	return sdk.ImportSource{Other: sdk.CustomSource{Type: sourceType, Value: []string{sourceValue}}}
 }

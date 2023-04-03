@@ -195,7 +195,7 @@ func TryAWSVault(keyringBackend string, result func(ctx context.Context, in sdk.
 			return
 		}
 
-		attempt := out.NewAttempt(importer.SourceOther(keyringBackend))
+		attempt := out.NewAttempt(importer.SourceOther(keyringBackend, ""))
 
 		result(ctx, in, attempt)
 	}
