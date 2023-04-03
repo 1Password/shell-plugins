@@ -2,7 +2,6 @@ package aws
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 
@@ -88,7 +87,7 @@ func TryAwsVaultCredentials() sdk.Importer {
 	// Backend types from aws-vault and their respective user-friendly display names
 	// Details can be found at https://pkg.go.dev/github.com/99designs/keyring@v1.2.2#section-readme
 	backendNames := map[keyring.BackendType]string{
-		keyring.SecretServiceBackend: "Secret Service: Gnome Keyring, KWallet",
+		keyring.SecretServiceBackend: "Secret Service: GNOME Keyring, KWallet",
 		keyring.KeychainBackend:      "macOS Keychain",
 		keyring.KeyCtlBackend:        "KeyCtl",
 		keyring.KWalletBackend:       "KWallet",
@@ -113,7 +112,18 @@ func TryAwsVaultCredentials() sdk.Importer {
 	}
 
 	return TryAWSVault(backendNames[awsVaultBackend], func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		awsVault := &cli.AwsVault{}
+		var keyringConfigDefaults = keyring.Config{
+			ServiceName:              "aws-vault",
+			LibSecretCollectionName:  "awsvault",
+			KWalletAppID:             "aws-vault",
+			KWalletFolder:            "aws-vault",
+			KeychainTrustApplication: true,
+			WinCredPrefix:            "aws-vault",
+			KeychainName:             "aws-vault",
+			FileDir:                  "~/.awsvault/keys/",
+		}
+
+		awsVault := &cli.AwsVault{KeyringConfig: keyringConfigDefaults}
 		awsVault.KeyringBackend = string(awsVaultBackend)
 		keyring, err := awsVault.Keyring()
 		if err != nil {
@@ -143,13 +153,11 @@ func TryAwsVaultCredentials() sdk.Importer {
 		for _, profileName := range awsConfigFile.ProfileNames() {
 			creds, err := credentialKeyring.Get(profileName)
 			if err != nil {
-				out.AddError(fmt.Errorf("could not retrieve credentials for %s from vaulting backend", profileName))
 				continue
 			}
 
 			profileConfig, err := configLoader.GetProfileConfig(profileName)
 			if err != nil {
-				out.AddError(err)
 				continue
 			}
 
