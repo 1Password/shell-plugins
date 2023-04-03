@@ -82,7 +82,7 @@ func TryCredentialsFile() sdk.Importer {
 	})
 }
 
-// Backend types from aws-vault and their respective user-friendly display names
+// Backend types from AWS Vault and their respective user-friendly display names
 // Details can be found at https://pkg.go.dev/github.com/99designs/keyring@v1.2.2#section-readme
 var backendNames = map[keyring.BackendType]string{
 	keyring.SecretServiceBackend: "Secret Service: GNOME Keyring, KWallet",
@@ -106,10 +106,10 @@ var keyringConfigDefaults = keyring.Config{
 	FileDir:                  "~/.awsvault/keys/",
 }
 
-// TryAWSVaultBackends looks for the access key in the user's vaulting backends, using functionality provided by AWS Vault.
+// TryAWSVaultBackends looks for AWS credentials in the user's vaulting backends, using functionality provided by AWS Vault.
 func TryAWSVaultBackends() sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
-		// Retrieve all available vaulting backends based on the current OS
+		// Retrieve all available vaulting backends on the current OS
 		availableBackends := keyring.AvailableBackends()
 		if len(availableBackends) == 0 {
 			return
