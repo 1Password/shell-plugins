@@ -73,8 +73,8 @@ func AccessKey() schema.CredentialType {
 				"AWS_ACCESS_SECRET":  fieldname.SecretAccessKey,
 				"AWS_DEFAULT_REGION": fieldname.DefaultRegion,
 			}),
-			TryCredentialsFile(),
 			TryAWSVaultBackends(),
+			TryCredentialsFile(),
 		),
 	}
 }
