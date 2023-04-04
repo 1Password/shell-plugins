@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://developer.1password.com/docs/cli/shell-plugins/"><img alt="Get Started" src="https://user-images.githubusercontent.com/45081667/226940040-16d3684b-60f4-4d95-adb2-5757a8f1bc15.png" height="37" /></a>
-  <a href="https://developer.1password.com/docs/cli/shell-plugins/contribute"><img alt="Build" src="https://user-images.githubusercontent.com/45081667/226941089-473be407-5417-48e3-8710-55b2d4ec761a.png" height="37" /></a>
+  <a href="https://developer.1password.com/docs/cli/shell-plugins/contribute"><img alt="Build" src="https://user-images.githubusercontent.com/45081667/229808294-5a5e5840-6bbb-481c-8b3c-836d7958c1ee.png" height="37" /></a>
 </p>
 <br/>
 
