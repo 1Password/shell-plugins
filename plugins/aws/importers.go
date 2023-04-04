@@ -94,7 +94,8 @@ var backendNames = map[keyring.BackendType]string{
 	keyring.PassBackend:          "Pass",
 }
 
-// Default keyring config details used when initializing the AWSVault struct
+// Default keyring config values, based on the default values used by AWS Vault
+// Refer to the aws-vault codebase for more context: https://github.com/99designs/aws-vault/blob/master/cli/global.go
 var keyringConfigDefaults = keyring.Config{
 	ServiceName:              "aws-vault",
 	LibSecretCollectionName:  "awsvault",
@@ -146,18 +147,24 @@ func TryAWSVaultBackends() sdk.Importer {
 			// Iterate through the profiles in the AWS config file and
 			// import any matching credentials stored in the vaulting backend
 			for _, profileName := range awsConfigFile.ProfileNames() {
-				profileFound, _ := credentialKeyring.Has(profileName)
+				profileFound, err := credentialKeyring.Has(profileName)
+				if err != nil {
+					attempt.AddError(err)
+					continue
+				}
 				if !profileFound {
 					continue
 				}
 
 				creds, err := credentialKeyring.Get(profileName)
 				if err != nil {
+					attempt.AddError(err)
 					continue
 				}
 
 				profileConfig, err := configLoader.GetProfileConfig(profileName)
 				if err != nil {
+					attempt.AddError(err)
 					continue
 				}
 
