@@ -10,16 +10,18 @@ import (
 
 // Retrieve the config directory to read or write to
 func main() {
-	opConfigDir, _ := os.LookupEnv("OP_CONFIG_DIR")
-	xdgConfigHome, _ := os.LookupEnv("XDG_CONFIG_HOME")
-	home, _ := homedir.Dir()
-
 	// This logic is based on the order of precedence outlined in the CLI documentation:
 	// https://developer.1password.com/docs/cli/config-directories
-	configDirPaths := []string{}
-	if opConfigDir != "" {
-		configDirPaths = append(configDirPaths, opConfigDir)
+
+	// If OP_CONFIG_DIR is set, use it immediately
+	if opConfigDir, _ := os.LookupEnv("OP_CONFIG_DIR"); opConfigDir != "" {
+		fmt.Print(opConfigDir)
+		return
 	}
+
+	xdgConfigHome, _ := os.LookupEnv("XDG_CONFIG_HOME")
+	home, _ := homedir.Dir()
+	configDirPaths := []string{}
 	if home != "" {
 		// Legacy home
 		configDirPaths = append(configDirPaths, filepath.Join(home, ".op"))
@@ -45,8 +47,8 @@ func main() {
 		}
 	}
 
-	// If we reach this point then none of those directories exist (op is executed
-	// for the first time). Default to the last entry in the list.
+	// None of those directories exist and OP_CONFIG_DIR is not set
+	// Default to the last entry in the list
 	if len(configDirPaths) > 0 {
 		fmt.Print(configDirPaths[len(configDirPaths)-1])
 	}
