@@ -16,14 +16,20 @@ import (
 const defaultProfileName = "default"
 
 type STSProvisioner struct {
-	profileName     string
-	providerFactory STSProviderFactory
+	profileName        string
+	newProviderFactory func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory
 }
 
 func NewSTSProvisioner(profileName string) STSProvisioner {
 	return STSProvisioner{
-		profileName:     profileName,
-		providerFactory: &CacheProviderFactory{},
+		profileName: profileName,
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &CacheProviderFactory{
+				InCache:    cacheState,
+				OutCache:   cacheOps,
+				ItemFields: fields,
+			}
+		},
 	}
 }
 
@@ -41,8 +47,6 @@ func (p STSProvisioner) getProfile() (string, error) {
 }
 
 func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	p.providerFactory.SetState(in, out)
-
 	profile, err := p.getProfile()
 	if err != nil {
 		out.AddError(err)
@@ -61,7 +65,8 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
-	tempCredentialsProvider, err := p.ChooseTemporaryCredentialsProvider(awsConfig)
+	cacheProviderFactory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
+	tempCredentialsProvider, err := ChooseTemporaryCredentialsProvider(awsConfig, cacheProviderFactory)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -92,7 +97,7 @@ func (p STSProvisioner) Description() string {
 }
 
 // ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
-func (p STSProvisioner) ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config) (aws.CredentialsProvider, error) {
+func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
 	if awsConfig.HasSSOStartURL() {
 		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
@@ -100,32 +105,28 @@ func (p STSProvisioner) ChooseTemporaryCredentialsProvider(awsConfig *confighelp
 
 	if awsConfig.HasWebIdentity() {
 		return nil, fmt.Errorf(unsupportedMessage, "Web Identity Authentication", "https://github.com/1Password/shell-plugins/issues/209")
-
 	}
 
 	if awsConfig.HasCredentialProcess() {
 		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
-
 	}
 
 	if awsConfig.HasSourceProfile() {
 		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles", "https://github.com/1Password/shell-plugins/issues/212")
-
 	}
 
 	if awsConfig.HasRole() {
-		return p.providerFactory.NewAssumeRoleProvider(awsConfig), nil
+		return providerFactory.NewAssumeRoleProvider(awsConfig), nil
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return p.providerFactory.NewMFASessionTokenProvider(awsConfig), nil
+		return providerFactory.NewMFASessionTokenProvider(awsConfig), nil
 	}
 
-	return p.providerFactory.NewAccessKeysProvider(), nil
+	return providerFactory.NewAccessKeysProvider(), nil
 }
 
 type STSProviderFactory interface {
-	SetState(in sdk.ProvisionInput, out *sdk.ProvisionOutput)
 	NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
 	NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
 	NewAccessKeysProvider() aws.CredentialsProvider
@@ -136,12 +137,6 @@ type CacheProviderFactory struct {
 	InCache    sdk.CacheState
 	OutCache   sdk.CacheOperations
 	ItemFields map[sdk.FieldName]string
-}
-
-func (m *CacheProviderFactory) SetState(in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	m.InCache = in.Cache
-	m.OutCache = out.Cache
-	m.ItemFields = in.ItemFields
 }
 
 func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
@@ -166,7 +161,7 @@ func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelper
 	}
 
 	if awsConfig.NonChainedGetSessionTokenDuration == 0 {
-		awsConfig.NonChainedGetSessionTokenDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+		awsConfig.NonChainedGetSessionTokenDuration = 15 * time.Minute // default to minimum duration of 15 minutes
 	}
 
 	return &mfaSessionTokenProvider{
@@ -274,7 +269,7 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 
 func initAssumeRoleProvider(awsConfig *confighelpers.Config, stsClient *sts.Client, cacheWriter stsCacheWriter) *assumeRoleProvider {
 	if awsConfig.AssumeRoleDuration == 0 {
-		awsConfig.AssumeRoleDuration = 900 * time.Second // default to minimum duration of 15 minutes for security
+		awsConfig.AssumeRoleDuration = 15 * time.Minute // default to minimum duration of 15 minutes
 	}
 	return &assumeRoleProvider{
 		AssumeRoleProvider: confighelpers.AssumeRoleProvider{

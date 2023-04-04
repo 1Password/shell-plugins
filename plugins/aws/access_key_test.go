@@ -249,6 +249,9 @@ func TestAccessKeyImporter(t *testing.T) {
 }
 
 func TestAccessKeyDefaultProvisioner(t *testing.T) {
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
@@ -269,6 +272,7 @@ func TestAccessKeyDefaultProvisioner(t *testing.T) {
 
 func TestSTSProvisioner(t *testing.T) {
 	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
 	configPath := filepath.Join(t.TempDir(), "awsConfig")
 	t.Setenv("AWS_CONFIG_FILE", configPath)
 
@@ -298,8 +302,10 @@ func TestSTSProvisioner(t *testing.T) {
 	require.NoError(t, err)
 
 	plugintest.TestProvisioner(t, STSProvisioner{
-		profileName:     "",
-		providerFactory: &mockProviderManager{},
+		profileName: "",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
 	}, map[string]plugintest.ProvisionCase{
 		"WithAccessKeysProvider": {
 			ItemFields: map[sdk.FieldName]string{
@@ -320,8 +326,10 @@ func TestSTSProvisioner(t *testing.T) {
 		},
 	})
 	plugintest.TestProvisioner(t, STSProvisioner{
-		profileName:     "dev",
-		providerFactory: &mockProviderManager{},
+		profileName: "dev",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
 	}, map[string]plugintest.ProvisionCase{
 		"WithAssumeRoleProvider": {
 			ItemFields: map[sdk.FieldName]string{
@@ -340,8 +348,10 @@ func TestSTSProvisioner(t *testing.T) {
 	})
 
 	plugintest.TestProvisioner(t, STSProvisioner{
-		profileName:     "prod",
-		providerFactory: &mockProviderManager{},
+		profileName: "prod",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
 	}, map[string]plugintest.ProvisionCase{
 		"WithMFAProvider": {
 			ItemFields: map[sdk.FieldName]string{
@@ -361,8 +371,10 @@ func TestSTSProvisioner(t *testing.T) {
 	})
 
 	plugintest.TestProvisioner(t, STSProvisioner{
-		profileName:     "test",
-		providerFactory: &mockProviderManager{},
+		profileName: "test",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
 	}, map[string]plugintest.ProvisionCase{
 		"WithAssumeRoleAndMFAProvider": {
 			ItemFields: map[sdk.FieldName]string{
