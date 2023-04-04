@@ -125,6 +125,7 @@ func TryAWSVaultBackends() sdk.Importer {
 
 			keyring, err := awsVault.Keyring()
 			if err != nil {
+				attempt.AddError(err)
 				return
 			}
 
@@ -134,6 +135,7 @@ func TryAWSVaultBackends() sdk.Importer {
 			// Load the AWS config file (default location at ~/.aws/config)
 			awsConfigFile, err := awsVault.AwsConfigFile()
 			if err != nil {
+				attempt.AddError(err)
 				return
 			}
 			configLoader := &vault.ConfigLoader{File: awsConfigFile}
