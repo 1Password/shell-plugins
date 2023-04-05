@@ -164,7 +164,7 @@ func TryAWSVaultBackends() sdk.Importer {
 					continue
 				}
 
-				profileConfig, err := configLoader.GetProfileConfig(profileName)
+				profileConfig, err := configLoader.LoadFromProfile(profileName)
 				if err != nil {
 					attempt.AddError(err)
 					continue
