@@ -60,7 +60,7 @@ func AccessKey() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: AWSProvisioner(),
+		DefaultProvisioner: NewSTSProvisioner(""),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryEnvVarPair(map[string]sdk.FieldName{

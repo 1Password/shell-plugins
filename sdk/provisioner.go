@@ -164,6 +164,12 @@ func (c CacheState) Get(key string, out any) (ok bool) {
 	return true
 }
 
+// Has returns whether the specified key is present in the cache.
+func (c CacheState) Has(key string) (ok bool) {
+	_, ok = c[key]
+	return ok
+}
+
 // Put puts data into the cache at the specified key and with the specified TTL, which will be applied to the provision step of
 // all consecutive runs, until the TTL is met or Remove is called. The data will be stored as a []byte or marshaled as JSON.
 func (c *CacheOperations) Put(key string, data any, expiresAt time.Time) error {
