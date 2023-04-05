@@ -79,12 +79,6 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has no more than one executable defined. Plugins with multiple executables are not supported yet",
-		Assertion:   len(p.Executables) == 1,
-		Severity:    ValidationSeverityError,
-	})
-
-	report.AddCheck(ValidationCheck{
 		Description: "Credentials referenced in executables are included in the same plugin definition",
 		Assertion:   CredentialReferencesInCredentialList(p),
 		Severity:    ValidationSeverityError,
