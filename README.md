@@ -48,7 +48,7 @@ See all...
 
 <br/>
 
-## 🔩 Don’t see yours? Contribute! <sup><b><a href="https://github.com/1Password/shell-plugins/blob/andi_t/readme-revamp/CONTRIBUTING.md#-contributions-beta-notice">[BETA]</a></b></sup>
+## 🔩 Don’t see yours? Contribute! <sup><b><a href="https://github.com/1Password/shell-plugins/blob/main/CONTRIBUTING.md">[BETA]</a></b></sup>
 Is your favorite CLI not listed yet? Learn [how to build a new plugin](https://developer.1password.com/docs/cli/shell-plugins/contribute) yourself and then open a PR on this repository to get it included in the 1Password CLI!
 
 For the contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
