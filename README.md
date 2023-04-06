@@ -42,7 +42,7 @@ No more plaintext credentials in your home directory. Automatically authenticate
   <img alt="Picture changing depending on light mode." src="https://user-images.githubusercontent.com/45081667/226969008-0a3f7537-7942-442f-9170-18b008a6574c.png">
 
 </picture>
-<p>See all...</p>
+<p align="center">See all...</p>
 </a>
 </p>
 
