@@ -9,16 +9,16 @@ import (
 
 func MongoDBAtlasCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "MongoDB Atlas CLI", // TODO: Check if this is correct
-		Runs:      []string{"atlas"},
-		DocsURL:   sdk.URL("https://www.mongodb.com/docs/atlas/cli/v1.2/"),
+		Name:    "MongoDB Atlas CLI",
+		Runs:    []string{"atlas"},
+		DocsURL: sdk.URL("https://www.mongodb.com/docs/atlas/cli/stable/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name: credname.PrivateKeyPair,
 			},
 		},
 	}

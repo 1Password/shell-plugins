@@ -10,10 +10,10 @@ func New() schema.Plugin {
 		Name: "atlas",
 		Platform: schema.PlatformInfo{
 			Name:     "MongoDB Atlas",
-			Homepage: sdk.URL("https://www.mongodb.com/"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://www.mongodb.com/"),
 		},
 		Credentials: []schema.CredentialType{
-			Credentials(),
+			PrivateKeyPair(),
 		},
 		Executables: []schema.Executable{
 			MongoDBAtlasCLI(),

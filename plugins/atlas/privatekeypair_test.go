@@ -9,9 +9,9 @@ import (
 )
 
 func TestCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, PrivateKeyPair().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.PublicKey:  "eexample",
 				fieldname.PrivateKey: "qohcbhiu-26ag-wpwf-maqn-cw5xlexample",
 			},
@@ -26,9 +26,9 @@ func TestCredentialsProvisioner(t *testing.T) {
 }
 
 func TestCredentialsImporter(t *testing.T) {
-	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, PrivateKeyPair().Importer, map[string]plugintest.ImportCase{
 		"environment": {
-			Environment: map[string]string{ // TODO: Check if this is correct
+			Environment: map[string]string{
 				"MONGODB_ATLAS_PUBLIC_API_KEY":  "eexample",
 				"MONGODB_ATLAS_PRIVATE_API_KEY": "qohcbhiu-26ag-wpwf-maqn-cw5xlexample",
 			},
