@@ -1,4 +1,4 @@
-package aws
+package zendesk
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,17 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "aws",
+		Name: "zendesk",
 		Platform: schema.PlatformInfo{
-			Name:     "AWS",
-			Homepage: sdk.URL("https://aws.amazon.com/"),
+			Name:     "Zendesk",
+			Homepage: sdk.URL("https://www.zendesk.com/"),
 		},
 		Credentials: []schema.CredentialType{
-			AccessKey(),
+			APIToken(),
 		},
 		Executables: []schema.Executable{
-			AWSCLI(),
-			AWSCDKToolkit(),
+			ZendeskCLI(),
 		},
 	}
 }
