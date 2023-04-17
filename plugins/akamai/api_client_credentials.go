@@ -76,7 +76,9 @@ func APIClientCredentials() schema.CredentialType {
 			provision.AddArgs(
 				"--edgerc", "{{ .Path }}",
 				"--section", "default",
-			)),
+			),
+			provision.SetPathAsEnvVar("EDGERC"), // for Akamai Terraform provider
+		),
 		Importer: importer.TryAll(
 			TryAkamaiConfigFile(),
 		)}
