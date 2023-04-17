@@ -22,6 +22,9 @@ func TestAPIClientCredentialsProvisioner(t *testing.T) {
 				Files: map[string]sdk.OutputFile{
 					"/tmp/.edgerc": {Contents: []byte(plugintest.LoadFixture(t, ".edgerc-single"))},
 				},
+				Environment: map[string]string{
+					"EDGERC": "/tmp/.edgerc",
+				},
 			},
 		},
 	})
