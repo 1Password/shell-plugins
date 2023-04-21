@@ -107,7 +107,9 @@ func fileKeyringPassphrasePrompt(prompt string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println()
+
+	fmt.Print("\n\n")
+
 	return string(b), nil
 }
 
