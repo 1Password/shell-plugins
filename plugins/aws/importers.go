@@ -3,7 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -131,7 +131,7 @@ var keyringConfigDefaults = keyring.Config{
 func TryAWSVaultBackends() sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
 		// Disable log output produced by AWS Vault code
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 
 		// Retrieve all available vaulting backends on the current OS
 		availableBackends := keyring.AvailableBackends()
