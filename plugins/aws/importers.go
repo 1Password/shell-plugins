@@ -2,10 +2,11 @@ package aws
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"strings"
-
-	"gopkg.in/ini.v1"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -14,6 +15,8 @@ import (
 	"github.com/99designs/aws-vault/v7/cli"
 	"github.com/99designs/aws-vault/v7/vault"
 	"github.com/99designs/keyring"
+	"golang.org/x/term"
+	"gopkg.in/ini.v1"
 )
 
 // TryCredentialsFile looks for the access key in the ~/.aws/credentials file.
@@ -94,10 +97,25 @@ var backendNames = map[keyring.BackendType]string{
 	keyring.PassBackend:          "Pass",
 }
 
+func fileKeyringPassphrasePrompt(prompt string) (string, error) {
+	if password, ok := os.LookupEnv("AWS_VAULT_FILE_PASSPHRASE"); ok {
+		return password, nil
+	}
+
+	fmt.Fprintf(os.Stderr, "%s: ", prompt)
+	b, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		return "", err
+	}
+	fmt.Println()
+	return string(b), nil
+}
+
 // Default keyring config values, based on the default values used by AWS Vault
 // Refer to the aws-vault codebase for more context: https://github.com/99designs/aws-vault/blob/master/cli/global.go
 var keyringConfigDefaults = keyring.Config{
 	ServiceName:              "aws-vault",
+	FilePasswordFunc:         fileKeyringPassphrasePrompt,
 	LibSecretCollectionName:  "awsvault",
 	KWalletAppID:             "aws-vault",
 	KWalletFolder:            "aws-vault",
@@ -110,6 +128,9 @@ var keyringConfigDefaults = keyring.Config{
 // TryAWSVaultBackends looks for AWS credentials in the user's vaulting backends, using functionality provided by AWS Vault.
 func TryAWSVaultBackends() sdk.Importer {
 	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		// Disable log output produced by AWS Vault code
+		log.SetOutput(ioutil.Discard)
+
 		// Retrieve all available vaulting backends on the current OS
 		availableBackends := keyring.AvailableBackends()
 		if len(availableBackends) == 0 {
@@ -191,5 +212,8 @@ func TryAWSVaultBackends() sdk.Importer {
 				}
 			}
 		}
+
+		// Re-enable log output
+		log.SetOutput(os.Stdout)
 	}
 }
