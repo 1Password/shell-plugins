@@ -22,7 +22,7 @@ func Credentials() schema.CredentialType {
 				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 43,
+					Length: 49,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -36,7 +36,7 @@ func Credentials() schema.CredentialType {
 				Optional:            true,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 48,
+					Length: 49,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
