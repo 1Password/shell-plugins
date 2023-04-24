@@ -18,6 +18,7 @@ func New() schema.Plugin {
 		Executables: []schema.Executable{
 			OpenAICLI(),
 			OpenAIEvalsCLI(),
+			OpenAIEvalSetCLI(),
 		},
 	}
 }
