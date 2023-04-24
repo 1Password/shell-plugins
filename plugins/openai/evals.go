@@ -1,4 +1,4 @@
-package evals
+package openai
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
