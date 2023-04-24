@@ -17,6 +17,7 @@ func New() schema.Plugin {
 		},
 		Executables: []schema.Executable{
 			FlyctlCLI(),
+			FlyCLI(),
 		},
 	}
 }
