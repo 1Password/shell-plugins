@@ -10,10 +10,10 @@ Provide a high-level description of this change.
 Check the box below that describes your change best:
 --> 
 
-- [ ] new plugin
-- [ ] improvement for an existing plugin
-- [ ] bug-fix for an existing plugin
-- [ ] changes in contributor's experience
+- [ ] Created a new plugin
+- [ ] Improved an existing plugin
+- [ ] Fixed a bug in an existing plugin
+- [ ] Improved contributor utilities or experience
 
 ## Related Issue(s)
 <!--  
@@ -47,7 +47,7 @@ Here are a few guidelines for writing a good changelog:
 A few examples:
 
 Authenticate the AWS CLI using Touch ID and other unlock options with 1Password Shell Plugins.
-The AWS plugin can now be correctly initialised with a default credential, using 'op plugin init'.
+The AWS plugin can now be correctly initialized with a default credential, using 'op plugin init'.
 The AWS plugin now checks for the 'AWS_SHARED_CREDENTIALS_FILE' environment variable and attempts to import credentials using the specified file.
 
 For more examples, have a look over 1Password CLI's past release notes: 
