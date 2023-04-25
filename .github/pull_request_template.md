@@ -41,10 +41,16 @@ If this has impact over the user experience, your changelog will be included in 
 Here are a few guidelines for writing a good changelog:
 - Keep your description to a single sentence if you can, and use proper capitalization and punctuation, including a final period.
 - Don't use emoji in your description.
-- Avoid starting your sentence with "improved" or "fixed", especially when using those change types. Instead, describe the improvement or say what you fixed.
+- Avoid starting your sentence with "improved" or "fixed". Instead, describe the improvement or say what you fixed.
 - Avoid using terminology like "Users are shown" or "You can now" and instead focus on the thing that was changed.
 
-Have a look over 1Password CLI's past release notes for examples: 
+A few examples:
+
+Authenticate the AWS CLI using Touch ID and other unlock options with 1Password Shell Plugins.
+The AWS plugin can now be correctly initialised with a default credential, using 'op plugin init'.
+The AWS plugin now checks for the 'AWS_SHARED_CREDENTIALS_FILE' environment variable and attempts to import credentials using the specified file.
+
+For more examples, have a look over 1Password CLI's past release notes: 
 https://app-updates.agilebits.com/product_history/CLI2
 -->  
 
