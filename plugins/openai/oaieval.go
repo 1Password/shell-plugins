@@ -11,7 +11,7 @@ func OpenAIEvalsCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "OpenAI Evals CLI",
 		Runs:    []string{"oaieval"},
-		DocsURL: sdk.URL("https://github.com/openai/evals/blob/main/README.md"),
+		DocsURL: sdk.URL("https://github.com/openai/evals/blob/main/docs/run-evals.md"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
