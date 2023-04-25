@@ -51,8 +51,8 @@ Here are a few guidelines for writing a good changelog:
 A few examples:
 
 Authenticate the AWS CLI using Touch ID and other unlock options with 1Password Shell Plugins.
-The AWS plugin can now be correctly initialized with a default credential, using 'op plugin init'.
-The AWS plugin now checks for the 'AWS_SHARED_CREDENTIALS_FILE' environment variable and attempts to import credentials using the specified file.
+The AWS plugin can now be correctly initialized with a default credential, using `op plugin init`.
+The AWS plugin now checks for the `AWS_SHARED_CREDENTIALS_FILE` environment variable and attempts to import credentials using the specified file.
 
 For more examples, have a look over 1Password CLI's past release notes: 
 https://app-updates.agilebits.com/product_history/CLI2
