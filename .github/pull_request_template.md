@@ -29,6 +29,10 @@ If applicable - add the issue that your PR relates to or closes:
 <!--
 Provide testing instructions for validating the changes introduced in this PR.
 This will serve as a starting point for your reviewers, for functional testing.
+
+If you created a new plugin, you can add a command here which can be used to test authentication.
+For example, for the AWS CLI:
+  aws s3 ls
 -->
 
 
