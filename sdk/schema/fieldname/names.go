@@ -42,6 +42,7 @@ const (
 	Port            = sdk.FieldName("Port")
 	PrivateKey      = sdk.FieldName("Private Key")
 	Region          = sdk.FieldName("Region")
+	Scheme          = sdk.FieldName("Scheme")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
 	Subdomain       = sdk.FieldName("Subdomain")
@@ -91,8 +92,10 @@ func ListAll() []sdk.FieldName {
 		Port,
 		PrivateKey,
 		Region,
+		Scheme,
 		Secret,
 		SecretAccessKey,
+		Subdomain,
 		Token,
 		URL,
 		User,
