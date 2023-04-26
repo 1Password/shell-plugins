@@ -30,13 +30,14 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(
-			provision.FieldAsFile(fieldname.APIKey),
-			provision.AtFixedPath("~/.tunnelto/key.token"),
-		),
+		DefaultProvisioner: provision.Arguments(argumentsMapping),
 		Importer: importer.TryAll(
 			TrytunneltodevConfigFile(),
 		)}
+}
+
+var argumentsMapping = map[string]sdk.FieldName{
+	"--key": fieldname.APIKey,
 }
 
 func TrytunneltodevConfigFile() sdk.Importer {
