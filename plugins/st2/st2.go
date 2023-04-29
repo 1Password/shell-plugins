@@ -9,17 +9,15 @@ import (
 
 func StackStormCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "StackStorm st2 CLI",
+		Name:      "StackStorm CLI",
 		Runs:      []string{"st2"},
 		DocsURL:   sdk.URL("https://docs.stackstorm.com/reference/cli.html"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
-			needsauth.NotForSt2ConfigFile(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AuthToken,
+				Name: credname.UserPass,
 			},
 		},
 	}

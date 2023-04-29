@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://stackstorm.com"),
 		},
 		Credentials: []schema.CredentialType{
-			AuthToken(),
+			UserPass(),
 		},
 		Executables: []schema.Executable{
 			StackStormCLI(),
