@@ -33,6 +33,10 @@ type CredentialField struct {
 	// The name of the field, e.g. "Token", "Password", or "Username".
 	Name sdk.FieldName
 
+	// Alternative names for this field. Can be used to deprecate field names without breaking existing setups.
+	// If there are values present for multiple entries, the first match will be chosen.
+	AlternativeNames []string
+
 	// A description of the field.
 	MarkdownDescription string
 
@@ -137,6 +141,7 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		if f.Secret {
 			hasSecretField = true
 		}
+
 	}
 
 	report.AddCheck(ValidationCheck{
@@ -170,6 +175,12 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
+		Description: "Has no duplicate field names",
+		Assertion:   c.hasNoDuplicateFieldNames(),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
 		Description: "Has a provisioner set",
 		Assertion:   c.DefaultProvisioner != nil,
 		Severity:    ValidationSeverityError,
@@ -182,4 +193,18 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 	})
 
 	return report.IsValid(), report
+}
+
+func (c CredentialType) hasNoDuplicateFieldNames() bool {
+	allFieldNames := make(map[string]struct{})
+	for _, f := range c.Fields {
+		for _, name := range append(f.AlternativeNames, f.Name.String()) {
+			if _, found := allFieldNames[name]; !found {
+				allFieldNames[name] = struct{}{}
+			} else {
+				return false
+			}
+		}
+	}
+	return true
 }

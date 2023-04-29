@@ -444,7 +444,7 @@ func Test{{ .CredentialNameUpperCamelCase }}Provisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, {{ .CredentialNameUpperCamelCase }}().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
-				fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+				fieldname.{{ .FieldNameUpperCamelCase }}: "{{ .TestCredentialExample }}",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -464,7 +464,7 @@ func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.{{ .FieldName }}: "{{ .TestCredentialExample }}",
+						fieldname.{{ .FieldNameUpperCamelCase }}: "{{ .TestCredentialExample }}",
 					},
 				},
 			},

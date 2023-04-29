@@ -1,11 +1,21 @@
 package aws
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	confighelpers "github.com/99designs/aws-vault/v7/vault"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/ini.v1"
 )
 
 func TestAccessKeyImporter(t *testing.T) {
@@ -238,7 +248,10 @@ func TestAccessKeyImporter(t *testing.T) {
 	})
 }
 
-func TestAccessKeyProvisioner(t *testing.T) {
+func TestAccessKeyDefaultProvisioner(t *testing.T) {
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
@@ -255,4 +268,398 @@ func TestAccessKeyProvisioner(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestSTSProvisioner(t *testing.T) {
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
+	// setup profiles in config file
+	file := ini.Empty()
+	profileDev, err := file.NewSection("profile dev")
+	require.NoError(t, err)
+	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole2")
+	require.NoError(t, err)
+	profileProd, err := file.NewSection("profile prod")
+	require.NoError(t, err)
+	_, err = profileProd.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	require.NoError(t, err)
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("region", "us-central-1")
+	require.NoError(t, err)
+	profileTest, err := file.NewSection("profile test")
+	require.NoError(t, err)
+	_, err = profileTest.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	require.NoError(t, err)
+	_, err = profileTest.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	require.NoError(t, err)
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAccessKeysProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "dev",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAssumeRoleProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "prod",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithMFAProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.OneTimePassword: "908789",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "test",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAssumeRoleAndMFAProvider": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.OneTimePassword: "908789",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+}
+
+func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
+	for _, scenario := range []struct {
+		description             string
+		itemFields              map[sdk.FieldName]string
+		awsConfig               *confighelpers.Config
+		expectedResultingConfig *confighelpers.Config
+		err                     error
+	}{
+		{
+			description: "mfa token is already present in local config",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "000000",
+			},
+			awsConfig: &confighelpers.Config{
+				MfaToken:   "019879",
+				MfaProcess: "mfa login",
+			},
+			err: fmt.Errorf("only 1Password-backed OTP authentication is supported by the MFA worklfow of the AWS shell plugin"),
+		},
+		{
+			description: "mfa data is present only in 1Password",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				Region:      "us-east-2",
+			},
+			expectedResultingConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+				MfaToken:    "515467",
+				Region:      "us-east-2",
+			},
+		},
+		{
+			description: "mfa otp is present only in 1Password, while mfa serial is present only in local config",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+				fieldname.Region:          "us-east-2",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+				Region:      "us-east-2",
+			},
+			expectedResultingConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+				MfaToken:    "515467",
+				Region:      "us-east-2",
+			},
+		},
+		{
+			description: "mfa serial is present both in 1Password and local config, but their values differ",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+			},
+			err: fmt.Errorf("your local AWS configuration (config file or environment variable) has a different MFA serial than the one specified in 1Password"),
+		},
+		{
+			description: "has mfa serial but no mfa token",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.MFASerial: "arn:aws:iam::123456789012:mfa/user",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+			},
+			err: fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password"),
+		},
+		{
+			description: "has mfa token but no mfa serial",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+			},
+			err: fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial"),
+		},
+		{
+			description: "has region only in 1Password",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+				fieldname.DefaultRegion:   "us-east-2",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+			},
+			expectedResultingConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+				MfaToken:    "515467",
+				Region:      "us-east-2",
+			},
+		},
+		{
+			description: "has region both in 1Password and local config, but values differ",
+			itemFields: map[sdk.FieldName]string{
+				fieldname.OneTimePassword: "515467",
+				fieldname.DefaultRegion:   "us-east-2",
+			},
+			awsConfig: &confighelpers.Config{
+				ProfileName: "dev",
+				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
+				Region:      "us-east-1",
+			},
+			err: fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password"),
+		},
+	} {
+		t.Run(scenario.description, func(t *testing.T) {
+			err := resolveLocalAnd1PasswordConfigurations(scenario.itemFields, scenario.awsConfig)
+			if scenario.err != nil {
+				assert.EqualError(t, err, scenario.err.Error())
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, scenario.expectedResultingConfig, scenario.awsConfig)
+			}
+		})
+	}
+}
+
+func TestStripAndReturnProfileFlag(t *testing.T) {
+	for i, scenario := range []struct {
+		args              []string
+		expectedArgs      []string
+		expectedFlagValue string
+		expectedErr       error
+	}{
+		{
+			args:              []string{"--cache", "false", "--session", "asdefg345reger", "--profile", "andy"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--cache", "false", "--profile", "andy", "--session", "asdefg345reger"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "",
+		},
+		{
+			args:         []string{"--cache", "false", "--session", "asdefg345reger", "--profile"},
+			expectedArgs: []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedErr:  fmt.Errorf("--profile flag was specified without a value"),
+		},
+		{
+			args:         []string{"--cache", "false", "--session", "asdefg345reger", "--profile", "andy", "--profile"},
+			expectedArgs: []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedErr:  fmt.Errorf("--profile flag was specified without a value"),
+		},
+		{
+			args:              []string{"--cache", "false", "--session", "asdefg345reger", "--profile=andy"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:         []string{"--cache", "false", "--session", "asdefg345reger", "--profile="},
+			expectedArgs: []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedErr:  fmt.Errorf("--profile flag was specified without a value"),
+		},
+		{
+			args:              []string{"--profile=andy", "--cache", "false", "--session", "asdefg345reger"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--profile=andy", "--cache", "false", "--profile=dev", "--session", "asdefg345reger", "--profile", "prod", "--profile", "stage"},
+			expectedArgs:      []string{"--cache", "false", "--session", "asdefg345reger"},
+			expectedFlagValue: "stage",
+		},
+		{
+			args:              []string{"--profile=andy", "--profile=dev", "--profile", "prod", "--profile", "stage", "--profile=production"},
+			expectedArgs:      nil,
+			expectedFlagValue: "production",
+		},
+		{
+			args:              []string{"--profile=andy", "--region=us-east-1", "--", "wrapped command"},
+			expectedArgs:      []string{"--region=us-east-1", "--", "wrapped command"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--profile=andy", "--", "wrapped command"},
+			expectedArgs:      []string{"--", "wrapped command"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--profile=andy", "--", "wrapped command", "--profile", "dev"},
+			expectedArgs:      []string{"--", "wrapped command", "--profile", "dev"},
+			expectedFlagValue: "andy",
+		},
+		{
+			args:              []string{"--", "wrapped command", "--profile", "dev"},
+			expectedArgs:      []string{"--", "wrapped command", "--profile", "dev"},
+			expectedFlagValue: "",
+		},
+	} {
+		t.Run(fmt.Sprintf("test case %d", i), func(t *testing.T) {
+			flag, args, err := stripAndReturnProfileFlag(scenario.args)
+			if scenario.expectedErr != nil {
+				assert.EqualError(t, scenario.expectedErr, err.Error())
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, scenario.expectedFlagValue, flag)
+				assert.Equal(t, scenario.expectedArgs, args)
+			}
+		})
+
+	}
+}
+
+func TestGetProfile(t *testing.T) {
+	err := os.Setenv("AWS_PROFILE", "dev")
+	require.NoError(t, err)
+
+	stsProvisionerWithProfile := STSProvisioner{profileName: "prod"}
+	profile, err := stsProvisionerWithProfile.getProfile()
+	require.NoError(t, err)
+	assert.Equal(t, "prod", profile)
+
+	stsProvisioner := STSProvisioner{}
+	profile, err = stsProvisioner.getProfile()
+	require.NoError(t, err)
+	assert.Equal(t, "dev", profile)
+
+	err = os.Unsetenv("AWS_PROFILE")
+	require.NoError(t, err)
+
+	profile, err = stsProvisioner.getProfile()
+	require.NoError(t, err)
+	assert.Equal(t, "default", profile)
+}
+
+type mockAwsProvider struct {
+}
+
+func (p mockAwsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	return aws.Credentials{
+		AccessKeyID:     "AKIAHPIZFMD5EEXSTS",
+		SecretAccessKey: "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+		SessionToken:    "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+		Source:          "",
+		CanExpire:       false,
+		Expires:         time.Time{},
+	}, nil
+}
+
+type mockProviderManager struct {
+	CacheProviderFactory
+}
+
+func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+	return mockAwsProvider{}
+}
+
+func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+	return mockAwsProvider{}
 }

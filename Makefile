@@ -1,4 +1,5 @@
-plugins_dir := ~/.op/plugins/local
+config_dir := $(shell go run cmd/contrib/scripts/config_dir_getter.go)
+plugins_dir := ${config_dir}/plugins/local
 
 .PHONY: new-plugin registry %/example-secrets %/validate %/build test
 
@@ -27,8 +28,8 @@ validate: registry
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)
-	chmod 700 ~/.op
-	chmod 700 ~/.op/plugins
+	chmod 700 ${config_dir}
+	chmod 700 ${config_dir}/plugins
 
 %/build: $(plugins_dir) registry beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
