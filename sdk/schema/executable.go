@@ -8,6 +8,17 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
+type AllowedCredentials int
+
+const (
+	// ExactlyOne the executable annotated with this value can only support one credential type.
+	ExactlyOne AllowedCredentials = iota
+	// ExactlyTwo the executable annotated with this value can support two credential types.
+	ExactlyTwo
+	// IndeterminateNumber the executable annotated with this value can support a number of credentials which can't be statically determined.
+	IndeterminateNumber
+)
+
 type Executable struct {
 	// The entrypoint of the command that should be executed, e.g. ["aws"] or ["stripe"].
 	Runs []string
@@ -23,6 +34,9 @@ type Executable struct {
 
 	// (Optional) Whether the exectuable needs authentication for certain args.
 	NeedsAuth sdk.NeedsAuthentication
+
+	// (Optional) How many credentials this executable can be provisioned with. When not specified, the defined Uses will be used.
+	AllowedCredentials AllowedCredentials
 }
 
 type CredentialUsage struct {
