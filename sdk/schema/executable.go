@@ -81,7 +81,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type defined or the number of supported credentials cannot be determined",
-		Assertion:   len(e.Uses) > 0 || e.AllowedCredentials == DynamicNumber,
+		Assertion:   e.AllowedCredentials == DynamicNumber || len(e.Uses) > 0,
 		Severity:    ValidationSeverityError,
 	})
 
