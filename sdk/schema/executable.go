@@ -11,12 +11,8 @@ import (
 type AllowedCredentials int
 
 const (
-	// ExactlyOne the executable annotated with this value can only support one credential type.
-	ExactlyOne AllowedCredentials = iota
-	// ExactlyTwo the executable annotated with this value can support two credential types.
-	ExactlyTwo
-	// IndeterminateNumber the executable annotated with this value can support a number of credentials which can't be statically determined.
-	IndeterminateNumber
+	// DynamicNumber the executable annotated with this value can support a number of credentials which can't be statically determined.
+	DynamicNumber AllowedCredentials = iota
 )
 
 type Executable struct {
@@ -84,8 +80,8 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has a credential type defined",
-		Assertion:   len(e.Uses) > 0,
+		Description: "Has a credential type defined or the number of supported credentials cannot be determined",
+		Assertion:   len(e.Uses) > 0 || e.AllowedCredentials == DynamicNumber,
 		Severity:    ValidationSeverityError,
 	})
 
