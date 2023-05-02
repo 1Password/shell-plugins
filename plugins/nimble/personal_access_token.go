@@ -32,8 +32,8 @@ func PersonalAccessToken() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
-			TryNimbleConfigFile(),
 			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryNimbleConfigFile(),
 		),
 	}
 }
