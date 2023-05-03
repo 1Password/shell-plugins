@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
@@ -16,4 +17,13 @@ func TestValidatePlugins(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestAllPluginsHaveUniqueNames(t *testing.T) {
+	var pluginNames []string
+	for _, p := range registry {
+		pluginNames = append(pluginNames, p.Name)
+	}
+
+	assert.True(t, schema.IsStringSliceASet(pluginNames))
 }

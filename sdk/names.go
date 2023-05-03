@@ -1,5 +1,7 @@
 package sdk
 
+import "strings"
+
 // FieldName represents a name of credential field. It should be title-cased.
 // Examples: "Password", "Token", "API Key".
 type FieldName string
@@ -14,4 +16,14 @@ type CredentialName string
 
 func (n CredentialName) String() string {
 	return string(n)
+}
+
+func (n CredentialName) ID() string {
+	return credentialNameToSnakeCase(n)
+}
+
+func credentialNameToSnakeCase(name CredentialName) string {
+	str := name.String()
+	str = strings.ReplaceAll(str, " ", "_")
+	return strings.ToLower(str)
 }

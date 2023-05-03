@@ -208,3 +208,13 @@ func (c CredentialType) hasNoDuplicateFieldNames() bool {
 	}
 	return true
 }
+
+func (c CredentialType) ID() CredentialTypeID {
+	return CredentialTypeID(c.Name.ID())
+}
+
+type CredentialTypeID string
+
+func (i CredentialTypeID) String() string {
+	return string(i)
+}

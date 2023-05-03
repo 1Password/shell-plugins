@@ -112,3 +112,27 @@ func CredentialReferencesInCredentialList(plugin Plugin) bool {
 	}
 	return true
 }
+
+func CredentialsAreUniquelyIdentifiableInsideAPlugin(plugin Plugin) bool {
+	var ids []string
+	for _, credential := range plugin.Credentials {
+		ids = append(ids, credential.ID().String())
+	}
+
+	return IsStringSliceASet(ids)
+}
+
+func IsStringSliceASet(slice []string) bool {
+	for i, s := range slice {
+		if i == len(s)-1 {
+			break
+		}
+		for _, ss := range slice[i+1:] {
+			if ss == s {
+				return false
+			}
+		}
+	}
+
+	return true
+}
