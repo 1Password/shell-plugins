@@ -1,9 +1,10 @@
 package credname
 
 import (
+	"testing"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestGettingCredentialIDsFromNames(t *testing.T) {
