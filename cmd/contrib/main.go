@@ -70,6 +70,15 @@ func main() {
 		return
 	}
 
+	if command == "registry.json" {
+		registry, err := plugins.RegistryJSON()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(registry))
+		return
+	}
+
 	if command == "new-plugin" {
 		err := newPlugin()
 		if err != nil {

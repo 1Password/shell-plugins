@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -80,4 +81,35 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 func (e Executable) Command() string {
 	return strings.Join(e.Runs, " ")
+}
+
+func (e Executable) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name    string            `json:"name"`
+		Runs    []string          `json:"runs"`
+		DocsURL string            `json:"docsURL,omitempty"`
+		Uses    []CredentialUsage `json:"uses"`
+	}{}
+
+	basic.Name = e.Name
+	basic.Runs = e.Runs
+	basic.Uses = e.Uses
+
+	if e.DocsURL != nil {
+		basic.DocsURL = e.DocsURL.String()
+	}
+
+	return json.Marshal(basic)
+}
+
+func (u CredentialUsage) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name   string `json:"name"`
+		Plugin string `json:"plugin,omitempty"`
+	}{}
+
+	basic.Name = u.Name.String()
+	basic.Plugin = u.Plugin
+
+	return json.Marshal(basic)
 }

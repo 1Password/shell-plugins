@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 )
@@ -104,4 +105,32 @@ func (p Plugin) DeepValidate() []ValidationReport {
 	}
 
 	return reports
+}
+
+func (p Plugin) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name        string           `json:"name"`
+		Platform    PlatformInfo     `json:"platform"`
+		Credentials []CredentialType `json:"credentials"`
+		Executables []Executable     `json:"executables"`
+	}{
+		Name:        p.Name,
+		Platform:    p.Platform,
+		Credentials: p.Credentials,
+		Executables: p.Executables,
+	}
+
+	return json.Marshal(basic)
+}
+
+func (p PlatformInfo) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name     string `json:"name"`
+		Homepage string `json:"homepage"`
+	}{
+		Name:     p.Name,
+		Homepage: p.Homepage.String(),
+	}
+
+	return json.Marshal(basic)
 }

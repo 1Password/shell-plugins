@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 
@@ -207,4 +208,41 @@ func (c CredentialType) hasNoDuplicateFieldNames() bool {
 		}
 	}
 	return true
+}
+
+func (c CredentialType) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name          string            `json:"name"`
+		Fields        []CredentialField `json:"fields"`
+		DocsURL       string            `json:"docsURL,omitempty"`
+		ManagementURL string            `json:"managementURL,omitempty"`
+	}{}
+
+	basic.Name = c.Name.String()
+	basic.Fields = c.Fields
+
+	if c.DocsURL != nil {
+		basic.DocsURL = c.DocsURL.String()
+	}
+	if c.ManagementURL != nil {
+		basic.ManagementURL = c.ManagementURL.String()
+	}
+
+	return json.Marshal(basic)
+}
+
+func (f CredentialField) MarshalJSON() ([]byte, error) {
+	basic := struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Secret      bool   `json:"secret"`
+		Optional    bool   `json:"optional"`
+	}{
+		Name:        f.Name.String(),
+		Description: f.MarkdownDescription,
+		Secret:      f.Secret,
+		Optional:    f.Optional,
+	}
+
+	return json.Marshal(basic)
 }

@@ -1,8 +1,10 @@
 package plugins
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
@@ -49,4 +51,16 @@ func GetCredentialType(pluginName string, credentialName string) (schema.Credent
 
 func Register(p schema.Plugin) {
 	registry = append(registry, p)
+}
+
+func RegistryJSON() ([]byte, error) {
+	registry := struct {
+		Timestamp time.Time       `json:"timestamp"`
+		Plugins   []schema.Plugin `json:"plugins"`
+	}{
+		Timestamp: time.Now(),
+		Plugins:   List(),
+	}
+
+	return json.Marshal(registry)
 }

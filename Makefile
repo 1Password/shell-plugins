@@ -16,6 +16,9 @@ registry:
 	@rm -f plugins/plugins.go
 	@go run cmd/contrib/main.go $@
 
+registry.json: registry
+	@go run cmd/contrib/main.go $@
+
 %/example-secrets: registry
 	go run cmd/contrib/main.go $@
 
