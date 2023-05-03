@@ -124,7 +124,7 @@ func CredentialsAreUniquelyIdentifiableInsideAPlugin(plugin Plugin) bool {
 
 func IsStringSliceASet(slice []string) bool {
 	for i, s := range slice {
-		if i == len(s)-1 {
+		if i == len(slice)-1 {
 			break
 		}
 		for _, ss := range slice[i+1:] {

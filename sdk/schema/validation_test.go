@@ -135,3 +135,33 @@ func TestPluginValidateEachReportFieldHasError(t *testing.T) {
 
 	assert.False(t, c.Assertion, fmt.Sprintf("\"%s\" validation is erroneous", c.Description))
 }
+
+func TestIsStringSliceASet(t *testing.T) {
+	testCases := []struct {
+		slice     []string
+		assertion bool
+	}{
+		{
+			slice:     []string{"a", "b", "c", "b", "d"},
+			assertion: false,
+		}, {
+			slice:     []string{"a", "a", "a", "a", "a"},
+			assertion: false,
+		}, {
+			slice:     []string{"a", "a", "c", "d", "e"},
+			assertion: false,
+		}, {
+			slice:     []string{"a", "b", "c", "d", "d"},
+			assertion: false,
+		}, {
+			slice:     []string{"a", "b", "c", "d", "e"},
+			assertion: true,
+		}, {
+			slice:     []string{"a", "b", "b", "b", "d"},
+			assertion: false,
+		},
+	}
+	for _, tc := range testCases {
+		assert.Equal(t, tc.assertion, IsStringSliceASet(tc.slice))
+	}
+}
