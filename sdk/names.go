@@ -25,6 +25,8 @@ func (n CredentialName) ID() CredentialTypeID {
 func credentialNameToSnakeCase(name CredentialName) string {
 	str := name.String()
 	str = strings.ReplaceAll(str, " ", "_")
+	str = strings.ReplaceAll(str, "-", "_")
+	str = strings.ReplaceAll(str, "/", "_")
 	return strings.ToLower(str)
 }
 

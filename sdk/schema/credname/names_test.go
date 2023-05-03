@@ -26,6 +26,12 @@ func TestGettingCredentialIDsFromNames(t *testing.T) {
 		PersonalAccessToken,
 		RegistryCredentials,
 		SecretKey,
+		sdk.CredentialName(""),
+		sdk.CredentialName("Database-specific Credentials"),
+		sdk.CredentialName("Public/Private Key-Pair"),
+		sdk.CredentialName("Public/Private Key Pair"),
+		sdk.CredentialName("KeyPair"),
+		sdk.CredentialName("some-test/name-which is/NOT-a_real_life scENARIo"),
 	}
 
 	expectedIDs := []string{
@@ -46,6 +52,12 @@ func TestGettingCredentialIDsFromNames(t *testing.T) {
 		"personal_access_token",
 		"registry_credentials",
 		"secret_key",
+		"",
+		"database_specific_credentials",
+		"public_private_key_pair",
+		"public_private_key_pair",
+		"keypair",
+		"some_test_name_which_is_not_a_real_life_scenario",
 	}
 
 	for i, name := range names {

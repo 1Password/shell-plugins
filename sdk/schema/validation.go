@@ -113,7 +113,7 @@ func CredentialReferencesInCredentialList(plugin Plugin) bool {
 	return true
 }
 
-func CredentialsAreUniquelyIdentifiableInsideAPlugin(plugin Plugin) bool {
+func NoDuplicateCredentials(plugin Plugin) bool {
 	var ids []string
 	for _, credential := range plugin.Credentials {
 		ids = append(ids, credential.Name.ID().String())

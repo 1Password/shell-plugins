@@ -86,7 +86,7 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Credentials are uniquely identifiable inside a plugin",
-		Assertion:   CredentialsAreUniquelyIdentifiableInsideAPlugin(p),
+		Assertion:   NoDuplicateCredentials(p),
 		Severity:    ValidationSeverityError,
 	})
 
