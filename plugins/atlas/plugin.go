@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://www.mongodb.com/"),
 		},
 		Credentials: []schema.CredentialType{
-			PrivateKeyPair(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
 			MongoDBAtlasCLI(),

@@ -18,7 +18,7 @@ func MongoDBAtlasCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.PrivateKeyPair,
+				Name: credname.APIKey,
 			},
 		},
 	}

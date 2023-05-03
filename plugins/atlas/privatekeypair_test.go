@@ -9,7 +9,7 @@ import (
 )
 
 func TestCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, PrivateKeyPair().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.PublicKey:  "eexample",
@@ -26,7 +26,7 @@ func TestCredentialsProvisioner(t *testing.T) {
 }
 
 func TestCredentialsImporter(t *testing.T) {
-	plugintest.TestImporter(t, PrivateKeyPair().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"MONGODB_ATLAS_PUBLIC_API_KEY":  "eexample",

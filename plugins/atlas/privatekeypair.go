@@ -9,9 +9,9 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func PrivateKeyPair() schema.CredentialType {
+func APIKey() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.PrivateKeyPair,
+		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/"),
 		ManagementURL: nil,
 		Fields: []schema.CredentialField{
