@@ -1,10 +1,10 @@
 package plugins
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidatePlugins(t *testing.T) {
