@@ -116,7 +116,7 @@ func CredentialReferencesInCredentialList(plugin Plugin) bool {
 func CredentialsAreUniquelyIdentifiableInsideAPlugin(plugin Plugin) bool {
 	var ids []string
 	for _, credential := range plugin.Credentials {
-		ids = append(ids, credential.ID().String())
+		ids = append(ids, credential.Name.ID().String())
 	}
 
 	return IsStringSliceASet(ids)

@@ -18,12 +18,18 @@ func (n CredentialName) String() string {
 	return string(n)
 }
 
-func (n CredentialName) ID() string {
-	return credentialNameToSnakeCase(n)
+func (n CredentialName) ID() CredentialTypeID {
+	return CredentialTypeID(credentialNameToSnakeCase(n))
 }
 
 func credentialNameToSnakeCase(name CredentialName) string {
 	str := name.String()
 	str = strings.ReplaceAll(str, " ", "_")
 	return strings.ToLower(str)
+}
+
+type CredentialTypeID string
+
+func (i CredentialTypeID) String() string {
+	return string(i)
 }
