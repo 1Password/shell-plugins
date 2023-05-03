@@ -49,6 +49,6 @@ func TestGettingCredentialIDsFromNames(t *testing.T) {
 	}
 
 	for i, name := range names {
-		assert.Equal(t, expectedIDs[i], name.ID())
+		assert.Equal(t, expectedIDs[i], name.ID().String())
 	}
 }
