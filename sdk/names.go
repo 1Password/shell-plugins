@@ -1,6 +1,9 @@
 package sdk
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // FieldName represents a name of credential field. It should be title-cased.
 // Examples: "Password", "Token", "API Key".
@@ -23,10 +26,19 @@ func (n CredentialName) ID() CredentialTypeID {
 }
 
 func credentialNameToSnakeCase(name CredentialName) string {
+	const underscore = "_"
+
 	str := name.String()
-	str = strings.ReplaceAll(str, " ", "_")
-	str = strings.ReplaceAll(str, "-", "_")
-	str = strings.ReplaceAll(str, "/", "_")
+
+	charsToReplace := regexp.MustCompile(`[-/,. ]`)
+	str = charsToReplace.ReplaceAllLiteralString(str, underscore)
+
+	multipleUnderscores := regexp.MustCompile(`_+`)
+	str = multipleUnderscores.ReplaceAllString(str, underscore)
+
+	str = strings.TrimPrefix(str, "_")
+	str = strings.TrimSuffix(str, "_")
+
 	return strings.ToLower(str)
 }
 
