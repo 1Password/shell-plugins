@@ -1,6 +1,8 @@
 package nimble
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -33,7 +35,7 @@ func PersonalAccessToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryNimbleConfigFile(),
+			TryNimbleConfigFile("~/.nimble/github_api_token"),
 		),
 	}
 }
@@ -42,11 +44,16 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NIMBLE_GITHUB_API_TOKEN": fieldname.Token,
 }
 
-func TryNimbleConfigFile() sdk.Importer {
-	// TODO: Try importing from ~/.nimble/github_api_token file
-	return importer.NoOp()
-}
+func TryNimbleConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		credential := contents.ToString()
+		fields := make(map[sdk.FieldName]string)
 
-type Config struct {
-	Token string `ini:"token"`
+		if len(credential) != 0 {
+			fields[fieldname.Token] = credential
+		}
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: fields,
+		})
+	})
 }

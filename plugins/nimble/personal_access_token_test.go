@@ -37,5 +37,17 @@ func TestPersonalAccessTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"config file": {
+			Files: map[string]string{
+				"~/.nimble/github_api_token": plugintest.LoadFixture(t, "github_api_token"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "ghp_ahhfw82h48fh72nfn29fn291nwidhf8EXAMPLE",
+					},
+				},
+			},
+		},
 	})
 }
