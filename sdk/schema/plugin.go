@@ -84,6 +84,12 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	report.AddCheck(ValidationCheck{
+		Description: "Credentials are uniquely identifiable inside a plugin",
+		Assertion:   NoDuplicateCredentials(p),
+		Severity:    ValidationSeverityError,
+	})
+
 	return report.IsValid(), report
 }
 
