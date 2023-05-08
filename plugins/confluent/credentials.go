@@ -11,8 +11,8 @@ import (
 
 func CloudCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.Credentials,
-		DocsURL:       sdk.URL("https://docs.confluent.io/confluent-cli/current/command-reference/confluent_login.html"),
+		Name:          credname.UserLogin,
+		DocsURL:       sdk.URL("https://docs.confluent.io/cloud/current/access-management/identity/user-accounts.html#local-user-username-password"),
 		ManagementURL: sdk.URL("https://confluent.cloud"),
 		Fields: []schema.CredentialField{
 			{

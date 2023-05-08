@@ -13,11 +13,19 @@ func ConfluentCLI() schema.Executable {
 		Runs:    []string{"confluent"},
 		DocsURL: sdk.URL("https://docs.confluent.io/confluent-cli/current/overview.html"),
 		NeedsAuth: needsauth.IfAll(
-			needsauth.ForCommand("login"),
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotForExactArgs("local"),
+			needsauth.NotForExactArgs("update"),
+			needsauth.NotForExactArgs("prompt"),
+			needsauth.NotForExactArgs("plugin"),
+			needsauth.NotForExactArgs("logout"),
+			needsauth.NotForExactArgs("context"),
+			needsauth.NotForExactArgs("completion"),
+			needsauth.NotForExactArgs("cloud-signup"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name: credname.UserLogin,
 			},
 		},
 	}
