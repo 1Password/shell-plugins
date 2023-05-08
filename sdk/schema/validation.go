@@ -94,3 +94,45 @@ func ContainsLowercaseLettersOrDigits(str string) bool {
 	}
 	return matched
 }
+
+func CredentialReferencesInCredentialList(plugin Plugin) bool {
+	for _, executable := range plugin.Executables {
+		for _, execCredential := range executable.Uses {
+			found := false
+			for _, credential := range plugin.Credentials {
+				if execCredential.Name == credential.Name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func NoDuplicateCredentials(plugin Plugin) bool {
+	var ids []string
+	for _, credential := range plugin.Credentials {
+		ids = append(ids, credential.Name.ID().String())
+	}
+
+	return IsStringSliceASet(ids)
+}
+
+func IsStringSliceASet(slice []string) bool {
+	for i, s := range slice {
+		if i == len(slice)-1 {
+			break
+		}
+		for _, ss := range slice[i+1:] {
+			if ss == s {
+				return false
+			}
+		}
+	}
+
+	return true
+}

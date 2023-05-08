@@ -11,13 +11,15 @@ import (
 
 func AccessToken() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.AccessToken,
-		DocsURL: sdk.URL("https://docs.sourcegraph.com/cli"),
+		Name:          credname.AccessToken,
+		DocsURL:       sdk.URL("https://docs.sourcegraph.com/cli"),
+		ManagementURL: sdk.URL("https://sourcegraph.com/user/settings/tokens"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Endpoint,
 				MarkdownDescription: "Base URL for your Sourcegraph instance.",
 				Secret:              false,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,

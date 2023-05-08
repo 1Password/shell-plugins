@@ -5,11 +5,9 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"gopkg.in/yaml.v3"
 )
 
 func Credentials() schema.CredentialType {
@@ -18,8 +16,9 @@ func Credentials() schema.CredentialType {
 		DocsURL: sdk.URL("https://ngrok.com/docs/ngrok-agent/config"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.AuthToken,
-				MarkdownDescription: "Auth Token used to authenticate to ngrok.",
+				Name:                fieldname.Authtoken,
+				AlternativeNames:    []string{"Auth Token"},
+				MarkdownDescription: "Authtoken used to authenticate to ngrok.",
 				Optional:            false,
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -46,7 +45,7 @@ func Credentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(ngrokConfig, provision.Filename("config.yml"), provision.AddArgs("--config", "{{ .Path }}")),
+		DefaultProvisioner: newNgrokProvisioner(),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.MacOnly(
@@ -58,21 +57,8 @@ func Credentials() schema.CredentialType {
 		)}
 }
 
-func ngrokConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{
-		AuthToken: in.ItemFields[fieldname.AuthToken],
-		APIKey:    in.ItemFields[fieldname.APIKey],
-		Version:   "2", // required field for ngrok CLI to work when file-based configuration is used; automatically configured by the CLI program and is not configurable by the user
-	}
-	contents, err := yaml.Marshal(&config)
-	if err != nil {
-		return nil, err
-	}
-	return []byte(contents), nil
-}
-
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"NGROK_AUTHTOKEN": fieldname.AuthToken,
+	"NGROK_AUTHTOKEN": fieldname.Authtoken,
 	"NGROK_API_KEY":   fieldname.APIKey,
 }
 
@@ -90,15 +76,16 @@ func TryngrokConfigFile(path string) sdk.Importer {
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.AuthToken: config.AuthToken,
+				fieldname.Authtoken: config.AuthToken,
 				fieldname.APIKey:    config.APIKey,
 			},
 		})
 	})
 }
 
+// Config struct is exhaustive, covering all documented configurations.
 type Config struct {
 	AuthToken string `yaml:"authtoken"`
 	APIKey    string `yaml:"api_key"`
-	Version   string
+	Version   string `yaml:"version"`
 }

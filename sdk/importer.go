@@ -32,9 +32,15 @@ func (c *ImportCandidate) Equal(other ImportCandidate) bool {
 	return true
 }
 
+type CustomSource struct {
+	Type  string
+	Value []string
+}
+
 type ImportSource struct {
 	Env   []string
 	Files []string
+	Other CustomSource
 }
 
 type ImportInput struct {
