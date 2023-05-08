@@ -8,11 +8,11 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
-type AllowedCredentials int
+type SupportedCredentialAmount int
 
 const (
 	// ExactlyOne signifies that a certain executable supports exactly one credential
-	ExactlyOne AllowedCredentials = iota
+	ExactlyOne SupportedCredentialAmount = iota
 	// DynamicNumber signifies that a certain executable supports a number of credentials which can't be statically determined.
 	DynamicNumber
 )
@@ -34,7 +34,7 @@ type Executable struct {
 	NeedsAuth sdk.NeedsAuthentication
 
 	// (Optional) How many credentials this executable can be provisioned with. When not specified, the defined Uses will be used.
-	AllowedCredentials AllowedCredentials
+	SupportedCredentialAmount SupportedCredentialAmount
 }
 
 type CredentialUsage struct {
@@ -83,7 +83,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type defined or the number of supported credentials cannot be determined",
-		Assertion:   e.AllowedCredentials == DynamicNumber || len(e.Uses) > 0,
+		Assertion:   e.SupportedCredentialAmount == DynamicNumber || len(e.Uses) > 0,
 		Severity:    ValidationSeverityError,
 	})
 
