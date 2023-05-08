@@ -11,8 +11,10 @@ import (
 type AllowedCredentials int
 
 const (
-	// DynamicNumber the executable annotated with this value can support a number of credentials which can't be statically determined.
-	DynamicNumber AllowedCredentials = iota
+	// ExactlyOne signifies that a certain executable supports exactly one credential
+	ExactlyOne AllowedCredentials = iota
+	// DynamicNumber signifies that a certain executable supports a number of credentials which can't be statically determined.
+	DynamicNumber
 )
 
 type Executable struct {
