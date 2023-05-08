@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/ini.v1"
@@ -133,7 +134,7 @@ func TryAWSVaultBackends() sdk.Importer {
 			credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
 
 			// Load the AWS config file (default location at ~/.aws/config)
-			awsConfigFile, err := awsVault.AwsConfigFile()
+			awsConfigFile, err := GetAWSConfigFile()
 			if err != nil {
 				attempt.AddError(err)
 				return
@@ -192,4 +193,56 @@ func TryAWSVaultBackends() sdk.Importer {
 			}
 		}
 	}
+}
+
+func GetAWSConfigFile() (*vault.ConfigFile, error) {
+	file := os.Getenv("AWS_CONFIG_FILE")
+	if file == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		file = filepath.Join(home, "/.aws/config")
+	}
+
+	config := &vault.ConfigFile{
+		Path: file,
+	}
+
+	f, err := ini.LoadSources(ini.LoadOptions{
+		AllowNestedValues:   true,
+		InsensitiveSections: false,
+		InsensitiveKeys:     true,
+	}, file)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, section := range f.Sections() {
+		var region, mfaSerial string
+		if section.HasKey("mfa_serial") {
+			key, err := section.GetKey("mfa_serial")
+			if err != nil {
+				return nil, err
+			}
+			mfaSerial = key.String()
+		}
+		if section.HasKey("region") {
+			key, err := section.GetKey("region")
+			if err != nil {
+				return nil, err
+			}
+			region = key.String()
+		}
+		err = config.Add(vault.ProfileSection{
+			Name:      section.Name(),
+			MfaSerial: mfaSerial,
+			Region:    region,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return config, nil
 }
