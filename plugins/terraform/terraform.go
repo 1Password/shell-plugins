@@ -14,6 +14,8 @@ func TerraformCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("login"),
+			needsauth.NotWhenContainsArgs("logout"),
 		),
 		SupportedCredentialAmount: schema.DynamicNumber,
 	}
