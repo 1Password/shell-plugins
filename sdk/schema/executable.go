@@ -38,7 +38,7 @@ type Executable struct {
 }
 
 type CredentialUsage struct {
-	// The name of the credential to use in the executable.
+	// (Optional) The name of the credential to use in the executable. Mutually exclusive with `SelectFrom`.
 	Name sdk.CredentialName
 
 	// (Optional) The plugin name that contains the credential. Defaults to the current package. This can be used to
@@ -49,7 +49,27 @@ type CredentialUsage struct {
 	// set in the credential schema, so should only be used if this executable requires a custom configuration, that deviates
 	// from the way the credential is usually provisioned.
 	Provisioner sdk.Provisioner
+
+	// (Optional) What this credential will be used for by the executable.
+	Description string
+
+	// (Optional) Instead of requiring a specific credential, have the user select from a list of compatible credentials.
+	// Mutually exclusive with: `Name` and `Plugin`.
+	SelectFrom CredentialSelection
+
+	// (Optional) Whether the exectuable needs authentication for this credential. Works side by side with the executable's
+	// `NeedsAuth`, which can still be used for more generic authentications opt-outs, such as the help flag.
+	NeedsAuth sdk.NeedsAuthentication
 }
+
+type CredentialSelection struct {
+	SelectionID    string
+	PredefinedList []CredentialUsage
+	Selector       CredentialSelector
+	AllowMultiple  bool
+}
+
+type CredentialSelector string
 
 func (e Executable) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
