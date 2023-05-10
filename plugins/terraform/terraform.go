@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credselect"
 )
 
 func TerraformCLI() schema.Executable {
@@ -14,9 +15,22 @@ func TerraformCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.NotWhenContainsArgs("login"),
-			needsauth.NotWhenContainsArgs("logout"),
 		),
-		SupportedCredentialAmount: schema.DynamicNumber,
+		Uses: []schema.CredentialUsage{
+			{
+				Description: "Credentials to use within the Terraform project",
+				SelectFrom: credselect.New("project",
+					// Allow any credential to be provisioned to Terraform
+					credselect.Any(),
+					// Allow multiple credentials to be provisioned at the same time
+					credselect.AllowMultiple(),
+				),
+				NeedsAuth: needsauth.IfAny(
+					needsauth.ForCommand("refresh"),
+					needsauth.ForCommand("plan"),
+					needsauth.ForCommand("apply"),
+				),
+			},
+		},
 	}
 }
