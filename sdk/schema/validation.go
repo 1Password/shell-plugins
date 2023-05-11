@@ -104,13 +104,17 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 	return IsStringSliceASet(ids)
 }
 
-func NoDuplicateCredentialUsages(executable Executable) bool {
-	var usageIds []string
-	for _, credentialUsage := range executable.Uses {
-		usageIds = append(usageIds, credentialUsage.Name.ID().String()+"|"+credentialUsage.Plugin)
-	}
+func CredentialUsagesSpecifyCredentials(executable Executable) bool {
+	for _, usage := range executable.Uses {
+		if usage.Name == "" && usage.SelectFrom.ID == "" {
+			return false
+		}
 
-	return IsStringSliceASet(usageIds)
+		if usage.Name != "" && usage.SelectFrom.ID != "" {
+			return false
+		}
+	}
+	return true
 }
 
 func IsStringSliceASet(slice []string) bool {

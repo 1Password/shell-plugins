@@ -59,8 +59,6 @@ type CredentialSelection struct {
 	AllowMultiple         bool
 }
 
-type CredentialSelector string
-
 func (e Executable) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
 		Heading: fmt.Sprintf("Executable: %s", e.Name),
@@ -99,6 +97,12 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Credential Usages are uniquely identifiable inside an executable",
+		Assertion:   NoDuplicateCredentialUsages(e),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "Credential Usages have either Name or SelectFrom defined",
 		Assertion:   NoDuplicateCredentialUsages(e),
 		Severity:    ValidationSeverityError,
 	})
