@@ -102,8 +102,8 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Credential Usages have either Name or SelectFrom defined",
-		Assertion:   NoDuplicateCredentialUsages(e),
+		Description: "Credential Usages have either Name or SelectFrom properly defined",
+		Assertion:   CredentialUsagesSpecifyCredentials(e),
 		Severity:    ValidationSeverityError,
 	})
 
