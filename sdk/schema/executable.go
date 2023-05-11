@@ -48,6 +48,9 @@ type CredentialUsage struct {
 	// (Optional) Whether the exectuable needs authentication for this credential. Works side by side with the executable's
 	// `NeedsAuth`, which can still be used for more generic authentications opt-outs, such as the help flag.
 	NeedsAuth sdk.NeedsAuthentication
+
+	// (Optional) Whether this credential is needed for the executable to run.
+	Optional bool
 }
 
 type CredentialSelection struct {
