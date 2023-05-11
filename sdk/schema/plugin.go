@@ -68,19 +68,13 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has a credential type or executable defined",
-		Assertion:   len(p.Credentials) > 0 && len(p.Executables) > 0,
+		Assertion:   len(p.Credentials) > 0 || len(p.Executables) > 0,
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
 		Description: "Has no more than one credential type defined. Plugins with multiple credential types are not supported yet",
-		Assertion:   len(p.Credentials) == 1,
-		Severity:    ValidationSeverityError,
-	})
-
-	report.AddCheck(ValidationCheck{
-		Description: "Credentials referenced in executables are included in the same plugin definition",
-		Assertion:   CredentialReferencesInCredentialList(p),
+		Assertion:   len(p.Credentials) <= 1,
 		Severity:    ValidationSeverityError,
 	})
 

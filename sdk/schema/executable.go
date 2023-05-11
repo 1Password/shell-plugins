@@ -97,6 +97,12 @@ func (e Executable) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	report.AddCheck(ValidationCheck{
+		Description: "Credential Usages are uniquely identifiable inside an executable",
+		Assertion:   NoDuplicateCredentialUsages(e),
+		Severity:    ValidationSeverityError,
+	})
+
 	return report.IsValid(), report
 }
 
