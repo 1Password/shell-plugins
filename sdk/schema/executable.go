@@ -54,9 +54,10 @@ type CredentialUsage struct {
 }
 
 type CredentialSelection struct {
-	SelectionID    string
-	PredefinedList []CredentialUsage
-	AllowMultiple  bool
+	ID                    string
+	IncludeOptions        []CredentialUsage
+	IncludeAllCredentials bool
+	AllowMultiple         bool
 }
 
 type CredentialSelector string
