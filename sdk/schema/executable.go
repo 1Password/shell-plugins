@@ -21,7 +21,7 @@ type Executable struct {
 	// (Optional) A URL to the documentation about this executable.
 	DocsURL *url.URL
 
-	// (Optional) Whether the exectuable needs authentication for certain args.
+	// (Optional) Whether the executable needs authentication for certain args.
 	NeedsAuth sdk.NeedsAuthentication
 }
 
