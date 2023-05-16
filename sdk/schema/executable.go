@@ -43,20 +43,29 @@ type CredentialUsage struct {
 
 	// (Optional) Instead of requiring a specific credential, have the user select from a list of compatible credentials.
 	// Mutually exclusive with: `Name` and `Plugin`.
-	SelectFrom CredentialSelection
+	SelectFrom *CredentialSelection
 
 	// (Optional) Whether the exectuable needs authentication for this credential. Works side by side with the executable's
 	// `NeedsAuth`, which can still be used for more generic authentications opt-outs, such as the help flag.
 	NeedsAuth sdk.NeedsAuthentication
 
-	// (Optional) Whether this credential is needed for the executable to run.
+	// Whether this credential is needed for the executable to run. If set to true, the executable cannot run without provisioning this credential.
 	Optional bool
 }
 
 type CredentialSelection struct {
-	ID                    string
+	// ID helps identify credentials chosen in this selection
+	ID string
+	// IncludeAllCredentials specifies whether the entire list of credentials should be included in the selection prompt when configuring this credential use.
 	IncludeAllCredentials bool
-	AllowMultiple         bool
+	// AllowMultiple specifies whether multiple credentials can be selected to be part of this credential use.
+	AllowMultiple bool
+}
+
+type CredentialReference struct {
+	Name        sdk.CredentialName
+	Plugin      string
+	Provisioner sdk.Provisioner
 }
 
 func (e Executable) Validate() (bool, ValidationReport) {
@@ -96,14 +105,14 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Credential Usages are uniquely identifiable inside an executable",
-		Assertion:   NoDuplicateCredentialUsages(e),
+		Description: "Credential Usages have either a credential reference or a selection form correctly defined",
+		Assertion:   CredentialUsagesAreProperlyDefined(e),
 		Severity:    ValidationSeverityError,
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Credential Usages have either Name or SelectFrom properly defined",
-		Assertion:   CredentialUsagesSpecifyCredentials(e),
+		Description: "Credential Usages are uniquely identifiable inside an executable",
+		Assertion:   NoDuplicateCredentialUsages(e),
 		Severity:    ValidationSeverityError,
 	})
 
@@ -112,4 +121,28 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 func (e Executable) Command() string {
 	return strings.Join(e.Runs, " ")
+}
+
+func (c CredentialUsage) GetCredentialReference() *CredentialReference {
+	if c.Name != "" || c.Plugin != "" || c.Provisioner != nil {
+		return &CredentialReference{
+			Name:        c.Name,
+			Plugin:      c.Plugin,
+			Provisioner: c.Provisioner,
+		}
+	}
+
+	return nil
+}
+
+func (c CredentialUsage) ID() string {
+	if c.SelectFrom != nil {
+		return c.SelectFrom.ID
+	}
+
+	if ref := c.GetCredentialReference(); ref != nil {
+		return strings.Join([]string{ref.Plugin, ref.Name.String()}, "|")
+	}
+
+	return ""
 }

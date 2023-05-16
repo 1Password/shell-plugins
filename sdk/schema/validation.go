@@ -95,6 +95,24 @@ func ContainsLowercaseLettersOrDigits(str string) bool {
 	return matched
 }
 
+func CredentialReferencesInCredentialList(plugin Plugin) bool {
+	for _, executable := range plugin.Executables {
+		for _, execCredential := range executable.Uses {
+			found := false
+			for _, credential := range plugin.Credentials {
+				if execCredential.Name == credential.Name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 func NoDuplicateCredentials(plugin Plugin) bool {
 	var ids []string
 	for _, credential := range plugin.Credentials {
@@ -107,22 +125,38 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 func NoDuplicateCredentialUsages(executable Executable) bool {
 	var usageIds []string
 	for _, credentialUsage := range executable.Uses {
-		usageIds = append(usageIds, credentialUsage.Name.ID().String()+"|"+credentialUsage.Plugin)
+		usageIds = append(usageIds, credentialUsage.ID())
 	}
 
 	return IsStringSliceASet(usageIds)
 }
 
-func CredentialUsagesSpecifyCredentials(executable Executable) bool {
-	for _, usage := range executable.Uses {
-		if usage.Name == "" && usage.SelectFrom.ID == "" {
+func CredentialUsagesAreProperlyDefined(exec Executable) bool {
+	for _, usage := range exec.Uses {
+		credentialRef := usage.GetCredentialReference()
+		credentialSelection := usage.SelectFrom
+
+		// at least one credential selection approach must be specified
+		if credentialSelection != nil && credentialRef != nil {
 			return false
 		}
 
-		if usage.Name != "" && usage.SelectFrom.ID != "" {
+		// multiple credential selection approaches cannot exist at the same time
+		if credentialSelection == nil && credentialRef == nil {
+			return false
+		}
+
+		// if defined, a credential selection must have an ID
+		if credentialSelection != nil && credentialSelection.ID == "" {
+			return false
+		}
+
+		// if defined, a credential reference must have at least a Name
+		if credentialRef != nil && credentialRef.Name == "" {
 			return false
 		}
 	}
+
 	return true
 }
 
