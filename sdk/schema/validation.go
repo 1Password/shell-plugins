@@ -98,10 +98,10 @@ func ContainsLowercaseLettersOrDigits(str string) bool {
 func CredentialReferencesInCredentialList(plugin Plugin) bool {
 	for _, executable := range plugin.Executables {
 		for _, execCredential := range executable.Uses {
-			if credRef := execCredential.GetCredentialReference(); credRef != nil {
+			if execCredential.Name != "" {
 				found := false
 				for _, credential := range plugin.Credentials {
-					if credRef.Name == credential.Name {
+					if execCredential.Name == credential.Name {
 						found = true
 						break
 					}
@@ -127,39 +127,14 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 func NoDuplicateCredentialUsages(executable Executable) bool {
 	var usageIds []string
 	for _, credentialUsage := range executable.Uses {
-		usageIds = append(usageIds, credentialUsage.ID())
+		id, err := credentialUsage.ID()
+		if err != nil {
+			return false
+		}
+		usageIds = append(usageIds, id)
 	}
 
 	return IsStringSliceASet(usageIds)
-}
-
-func CredentialUsagesAreProperlyDefined(exec Executable) bool {
-	for _, usage := range exec.Uses {
-		credentialRef := usage.GetCredentialReference()
-		credentialSelection := usage.SelectFrom
-
-		// at least one credential selection approach must be specified
-		if credentialSelection != nil && credentialRef != nil {
-			return false
-		}
-
-		// multiple credential selection approaches cannot exist at the same time
-		if credentialSelection == nil && credentialRef == nil {
-			return false
-		}
-
-		// if defined, a credential selection must have an ID
-		if credentialSelection != nil && credentialSelection.ID == "" {
-			return false
-		}
-
-		// if defined, a credential reference must have at least a Name
-		if credentialRef != nil && credentialRef.Name == "" {
-			return false
-		}
-	}
-
-	return true
 }
 
 func IsStringSliceASet(slice []string) bool {

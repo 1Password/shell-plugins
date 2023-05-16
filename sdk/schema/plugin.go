@@ -107,6 +107,12 @@ func (p Plugin) DeepValidate() []ValidationReport {
 	for _, exe := range p.Executables {
 		_, exeReport := exe.Validate()
 		reports = append(reports, exeReport)
+
+		for _, usage := range exe.Uses {
+			_, usageReport := usage.Validate()
+			usageReport.Heading = fmt.Sprintf("Executable %s: %s", exe.Name, usageReport.Heading)
+			reports = append(reports, usageReport)
+		}
 	}
 
 	return reports
