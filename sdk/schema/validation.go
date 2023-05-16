@@ -100,7 +100,7 @@ func CredentialReferencesInCredentialList(plugin Plugin) bool {
 		for _, execCredential := range executable.Uses {
 			found := false
 			for _, credential := range plugin.Credentials {
-				if execCredential.Name == credential.Name {
+				if credRef := execCredential.GetCredentialReference(); credRef != nil && credRef.Name == credential.Name {
 					found = true
 					break
 				}
