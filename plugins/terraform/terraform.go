@@ -19,7 +19,7 @@ func TerraformCLI() schema.Executable {
 			{
 				Description: "Credentials to use within the Terraform project",
 				SelectFrom: &schema.CredentialSelection{
-					ID:                    "project",
+					ID:                    "Project Credentials",
 					IncludeAllCredentials: true,
 					AllowMultiple:         true,
 				},
