@@ -130,7 +130,7 @@ func (c CredentialUsage) Validate() (bool, ValidationReport) {
 
 	selection, err := c.GetCredentialSelection()
 	report.AddCheck(ValidationCheck{
-		Description: "If defined, a credential selection must have an ID",
+		Description: "If defined, a credential selection must have its ID and IncludeAllCredentials set",
 		Assertion:   err == nil,
 		Severity:    ValidationSeverityError,
 	})
@@ -162,10 +162,12 @@ func (c CredentialUsage) GetCredentialReference() (*CredentialReference, error) 
 
 func (c CredentialUsage) GetCredentialSelection() (*CredentialSelection, error) {
 	if c.SelectFrom != nil {
-		if c.SelectFrom.ID != "" {
-			return c.SelectFrom, nil
-		} else {
+		if c.SelectFrom.ID == "" {
 			return nil, fmt.Errorf("credential selection specified without an ID")
+		} else if !c.SelectFrom.IncludeAllCredentials {
+			return nil, fmt.Errorf("it is not currently possible to specify a credential selection without `IncludeAllCredentials` set to true")
+		} else {
+			return c.SelectFrom, nil
 		}
 	}
 
