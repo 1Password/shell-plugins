@@ -128,16 +128,17 @@ func (c CredentialUsage) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	selection, err := c.GetCredentialSelection()
 	report.AddCheck(ValidationCheck{
 		Description: "If defined, a credential selection must have an ID",
-		Assertion:   c.SelectFrom == nil || c.SelectFrom.ID != "",
+		Assertion:   err == nil,
 		Severity:    ValidationSeverityError,
 	})
 
 	id, err := c.ID()
 	report.AddCheck(ValidationCheck{
 		Description: "Credential usage has either a credential reference or selection properly defined, but not both",
-		Assertion:   err == nil && !(credRef != nil && c.SelectFrom != nil),
+		Assertion:   err == nil && !(credRef != nil && selection != nil),
 		Severity:    ValidationSeverityError,
 	})
 	report.Heading = fmt.Sprintf("Credential usage: %s", id)
@@ -159,8 +160,25 @@ func (c CredentialUsage) GetCredentialReference() (*CredentialReference, error) 
 	return nil, nil
 }
 
+func (c CredentialUsage) GetCredentialSelection() (*CredentialSelection, error) {
+	if c.SelectFrom != nil {
+		if c.SelectFrom.ID != "" {
+			return c.SelectFrom, nil
+		} else {
+			return nil, fmt.Errorf("credential selection specified without an ID")
+		}
+	}
+
+	return nil, nil
+}
+
 func (c CredentialUsage) ID() (string, error) {
 	reference, err := c.GetCredentialReference()
+	if err != nil {
+		return "", err
+	}
+
+	selection, err := c.GetCredentialSelection()
 	if err != nil {
 		return "", err
 	}
@@ -169,9 +187,9 @@ func (c CredentialUsage) ID() (string, error) {
 		return strings.Join([]string{reference.Plugin, reference.Name.String()}, "|"), nil
 	}
 
-	if c.SelectFrom != nil {
-		return c.SelectFrom.ID, nil
+	if selection != nil {
+		return selection.ID, nil
 	}
 
-	return "", fmt.Errorf("credential usage cannot be identified")
+	return "", fmt.Errorf("credential usage does not have a valid identifier")
 }
