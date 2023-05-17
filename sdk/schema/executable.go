@@ -54,7 +54,7 @@ type CredentialUsage struct {
 }
 
 type CredentialSelection struct {
-	// ID helps identify credentials chosen in this selection. This must be unique within the executable it is specified in.
+	// ID helps identify credentials chosen in this selection. This must be unique in relation to other selections specified in usages within its executable.
 	ID string
 	// IncludeAllCredentials specifies whether all credentials defined in all plugins should be included in the selection prompt when configuring this credential use.
 	IncludeAllCredentials bool
@@ -106,7 +106,7 @@ func (e Executable) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Credential Usages are uniquely identifiable inside an executable",
-		Assertion:   NoDuplicateCredentialUsages(e),
+		Assertion:   CredentialUsagesUniquelyIdentifiable(e),
 		Severity:    ValidationSeverityError,
 	})
 
