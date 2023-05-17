@@ -62,12 +62,6 @@ type CredentialSelection struct {
 	AllowMultiple bool
 }
 
-type CredentialReference struct {
-	Name        sdk.CredentialName
-	Plugin      string
-	Provisioner sdk.Provisioner
-}
-
 func (e Executable) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
 		Heading: fmt.Sprintf("Executable: %s", e.Name),
@@ -119,79 +113,42 @@ func (e Executable) Command() string {
 
 func (c CredentialUsage) Validate() (bool, ValidationReport) {
 	report := ValidationReport{
-		Checks: []ValidationCheck{},
+		Heading: fmt.Sprintf("Credential usage %s", c.ID()),
+		Checks:  []ValidationCheck{},
 	}
-	credRef, err := c.GetCredentialReference()
 	report.AddCheck(ValidationCheck{
-		Description: "If defined, a credential reference must have at least a Name",
-		Assertion:   err == nil,
+		Description: "If defined, a credential reference must have at least a `Name`",
+		Assertion:   c.Name != "" || (c.Plugin == "" && c.Provisioner == nil),
 		Severity:    ValidationSeverityError,
 	})
 
-	selection, err := c.GetCredentialSelection()
 	report.AddCheck(ValidationCheck{
-		Description: "If defined, a credential selection must have its ID and IncludeAllCredentials set",
-		Assertion:   err == nil,
+		Description: "If defined, a credential selection must have its `ID` and `IncludeAllCredentials` set",
+		Assertion:   c.SelectFrom == nil || (c.SelectFrom.ID != "" && c.SelectFrom.IncludeAllCredentials),
 		Severity:    ValidationSeverityError,
 	})
 
-	id, err := c.ID()
 	report.AddCheck(ValidationCheck{
 		Description: "Credential usage has either a credential reference or selection properly defined, but not both",
-		Assertion:   err == nil && !(credRef != nil && selection != nil),
+		Assertion:   c.ID() != "" && !(c.SelectFrom != nil && c.Name != ""),
 		Severity:    ValidationSeverityError,
 	})
-	report.Heading = fmt.Sprintf("Credential usage %s", id)
-
 	return report.IsValid(), report
 }
 
-func (c CredentialUsage) GetCredentialReference() (*CredentialReference, error) {
+// ID returns the identifier of this credential usage at the scope of its executable
+func (c CredentialUsage) ID() string {
 	if c.Name != "" {
-		return &CredentialReference{
-			Name:        c.Name,
-			Plugin:      c.Plugin,
-			Provisioner: c.Provisioner,
-		}, nil
-	} else if c.Plugin != "" || c.Provisioner != nil {
-		return nil, fmt.Errorf("plugin or provisioner specified without a credential name")
-	}
-
-	return nil, nil
-}
-
-func (c CredentialUsage) GetCredentialSelection() (*CredentialSelection, error) {
-	if c.SelectFrom != nil {
-		if c.SelectFrom.ID == "" {
-			return nil, fmt.Errorf("credential selection specified without an ID")
-		} else if !c.SelectFrom.IncludeAllCredentials {
-			return nil, fmt.Errorf("it is not currently possible to specify a credential selection without `IncludeAllCredentials` set to true")
+		if c.Plugin != "" {
+			return strings.Join([]string{c.Name.ID().String(), c.Plugin}, "|")
 		} else {
-			return c.SelectFrom, nil
+			return c.Name.ID().String()
 		}
 	}
 
-	return nil, nil
-}
-
-func (c CredentialUsage) ID() (string, error) {
-	reference, err := c.GetCredentialReference()
-	if err != nil {
-		return "", err
+	if c.SelectFrom != nil && c.SelectFrom.ID != "" {
+		return c.SelectFrom.ID
 	}
 
-	selection, err := c.GetCredentialSelection()
-	if err != nil {
-		return "", err
-	}
-
-	if reference != nil {
-		return strings.Join([]string{reference.Plugin, reference.Name.String()}, "|"), nil
-	}
-
-	if selection != nil {
-		return selection.ID, nil
-	}
-
-	return "", fmt.Errorf("credential usage does not have a valid identifier")
+	return ""
 }

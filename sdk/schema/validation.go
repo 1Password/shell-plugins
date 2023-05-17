@@ -127,11 +127,7 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 func CredentialUsagesUniquelyIdentifiable(executable Executable) bool {
 	var usageIds []string
 	for _, credentialUsage := range executable.Uses {
-		id, err := credentialUsage.ID()
-		if err != nil {
-			return false
-		}
-		usageIds = append(usageIds, id)
+		usageIds = append(usageIds, credentialUsage.ID())
 	}
 
 	return IsStringSliceASet(usageIds)
