@@ -141,7 +141,7 @@ func (c CredentialUsage) Validate() (bool, ValidationReport) {
 		Assertion:   err == nil && !(credRef != nil && selection != nil),
 		Severity:    ValidationSeverityError,
 	})
-	report.Heading = fmt.Sprintf("Credential usage: %s", id)
+	report.Heading = fmt.Sprintf("Credential usage %s", id)
 
 	return report.IsValid(), report
 }
