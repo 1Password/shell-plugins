@@ -30,12 +30,12 @@ type CredentialUsage struct {
 	Name sdk.CredentialName
 
 	// (Optional) The plugin name that contains the credential. Defaults to the current package. This can be used to
-	// include credentials from other plugins.
+	// include credentials from other plugins. Mutually exclusive with `SelectFrom`.
 	Plugin string
 
 	// (Optional) The provisioner to use to provision this credential to the executable. Overrides the DefaultProvisioner
 	// set in the credential schema, so should only be used if this executable requires a custom configuration, that deviates
-	// from the way the credential is usually provisioned.
+	// from the way the credential is usually provisioned. Mutually exclusive with `SelectFrom`.
 	Provisioner sdk.Provisioner
 
 	// (Optional) What this credential will be used for by the executable.
