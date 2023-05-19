@@ -56,7 +56,7 @@ type CredentialUsage struct {
 type CredentialSelection struct {
 	// ID helps identify credentials chosen in this selection. This must be unique in relation to other selections specified in usages within its executable.
 	ID string
-	// IncludeAllCredentials specifies whether all credentials defined in all plugins should be included in the selection prompt when configuring this credential use.
+	// IncludeAllCredentials specifies whether this selection should contain all credentials defined in all plugins.
 	IncludeAllCredentials bool
 	// AllowMultiple specifies whether multiple credentials can be selected to be part of this credential use.
 	AllowMultiple bool
@@ -99,8 +99,8 @@ func (e Executable) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Credential Usages are uniquely identifiable inside an executable",
-		Assertion:   CredentialUsagesUniquelyIdentifiable(e),
+		Description: "Credential usage definitions are uniquely identifiable inside an executable",
+		Assertion:   AreCredentialUsagesUniquelyIdentifiable(e),
 		Severity:    ValidationSeverityError,
 	})
 
@@ -129,8 +129,8 @@ func (c CredentialUsage) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Credential usage has either a credential reference or selection properly defined, but not both",
-		Assertion:   c.ID() != "" && !(c.SelectFrom != nil && c.Name != ""),
+		Description: "Credential usage has either a credential reference or selection defined, but not both",
+		Assertion:   (c.SelectFrom != nil || c.Name != "") && !(c.SelectFrom != nil && c.Name != ""),
 		Severity:    ValidationSeverityError,
 	})
 	return report.IsValid(), report
