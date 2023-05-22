@@ -17,7 +17,7 @@ func TerraformCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Description: "Credentials to use within terraform projects",
+				Description: "Credentials to use within the Terraform project",
 				SelectFrom: &schema.CredentialSelection{
 					ID:                    "project",
 					IncludeAllCredentials: true,
