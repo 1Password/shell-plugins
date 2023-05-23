@@ -98,15 +98,17 @@ func ContainsLowercaseLettersOrDigits(str string) bool {
 func CredentialReferencesInCredentialList(plugin Plugin) bool {
 	for _, executable := range plugin.Executables {
 		for _, execCredential := range executable.Uses {
-			found := false
-			for _, credential := range plugin.Credentials {
-				if execCredential.Name == credential.Name {
-					found = true
-					break
+			if execCredential.Name != "" {
+				found := false
+				for _, credential := range plugin.Credentials {
+					if execCredential.Name == credential.Name {
+						found = true
+						break
+					}
 				}
-			}
-			if !found {
-				return false
+				if !found {
+					return false
+				}
 			}
 		}
 	}
@@ -120,6 +122,15 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 	}
 
 	return IsStringSliceASet(ids)
+}
+
+func AreCredentialUsagesUniquelyIdentifiable(executable Executable) bool {
+	var usageIds []string
+	for _, credentialUsage := range executable.Uses {
+		usageIds = append(usageIds, credentialUsage.ID())
+	}
+
+	return IsStringSliceASet(usageIds)
 }
 
 func IsStringSliceASet(slice []string) bool {
