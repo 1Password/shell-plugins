@@ -136,3 +136,14 @@ func IsStringSliceASet(slice []string) bool {
 
 	return true
 }
+
+func UnnecessaryPluginNameDefined(plugin Plugin) bool {
+	for _, executable := range plugin.Executables {
+		for _, execCredential := range executable.Uses {
+			if execCredential.Plugin == plugin.Name {
+				return true
+			}
+		}
+	}
+	return false
+}
