@@ -2,6 +2,7 @@ package ngrok
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
@@ -28,37 +28,24 @@ type fileProvisioner struct {
 }
 
 func ngrokProvisioner() sdk.Provisioner {
-	cmd := exec.Command("ngrok", "--version")
-	ngrokVersion, err := cmd.Output()
+	currentVersion, requiredVersion, err := getNgrokVersion()
 	if err != nil {
+		// When ngrok version check fails for any reason,
+		// use config file to provision as a fallback
 		return fileProvisioner{}
 	}
 
-	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
-	currentVersion := strings.TrimPrefix(string(ngrokVersion), "ngrok version ")
-
-	// Example: "3.1.1\n" to "3.1.1"
-	currentVersion = strings.Trim(currentVersion, "\n")
-
-	// Example: "3.1.1" to "v3.1.1" as that's the format
-	// the package semver expects
-	currentVersion = "v" + currentVersion
-
-	// NGROK_API_KEY is supported only from ngrok 3.2.1
-	// NGROK_AUTH_TOKEN was already supported
-	requiredVersion := "v3.2.1"
-
 	// If the current ngrok CLI version is 3.2.1 or higher,
-	// use environment variables to provision the Shell Plugin credentials
+	// use environment variables to provision credentials
 	//
 	// semver.Compare resulting in 0 means 3.2.1 is in use
 	// semver.Compare resulting in +1 means >3.2.1 is in use
 	if semver.Compare(currentVersion, requiredVersion) == 0 || semver.Compare(currentVersion, requiredVersion) == +1 {
-		return provision.EnvVars(defaultEnvVarMapping)
+		newNgrokEnvVarProvisioner := ngrokEnvVarProvisioner{}
+		newNgrokEnvVarProvisioner.Provision(context.Background(), sdk.ProvisionInput{}, &sdk.ProvisionOutput{})
 	}
 
-	// If the current ngrok CLI version less than 3.2.1,
-	// use configuration files to provision the credentials
+	// Otherwise use config file to provision credentials
 	return fileProvisioner{}
 }
 
@@ -127,6 +114,31 @@ func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []stri
 		}
 	}
 	return "", append(args, fmt.Sprintf("--config=%s", newFilePath))
+}
+
+// Get installed ngrok version and required version
+func getNgrokVersion() (string, string, error) {
+	cmd := exec.Command("ngrok", "--version")
+	ngrokVersion, err := cmd.Output()
+	if err != nil {
+		return "", "", errors.New("ngrok not found")
+	}
+
+	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
+	currentVersion := strings.TrimPrefix(string(ngrokVersion), "ngrok version ")
+
+	// Example: "3.1.1\n" to "3.1.1"
+	currentVersion = strings.Trim(currentVersion, "\n")
+
+	// Example: "3.1.1" to "v3.1.1" as that's the format
+	// the package semver expects
+	currentVersion = "v" + currentVersion
+
+	// NGROK_API_KEY is supported only from ngrok 3.2.1
+	// NGROK_AUTH_TOKEN was already supported, but NGROK_API_KEY is a new addition
+	requiredVersion := "v3.2.1"
+
+	return currentVersion, requiredVersion, nil
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
