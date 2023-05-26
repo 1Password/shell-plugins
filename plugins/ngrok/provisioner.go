@@ -41,9 +41,8 @@ func ngrokProvisioner() sdk.Provisioner {
 	//
 	// semver.Compare resulting in 0 means 3.2.1 is in use
 	// semver.Compare resulting in +1 means >3.2.1 is in use
-	if semver.Compare(currentVersion, envVarAuthVersion) == 0 || semver.Compare(currentVersion, envVarAuthVersion) == +1 {
-		newNgrokEnvVarProvisioner := ngrokEnvVarProvisioner{}
-		newNgrokEnvVarProvisioner.Provision(context.Background(), sdk.ProvisionInput{}, &sdk.ProvisionOutput{})
+	if semver.Compare(currentVersion, envVarAuthVersion) >= 0 {
+		return ngrokEnvVarProvisioner{}
 	}
 
 	// Otherwise use config file to provision credentials
