@@ -22,13 +22,14 @@ const (
 	apiKeyYamlName    = "api_key"
 	authTokenYamlName = "authtoken"
 	versionYamlName   = "version"
+	envVarAuthVersion = "v3.2.1"
 )
 
 type fileProvisioner struct {
 }
 
 func ngrokProvisioner() sdk.Provisioner {
-	currentVersion, requiredVersion, err := getNgrokVersion()
+	currentVersion, err := getNgrokVersion()
 	if err != nil {
 		// When ngrok version check fails for any reason,
 		// use config file to provision as a fallback
@@ -40,7 +41,7 @@ func ngrokProvisioner() sdk.Provisioner {
 	//
 	// semver.Compare resulting in 0 means 3.2.1 is in use
 	// semver.Compare resulting in +1 means >3.2.1 is in use
-	if semver.Compare(currentVersion, requiredVersion) == 0 || semver.Compare(currentVersion, requiredVersion) == +1 {
+	if semver.Compare(currentVersion, envVarAuthVersion) == 0 || semver.Compare(currentVersion, envVarAuthVersion) == +1 {
 		newNgrokEnvVarProvisioner := ngrokEnvVarProvisioner{}
 		newNgrokEnvVarProvisioner.Provision(context.Background(), sdk.ProvisionInput{}, &sdk.ProvisionOutput{})
 	}
@@ -117,11 +118,11 @@ func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []stri
 }
 
 // Get installed ngrok version and required version
-func getNgrokVersion() (string, string, error) {
+func getNgrokVersion() (string, error) {
 	cmd := exec.Command("ngrok", "--version")
 	ngrokVersion, err := cmd.Output()
 	if err != nil {
-		return "", "", errors.New("ngrok not found")
+		return "", errors.New("ngrok not found")
 	}
 
 	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
@@ -134,11 +135,7 @@ func getNgrokVersion() (string, string, error) {
 	// the package semver expects
 	currentVersion = "v" + currentVersion
 
-	// NGROK_API_KEY is supported only from ngrok 3.2.1
-	// NGROK_AUTH_TOKEN was already supported, but NGROK_API_KEY is a new addition
-	requiredVersion := "v3.2.1"
-
-	return currentVersion, requiredVersion, nil
+	return currentVersion, nil
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {

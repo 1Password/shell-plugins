@@ -13,7 +13,7 @@ type ngrokEnvVarProvisioner struct {
 }
 
 func (p ngrokEnvVarProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	currentVersion, requiredVersion, err := getNgrokVersion()
+	currentVersion, err := getNgrokVersion()
 	if err != nil {
 		out.AddError(err)
 		return
@@ -24,8 +24,8 @@ func (p ngrokEnvVarProvisioner) Provision(ctx context.Context, in sdk.ProvisionI
 	//
 	// semver.Compare resulting in 0 means 3.2.1 is in use
 	// semver.Compare resulting in +1 means >3.2.1 is in use
-	if semver.Compare(currentVersion, requiredVersion) == -1 {
-		out.AddError(fmt.Errorf("ngrok version %s is not supported. Please upgrade to version %s or higher", currentVersion, requiredVersion))
+	if semver.Compare(currentVersion, envVarAuthVersion) == -1 {
+		out.AddError(fmt.Errorf("ngrok version %s is not supported. Please upgrade to version %s or higher", currentVersion, envVarAuthVersion))
 		return
 	}
 
