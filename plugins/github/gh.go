@@ -15,6 +15,7 @@ func GitHubCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("__complete"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
