@@ -1,0 +1,13 @@
+[general]
+base_url = "https://stackstorm.example.com"
+[cli]
+cache_token = False
+[api]
+url = "https://stackstorm.example.com/api/v1"
+[auth]
+url = "https://stackstorm.example.com/auth/v1"
+[stream]
+url = "https://stackstorm.example.com/stream/v1"
+[credentials]
+username = janedoe
+password = hunter2

@@ -136,3 +136,9 @@ func NotWithoutArgs() sdk.NeedsAuthentication {
 func NotForHelpOrVersion() sdk.NeedsAuthentication {
 	return IfAll(NotForHelp(), NotForVersion())
 }
+
+func NotForSt2ConfigFile() sdk.NeedsAuthentication {
+	return IfAll(
+		NotForExactArgs("--config-file"),
+	)
+}
