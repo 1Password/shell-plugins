@@ -11,7 +11,7 @@ func RedisCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "Redis CLI",
 		Runs:    []string{"redis-cli"},
-		DocsURL: sdk.URL("https://redis.io/docs/manual/cli"),
+		DocsURL: sdk.URL("https://redis.io/docs/ui/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotWithoutArgs(),
 			needsauth.NotWhenContainsArgs("-u"),
