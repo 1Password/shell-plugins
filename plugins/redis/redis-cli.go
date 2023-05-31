@@ -16,8 +16,7 @@ func RedisCLI() schema.Executable {
 			needsauth.NotWithoutArgs(),
 			needsauth.NotWhenContainsArgs("-u"),
 			needsauth.NotWhenContainsArgs("-a"),
-			needsauth.NotWhenContainsArgs("-v"),
-			needsauth.NotWhenContainsArgs("--version"),
+			needsauth.NotForVersion(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
