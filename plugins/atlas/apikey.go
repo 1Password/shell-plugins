@@ -12,13 +12,13 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/"),
+		DocsURL:       sdk.URL("https://www.mongodb.com/docs/atlas/configure-api-access/"),
 		ManagementURL: nil,
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.PublicKey,
 				MarkdownDescription: "Public key used to authenticate to MongoDB Atlas.",
-				Secret:              true,
+				Secret:              false,
 				Composition: &schema.ValueComposition{
 					Length: 8,
 					Charset: schema.Charset{
