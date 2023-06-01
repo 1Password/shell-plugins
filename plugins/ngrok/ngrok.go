@@ -23,7 +23,8 @@ func ngrokCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name:        credname.Credentials,
+				Provisioner: ngrokProvisioner(),
 			},
 		},
 	}

@@ -2,8 +2,10 @@ package ngrok
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -11,6 +13,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v3"
 )
 
@@ -19,12 +22,30 @@ const (
 	apiKeyYamlName    = "api_key"
 	authTokenYamlName = "authtoken"
 	versionYamlName   = "version"
+	envVarAuthVersion = "v3.2.1"
 )
 
 type fileProvisioner struct {
 }
 
-func newNgrokProvisioner() sdk.Provisioner {
+func ngrokProvisioner() sdk.Provisioner {
+	currentVersion, err := getNgrokVersion()
+	if err != nil {
+		// When ngrok version check fails for any reason,
+		// use config file to provision as a fallback
+		return fileProvisioner{}
+	}
+
+	// If the current ngrok CLI version is 3.2.1 or higher,
+	// use environment variables to provision credentials
+	//
+	// semver.Compare resulting in 0 means 3.2.1 is in use
+	// semver.Compare resulting in +1 means >3.2.1 is in use
+	if semver.Compare(currentVersion, envVarAuthVersion) >= 0 {
+		return ngrokEnvVarProvisioner{}
+	}
+
+	// Otherwise use config file to provision credentials
 	return fileProvisioner{}
 }
 
@@ -93,6 +114,27 @@ func getConfigValueAndNewArgs(args []string, newFilePath string) (string, []stri
 		}
 	}
 	return "", append(args, fmt.Sprintf("--config=%s", newFilePath))
+}
+
+// Get installed ngrok version and required version
+func getNgrokVersion() (string, error) {
+	cmd := exec.Command("ngrok", "--version")
+	ngrokVersion, err := cmd.Output()
+	if err != nil {
+		return "", errors.New("ngrok not found")
+	}
+
+	// Example: "ngrok version 3.1.1\n" to "3.1.1\n"
+	currentVersion := strings.TrimPrefix(string(ngrokVersion), "ngrok version ")
+
+	// Example: "3.1.1\n" to "3.1.1"
+	currentVersion = strings.Trim(currentVersion, "\n")
+
+	// Example: "3.1.1" to "v3.1.1" as that's the format
+	// the package semver expects
+	currentVersion = "v" + currentVersion
+
+	return currentVersion, nil
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {

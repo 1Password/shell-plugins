@@ -45,7 +45,7 @@ func Credentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: newNgrokProvisioner(),
+		DefaultProvisioner: ngrokEnvVarProvisioner{},
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.MacOnly(
