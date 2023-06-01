@@ -35,5 +35,5 @@ func (p EnvVarFlagsProvisioner) Deprovision(ctx context.Context, in sdk.Deprovis
 }
 
 func (p EnvVarFlagsProvisioner) Description() string {
-	return "Provision environment variables with master credentials or temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
+	return "Provision credentials using a combination of environment variables and command-line flags."
 }
