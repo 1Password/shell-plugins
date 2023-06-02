@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://redis.io/"),
 		},
 		Credentials: []schema.CredentialType{
-			Password(),
+			UserCredentials(),
 		},
 		Executables: []schema.Executable{
 			RedisCLI(),
