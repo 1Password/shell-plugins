@@ -13,8 +13,8 @@ func TestCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, ngrokProvisioner(), map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
-				fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+				fieldname.Authtoken: "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",
+				fieldname.APIKey:    "NQdxymVXmWC15916Mmy1vYkpzzNG6a84Bo4mYKuDahEXAMPLE",
 			},
 			CommandLine: []string{"ngrok"},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -33,14 +33,14 @@ func TestCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"NGROK_AUTHTOKEN": "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
-				"NGROK_API_KEY":   "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+				"NGROK_AUTHTOKEN": "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",
+				"NGROK_API_KEY":   "NQdxymVXmWC15916Mmy1vYkpzzNG6a84Bo4mYKuDahEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
-						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+						fieldname.Authtoken: "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",
+						fieldname.APIKey:    "NQdxymVXmWC15916Mmy1vYkpzzNG6a84Bo4mYKuDahEXAMPLE",
 					},
 				},
 			},
@@ -53,8 +53,8 @@ func TestCredentialsImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
-						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+						fieldname.Authtoken: "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",
+						fieldname.APIKey:    "NQdxymVXmWC15916Mmy1vYkpzzNG6a84Bo4mYKuDahEXAMPLE",
 					},
 				},
 			},
@@ -67,8 +67,8 @@ func TestCredentialsImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Authtoken: "uSuQ7LUOJLs4xRbIySZ15F4v5KxfTnMknMdFEXAMPLE",
-						fieldname.APIKey:    "L4STpMP3K8FNaQjBo5EAsXA2SThzq0J7BKD3jUZgtEXAMPLE",
+						fieldname.Authtoken: "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",
+						fieldname.APIKey:    "NQdxymVXmWC15916Mmy1vYkpzzNG6a84Bo4mYKuDahEXAMPLE",
 					},
 				},
 			},
