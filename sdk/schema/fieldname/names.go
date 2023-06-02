@@ -78,6 +78,7 @@ func ListAll() []sdk.FieldName {
 		Credentials,
 		Database,
 		DefaultRegion,
+		Email,
 		Endpoint,
 		Host,
 		HostAddress,
