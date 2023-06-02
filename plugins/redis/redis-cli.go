@@ -15,12 +15,13 @@ func RedisCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotWithoutArgs(),
 			needsauth.NotWhenContainsArgs("-u"),
+			needsauth.NotWhenContainsArgs("--user"),
 			needsauth.NotWhenContainsArgs("-a"),
 			needsauth.NotForVersion(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Password,
+				Name: credname.UserCredentials,
 			},
 		},
 	}

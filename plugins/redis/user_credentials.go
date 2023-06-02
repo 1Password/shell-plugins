@@ -8,11 +8,23 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func Password() schema.CredentialType {
+func UserCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.Password,
+		Name:    credname.UserCredentials,
 		DocsURL: sdk.URL("https://redis.io/docs/ui/cli/#host-port-password-and-database"),
 		Fields: []schema.CredentialField{
+			{
+				Name:                fieldname.Username,
+				MarkdownDescription: "Username used to authenticate to Redis server.",
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Uppercase: true,
+						Lowercase: true,
+						Digits:    true,
+					},
+				},
+			},
 			{
 				Name:                fieldname.Password,
 				MarkdownDescription: "Password used to authenticate to Redis server.",
@@ -20,8 +32,10 @@ func Password() schema.CredentialType {
 				Composition: &schema.ValueComposition{
 					Length: 32,
 					Charset: schema.Charset{
+						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
+						Symbols:   true,
 					},
 				},
 			},
@@ -59,6 +73,7 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 }
 
 var flagsToProvision = map[string]sdk.FieldName{
-	"-h": fieldname.Host,
-	"-p": fieldname.Port,
+	"--user": fieldname.Username,
+	"-h":     fieldname.Host,
+	"-p":     fieldname.Port,
 }
