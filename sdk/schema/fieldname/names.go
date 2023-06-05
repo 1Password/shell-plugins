@@ -8,6 +8,7 @@ const (
 	APIKey          = sdk.FieldName("API Key")
 	APIKeyID        = sdk.FieldName("API Key ID")
 	APISecret       = sdk.FieldName("API Secret")
+	AccessKey       = sdk.FieldName("Access Key")
 	AccessKeyID     = sdk.FieldName("Access Key ID")
 	AccessToken     = sdk.FieldName("Access Token")
 	Account         = sdk.FieldName("Account")
@@ -47,6 +48,7 @@ const (
 	Project         = sdk.FieldName("Project")
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
+	SecretKey       = sdk.FieldName("Secret Key")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
 	Subdomain       = sdk.FieldName("Subdomain")
 	Token           = sdk.FieldName("Token")
@@ -62,6 +64,7 @@ func ListAll() []sdk.FieldName {
 		APIKey,
 		APIKeyID,
 		APISecret,
+		AccessKey,
 		AccessKeyID,
 		AccessToken,
 		Account,
@@ -100,6 +103,7 @@ func ListAll() []sdk.FieldName {
 		Project,
 		Region,
 		Secret,
+		SecretKey,
 		SecretAccessKey,
 		Token,
 		URL,
