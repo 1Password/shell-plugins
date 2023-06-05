@@ -4,7 +4,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
-	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func RedisCLI() schema.Executable {
@@ -20,7 +19,12 @@ func RedisCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.UserCredentials,
+				SelectFrom: &schema.CredentialSelection{
+					IncludeAllCredentials: false,
+					AllowMultiple:         false,
+				},
+				Optional:    false,
+				Provisioner: EnvVarFlags(flagsToProvision),
 			},
 		},
 	}

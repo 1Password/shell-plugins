@@ -3,6 +3,7 @@ package redis
 import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
+	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -14,10 +15,12 @@ func UserCredentials() schema.CredentialType {
 		DocsURL: sdk.URL("https://redis.io/docs/ui/cli/#host-port-password-and-database"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Username,
-				MarkdownDescription: "Username used to authenticate to Redis server.",
-				Secret:              false,
+				Name:                fieldname.Password,
+				MarkdownDescription: "Password used to authenticate to Redis server.",
+				Secret:              true,
+				Optional:            false,
 				Composition: &schema.ValueComposition{
+					Length: 32,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -26,16 +29,15 @@ func UserCredentials() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Password,
-				MarkdownDescription: "Password used to authenticate to Redis server.",
-				Secret:              true,
+				Name:                fieldname.Username,
+				MarkdownDescription: "Username used to authenticate to Redis server. Defaults to 'default'.",
+				Secret:              false,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
-					Length: 32,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
-						Symbols:   true,
 					},
 				},
 			},
@@ -62,7 +64,7 @@ func UserCredentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: EnvVarFlags(flagsToProvision),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 		)}
