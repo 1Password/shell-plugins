@@ -20,7 +20,9 @@ func RedisCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
+				Description: "Credentials to use to connect to a redis server, or to the Redis Enterprise Cloud platform.",
 				SelectFrom: &schema.CredentialSelection{
+					ID:                    "redis",
 					IncludeAllCredentials: false,
 					AllowMultiple:         false,
 				},
