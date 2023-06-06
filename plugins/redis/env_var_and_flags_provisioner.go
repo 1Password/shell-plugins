@@ -25,7 +25,7 @@ func (p EnvVarFlagsProvisioner) Provision(ctx context.Context, in sdk.ProvisionI
 	}
 	for flagName, fieldName := range p.Schema {
 		if value, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgsImmediatelyAfterExecutableName(flagName, value)
+			out.AddArgsFirst(flagName, value)
 		}
 	}
 }
