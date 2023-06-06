@@ -9,7 +9,7 @@ import (
 
 func nimCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "nimble",
+		Name:    "Nimble CLI",
 		Runs:    []string{"nimble"},
 		DocsURL: sdk.URL("https://github.com/nim-lang/nimble"),
 		NeedsAuth: needsauth.IfAll(

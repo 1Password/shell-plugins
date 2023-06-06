@@ -32,20 +32,20 @@ func PersonalAccessToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(nimbleDefaultEnvVarMapping),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryNimbleConfigFile("~/.nimble/github_api_token"),
+			importer.TryEnvVarPair(nimbleDefaultEnvVarMapping),
+			TryNimbleConfigFile(),
 		),
 	}
 }
 
-var defaultEnvVarMapping = map[string]sdk.FieldName{
+var nimbleDefaultEnvVarMapping = map[string]sdk.FieldName{
 	"NIMBLE_GITHUB_API_TOKEN": fieldname.Token,
 }
 
-func TryNimbleConfigFile(path string) sdk.Importer {
-	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryNimbleConfigFile() sdk.Importer {
+	return importer.TryFile("~/.nimble/github_api_token", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		credential := contents.ToString()
 		fields := make(map[sdk.FieldName]string)
 
