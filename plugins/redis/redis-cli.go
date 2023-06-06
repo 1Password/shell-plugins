@@ -4,6 +4,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
+	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
 func RedisCLI() schema.Executable {
@@ -20,13 +21,7 @@ func RedisCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Description: "Credentials to use to connect to a redis server, or to the Redis Enterprise Cloud platform.",
-				SelectFrom: &schema.CredentialSelection{
-					ID:                    "redis",
-					IncludeAllCredentials: false,
-					AllowMultiple:         false,
-				},
-				Optional:    false,
+				Name:        credname.UserCredentials,
 				Provisioner: EnvVarFlags(flagsToProvision),
 			},
 		},
