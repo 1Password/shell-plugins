@@ -45,6 +45,7 @@ func UserCredentials() schema.CredentialType {
 				Name:                fieldname.Host,
 				MarkdownDescription: "Host address for the Redis server.",
 				Secret:              false,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,
@@ -57,6 +58,7 @@ func UserCredentials() schema.CredentialType {
 				Name:                fieldname.Port,
 				MarkdownDescription: "Port for the Redis server.",
 				Secret:              false,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Digits: true,
