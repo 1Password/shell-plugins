@@ -6,12 +6,14 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
+// ChainedProvisioner chains multiple provisioners together for use at the same time.
 type ChainedProvisioner struct {
 	sdk.Provisioner
 
 	Provisioners []sdk.Provisioner
 }
 
+// ChainProvisioners creates a ChainedProvisioner that chains multiple provisioners together for use at the same time.
 func ChainProvisioners(provisioners ...sdk.Provisioner) sdk.Provisioner {
 	return ChainedProvisioner{
 		Provisioners: provisioners,
