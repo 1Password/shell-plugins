@@ -25,7 +25,7 @@ func (p ChainedProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput
 }
 
 func (p ChainedProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// Nothing to do here: environment variables and flags get wiped automatically when the process exits.
+	// Nothing to do here: environment variables and args get wiped automatically when the process exits.
 }
 
 func (p ChainedProvisioner) Description() string {
