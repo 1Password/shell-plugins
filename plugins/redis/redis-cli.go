@@ -25,7 +25,7 @@ func RedisCLI() schema.Executable {
 				Name: credname.UserCredentials,
 				Provisioner: provision.ChainProvisioners(
 					provision.EnvVars(defaultEnvVarMapping),
-					provision.Args(flagsToProvision),
+					provision.Args(flagsToProvision, "first"),
 				),
 			},
 		},
