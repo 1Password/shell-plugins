@@ -8,8 +8,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestSecretKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, SecretKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestRedisCloudAPIKeyProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, RedisCloudAPIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
@@ -25,8 +25,8 @@ func TestSecretKeyProvisioner(t *testing.T) {
 	})
 }
 
-func TestSecretKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, SecretKey().Importer, map[string]plugintest.ImportCase{
+func TestRedisCloudAPIKeyImporter(t *testing.T) {
+	plugintest.TestImporter(t, RedisCloudAPIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"REDISCLOUD_ACCESS_KEY": "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",

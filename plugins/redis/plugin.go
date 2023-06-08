@@ -14,7 +14,7 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			UserCredentials(),
-			SecretKey(),
+			RedisCloudAPIKey(),
 		},
 		Executables: []schema.Executable{
 			RedisCLI(),
