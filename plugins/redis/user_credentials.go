@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	index uint = 1
+	provisionImmediatelyAfterExecutable bool = true
 )
 
 func UserCredentials() schema.CredentialType {
@@ -86,8 +86,8 @@ var argsToProvision = map[string]sdk.FieldName{
 	"-p":     fieldname.Port,
 }
 
-var indexToProvisionAt = map[string]uint{
-	"--user": index,
-	"-h":     index,
-	"-p":     index,
+var indexToProvisionAt = map[string]bool{
+	"--user": provisionImmediatelyAfterExecutable,
+	"-h":     provisionImmediatelyAfterExecutable,
+	"-p":     provisionImmediatelyAfterExecutable,
 }

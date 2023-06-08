@@ -159,7 +159,7 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 			argsResolved[i] = result.String()
 		}
 
-		out.AddArgs(uint(len(argsResolved)), argsResolved...)
+		out.AddArgs(false, argsResolved...)
 	}
 }
 
