@@ -34,7 +34,7 @@ func UserCredentials() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.Username,
-				MarkdownDescription: "Username used to authenticate to Redis server. Defaults to 'default'.",
+				MarkdownDescription: "Username used to authenticate to Redis server.",
 				Secret:              false,
 				Optional:            true,
 				Composition: &schema.ValueComposition{
