@@ -38,6 +38,11 @@ type CredentialUsage struct {
 	// from the way the credential is usually provisioned. Mutually exclusive with `SelectFrom`.
 	Provisioner sdk.Provisioner
 
+	// (Optional) The importer to use to import the credential. Overrides the DefaultImporter set in the credential schema,
+	// so should only be used if the importer deviates from the general the default importer works.
+	// Mutually exclusive with `SelectFrom`.
+	Importer sdk.Importer
+
 	// (Optional) What this credential will be used for by the executable.
 	Description string
 

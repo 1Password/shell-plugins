@@ -7,6 +7,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
+const (
+	index uint = 1
+)
+
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.DatabaseCredentials,
@@ -66,4 +70,18 @@ func DatabaseCredentials() schema.CredentialType {
 		DefaultProvisioner: nil,
 		Importer:           nil,
 	}
+}
+
+var argsToProvision = map[string]sdk.FieldName{
+	"--host":     fieldname.Host,
+	"--port":     fieldname.Port,
+	"--username": fieldname.Username,
+	"--password": fieldname.Password,
+}
+
+var indexToProvisionAt = map[string]uint{
+	"--host":     index,
+	"--port":     index,
+	"--username": index,
+	"--password": index,
 }

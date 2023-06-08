@@ -14,9 +14,11 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
+			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
 			MongoDBAtlasCLI(),
+			MongoshCLI(),
 		},
 	}
 }
