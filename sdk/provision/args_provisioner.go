@@ -11,16 +11,16 @@ import (
 type ArgsProvisioner struct {
 	sdk.Provisioner
 
-	Schema       map[string]sdk.FieldName
 	ArgsPosition map[string]uint
+	Schema       map[string]sdk.FieldName
 }
 
 // Args creates an ArgsProvisioner that provisions secrets as command line arguments, based
 // on the specified schema of field name and argument name, and the position of the argument.
-func Args(schema map[string]sdk.FieldName, argsPosition map[string]uint) sdk.Provisioner {
+func ArgsAtIndex(argsPosition map[string]uint, schema map[string]sdk.FieldName) sdk.Provisioner {
 	return ArgsProvisioner{
-		Schema:       schema,
 		ArgsPosition: argsPosition,
+		Schema:       schema,
 	}
 }
 
