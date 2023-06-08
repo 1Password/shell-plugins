@@ -12,12 +12,12 @@ type ArgsProvisioner struct {
 	sdk.Provisioner
 
 	Schema       map[string]sdk.FieldName
-	ArgsPosition string
+	ArgsPosition map[string]uint
 }
 
 // Args creates an ArgsProvisioner that provisions secrets as command line arguments, based
 // on the specified schema of field name and argument name.
-func Args(schema map[string]sdk.FieldName, argsPosition string) sdk.Provisioner {
+func Args(schema map[string]sdk.FieldName, argsPosition map[string]uint) sdk.Provisioner {
 	return ArgsProvisioner{
 		Schema:       schema,
 		ArgsPosition: argsPosition,
@@ -25,18 +25,9 @@ func Args(schema map[string]sdk.FieldName, argsPosition string) sdk.Provisioner 
 }
 
 func (p ArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	if p.ArgsPosition == "first" {
-		for argName, fieldName := range p.Schema {
-			if value, ok := in.ItemFields[fieldName]; ok {
-				out.AddArgsFirst(argName, value)
-			}
-		}
-		return
-	}
-
 	for argName, fieldName := range p.Schema {
 		if value, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgsLast(argName, value)
+			out.AddArgs(uint(p.ArgsPosition[argName]), argName, value)
 		}
 	}
 }
