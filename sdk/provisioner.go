@@ -103,7 +103,7 @@ func (out *ProvisionOutput) AddEnvVar(name string, value string) {
 }
 
 // AddArgs can be used to add additional arguments to the command line of the provision output, at a specific index.
-func (out *ProvisionOutput) AddArgs(index uint, args ...string) {
+func (out *ProvisionOutput) AddArgsAtIndex(index uint, args ...string) {
 	newCommandLine := []string{}
 	newCommandLine = append(newCommandLine, out.CommandLine[:index]...)
 	newCommandLine = append(newCommandLine, args...)
