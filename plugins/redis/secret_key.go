@@ -21,7 +21,6 @@ func RedisCloudAPIKey() schema.CredentialType {
 				Secret:              true,
 				Optional:            false,
 				Composition: &schema.ValueComposition{
-					Length: 51,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -35,7 +34,6 @@ func RedisCloudAPIKey() schema.CredentialType {
 				Secret:              true,
 				Optional:            false,
 				Composition: &schema.ValueComposition{
-					Length: 50,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
