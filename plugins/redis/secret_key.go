@@ -11,8 +11,9 @@ import (
 
 func RedisCloudAPIKey() schema.CredentialType {
 	return schema.CredentialType{
-		Name:    credname.APIKey,
-		DocsURL: sdk.URL("https://docs.redis.com/latest/rc/api/get-started/manage-api-keys/"),
+		Name:          credname.APIKey,
+		DocsURL:       sdk.URL("https://docs.redis.com/latest/rc/api/get-started/manage-api-keys/"),
+		ManagementURL: sdk.URL("https://app.redislabs.com/#/access-management/api-keys"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.AccessKey,
