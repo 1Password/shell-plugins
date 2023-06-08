@@ -9,6 +9,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
+const (
+	index uint = 1
+)
+
 func UserCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.UserCredentials,
@@ -76,8 +80,14 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"REDISCLI_AUTH": fieldname.Password,
 }
 
-var flagsToProvision = map[string]sdk.FieldName{
+var argsToProvision = map[string]sdk.FieldName{
 	"--user": fieldname.Username,
 	"-h":     fieldname.Host,
 	"-p":     fieldname.Port,
+}
+
+var indexToProvisionAt = map[string]uint{
+	"--user": index,
+	"-h":     index,
+	"-p":     index,
 }

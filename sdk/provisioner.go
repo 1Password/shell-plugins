@@ -102,17 +102,12 @@ func (out *ProvisionOutput) AddEnvVar(name string, value string) {
 	out.Environment[name] = value
 }
 
-// AddArgs can be used to add additional arguments to the command line of the provision output.
-func (out *ProvisionOutput) AddArgsLast(args ...string) {
-	out.CommandLine = append(out.CommandLine, args...)
-}
-
-// AddArgsImmediatelyAfterExecutableName can be used to add additional arguments to the command line of the provision output, but immediately after the executable name. The rest of the command line appear after the additional arguments.
-func (out *ProvisionOutput) AddArgsFirst(args ...string) {
+// AddArgs can be used to add additional arguments to the command line of the provision output, at a specific index.
+func (out *ProvisionOutput) AddArgs(index uint, args ...string) {
 	newCommandLine := []string{}
-	newCommandLine = append(newCommandLine, out.CommandLine[0])
+	newCommandLine = append(newCommandLine, out.CommandLine[:index]...)
 	newCommandLine = append(newCommandLine, args...)
-	newCommandLine = append(newCommandLine, out.CommandLine[1:]...)
+	newCommandLine = append(newCommandLine, out.CommandLine[index:]...)
 	out.CommandLine = newCommandLine
 }
 
