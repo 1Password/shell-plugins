@@ -6,8 +6,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk"
 )
 
-// EnvVarProvisioner provisions secrets as command-line arguments.
-// ArgsPosition field is to control where the arguments are placed in the command line. We check for only "first" and provision those arguments first, otherwise we provision them last.
+// ArgsProvisioner provisions secrets as command-line arguments.
+// ArgsPosition field is to control where the arguments are placed in the command line. Setting it to 1 provisions the arguments immediately after the executable name, and setting it to the length of the command line provisions the arguments at the end.
 type ArgsProvisioner struct {
 	sdk.Provisioner
 
@@ -16,7 +16,7 @@ type ArgsProvisioner struct {
 }
 
 // Args creates an ArgsProvisioner that provisions secrets as command line arguments, based
-// on the specified schema of field name and argument name.
+// on the specified schema of field name and argument name, and the position of the argument.
 func Args(schema map[string]sdk.FieldName, argsPosition map[string]uint) sdk.Provisioner {
 	return ArgsProvisioner{
 		Schema:       schema,
