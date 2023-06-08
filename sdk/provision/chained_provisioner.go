@@ -8,8 +8,6 @@ import (
 
 // ChainedProvisioner chains multiple provisioners together for use at the same time.
 type ChainedProvisioner struct {
-	sdk.Provisioner
-
 	Provisioners []sdk.Provisioner
 }
 
