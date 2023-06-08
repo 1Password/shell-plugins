@@ -27,7 +27,14 @@ func Args(schema map[string]sdk.FieldName, argsPosition map[string]uint) sdk.Pro
 func (p ArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	for argName, fieldName := range p.Schema {
 		if value, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgs(uint(p.ArgsPosition[argName]), argName, value)
+			// This safeguard is to ensure that the argsPosition is not out of bounds.
+			//
+			// Example: For a "redis-cli incr key" command, arguments cannot be provisioned at index 4 or higher.
+			if uint(p.ArgsPosition[argName]) > uint(len(out.CommandLine)) {
+				out.AddArgsAtIndex(uint(len(out.CommandLine)), argName, value)
+				return
+			}
+			out.AddArgsAtIndex(uint(p.ArgsPosition[argName]), argName, value)
 		}
 	}
 }
