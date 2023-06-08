@@ -102,18 +102,13 @@ func (out *ProvisionOutput) AddEnvVar(name string, value string) {
 	out.Environment[name] = value
 }
 
-// AddArgs can be used to add additional arguments to the command line of the provision output, immediately after the executable name or at the end, depending on the value of provisionImmediatelyAfterExecutable.
-func (out *ProvisionOutput) AddArgs(provisionImmediatelyAfterExecutable bool, args ...string) {
-	if provisionImmediatelyAfterExecutable {
-		newCommandLine := []string{}
-		newCommandLine = append(newCommandLine, out.CommandLine[0])
-		newCommandLine = append(newCommandLine, args...)
-		newCommandLine = append(newCommandLine, out.CommandLine[1:]...)
-		out.CommandLine = newCommandLine
-		return
-	}
-
-	out.CommandLine = append(out.CommandLine, args...)
+// AddArgs can be used to add additional arguments to the command line of the provision output, at a specific index.
+func (out *ProvisionOutput) AddArgs(index uint, args ...string) {
+	newCommandLine := []string{}
+	newCommandLine = append(newCommandLine, out.CommandLine[:index]...)
+	newCommandLine = append(newCommandLine, args...)
+	newCommandLine = append(newCommandLine, out.CommandLine[index:]...)
+	out.CommandLine = newCommandLine
 }
 
 // AddSecretFile can be used to add a file containing secrets to the provision output.
