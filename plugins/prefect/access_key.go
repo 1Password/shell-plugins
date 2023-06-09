@@ -18,7 +18,7 @@ func AccessKey() schema.CredentialType {
 		ManagementURL: sdk.URL("https://app.prefect.cloud/my/api-keys"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Key,
+				Name:                fieldname.APIKey,
 				MarkdownDescription: "Key used to authenticate to Prefect.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -54,7 +54,7 @@ func AccessKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"PREFECT_API_KEY": fieldname.Key,
+	"PREFECT_API_KEY": fieldname.APIKey,
 	"PREFECT_API_URL": fieldname.URL,
 }
 

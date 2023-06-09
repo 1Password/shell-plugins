@@ -12,7 +12,7 @@ func TestAccessKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Key: "pnu_dOXnQZOBq4Sst6hIesrdcbYVbnu1XEXAMPLE",
+				fieldname.APIKey: "pnu_dOXnQZOBq4Sst6hIesrdcbYVbnu1XEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -32,7 +32,7 @@ func TestAccessKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Key: "pnu_dOXnQZOBq4Sst6hIesrdcbYVbnu1XEXAMPLE",
+						fieldname.APIKey: "pnu_dOXnQZOBq4Sst6hIesrdcbYVbnu1XEXAMPLE",
 					},
 				},
 			},
