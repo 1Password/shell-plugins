@@ -16,8 +16,8 @@ func RedisCloudAPIKey() schema.CredentialType {
 		ManagementURL: sdk.URL("https://app.redislabs.com/#/access-management/api-keys"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.AccessKey,
-				MarkdownDescription: "API account key (also known as Access Key, or just API Key) to authenticate to Redis Enterprise Cloud.",
+				Name:                fieldname.AccountKey,
+				MarkdownDescription: "API Account key (also known as Access Key, or just API Key) to authenticate to Redis Enterprise Cloud.",
 				Secret:              true,
 				Optional:            false,
 				Composition: &schema.ValueComposition{
@@ -29,7 +29,7 @@ func RedisCloudAPIKey() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.SecretKey,
+				Name:                fieldname.UserKey,
 				MarkdownDescription: "API user key (also known as Secret Key) to authenticate to Redis Enterprise Cloud.",
 				Secret:              true,
 				Optional:            false,
@@ -49,6 +49,6 @@ func RedisCloudAPIKey() schema.CredentialType {
 }
 
 var envVarMappingForRedisEnterpriseCloud = map[string]sdk.FieldName{
-	"REDISCLOUD_ACCESS_KEY": fieldname.AccessKey,
-	"REDISCLOUD_SECRET_KEY": fieldname.SecretKey,
+	"REDISCLOUD_ACCESS_KEY": fieldname.AccountKey,
+	"REDISCLOUD_SECRET_KEY": fieldname.UserKey,
 }
