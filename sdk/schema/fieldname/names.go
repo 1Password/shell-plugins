@@ -4,6 +4,7 @@ import "github.com/1Password/shell-plugins/sdk"
 
 // Credential field names.
 const (
+	AccountKey      = sdk.FieldName("Account Key")
 	APIHost         = sdk.FieldName("API Host")
 	APIUrl          = sdk.FieldName("API URL")
 	APIKey          = sdk.FieldName("API Key")
@@ -58,6 +59,7 @@ const (
 	URL             = sdk.FieldName("URL")
 	User            = sdk.FieldName("User")
 	UserAccessToken = sdk.FieldName("User Access Token")
+	UserKey         = sdk.FieldName("User Key")
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
 )

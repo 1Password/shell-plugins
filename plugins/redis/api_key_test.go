@@ -12,8 +12,8 @@ func TestRedisCloudAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, RedisCloudAPIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.AccessKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
-				fieldname.SecretKey: "I2mLL1tjTKcyb5p0vWUSAcuO7XTut2QPPSSMavKQbrCEXAMPLE",
+				fieldname.AccountKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
+				fieldname.UserKey:    "I2mLL1tjTKcyb5p0vWUSAcuO7XTut2QPPSSMavKQbrCEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -35,8 +35,8 @@ func TestRedisCloudAPIKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.AccessKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
-						fieldname.SecretKey: "I2mLL1tjTKcyb5p0vWUSAcuO7XTut2QPPSSMavKQbrCEXAMPLE",
+						fieldname.AccountKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
+						fieldname.UserKey:    "I2mLL1tjTKcyb5p0vWUSAcuO7XTut2QPPSSMavKQbrCEXAMPLE",
 					},
 				},
 			},
