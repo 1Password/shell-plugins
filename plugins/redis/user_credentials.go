@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	index uint = 1
+	index uint = 1 // We inject arguments immediately after the redis-cli command, because that's where they're expected by the redis-cli binary. Placing arguments at the end or in the middle of the command will cause redis-cli to fail.
 )
 
 func UserCredentials() schema.CredentialType {
