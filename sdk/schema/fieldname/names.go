@@ -7,6 +7,7 @@ const (
 	APIHost         = sdk.FieldName("API Host")
 	APIKey          = sdk.FieldName("API Key")
 	APIKeyID        = sdk.FieldName("API Key ID")
+	APIKeySecret    = sdk.FieldName("API Key Secret")
 	APISecret       = sdk.FieldName("API Secret")
 	AccessKeyID     = sdk.FieldName("Access Key ID")
 	AccessToken     = sdk.FieldName("Access Token")
@@ -59,6 +60,7 @@ func ListAll() []sdk.FieldName {
 		APIHost,
 		APIKey,
 		APIKeyID,
+		APIKeySecret,
 		APISecret,
 		AccessKeyID,
 		AccessToken,

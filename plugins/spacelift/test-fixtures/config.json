@@ -1,0 +1,13 @@
+{
+  "currentProfileAlias": "dev",
+  "profiles": {
+    "dev": {
+      "alias": "dev",
+      "credentials": {
+        "type": 3,
+        "endpoint": "https://mycorp.app.spacelift.io",
+        "access_token": "token"
+      }
+    }
+  }
+}
