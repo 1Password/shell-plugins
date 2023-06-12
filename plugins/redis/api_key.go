@@ -19,7 +19,6 @@ func RedisCloudAPIKey() schema.CredentialType {
 				Name:                fieldname.AccountKey,
 				MarkdownDescription: "API Account key (also known as Access Key, or just API Key) to authenticate to Redis Enterprise Cloud.",
 				Secret:              true,
-				Optional:            false,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Uppercase: true,
@@ -32,7 +31,6 @@ func RedisCloudAPIKey() schema.CredentialType {
 				Name:                fieldname.UserKey,
 				MarkdownDescription: "API user key (also known as Secret Key) to authenticate to Redis Enterprise Cloud.",
 				Secret:              true,
-				Optional:            false,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Uppercase: true,
