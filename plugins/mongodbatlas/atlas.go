@@ -1,4 +1,4 @@
-package atlas
+package mongodbatlas
 
 import (
 	"github.com/1Password/shell-plugins/sdk"

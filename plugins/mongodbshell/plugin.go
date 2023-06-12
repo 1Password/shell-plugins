@@ -1,4 +1,4 @@
-package atlas
+package mongodbshell
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,17 +7,15 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "atlas",
+		Name: "mongodbshell",
 		Platform: schema.PlatformInfo{
-			Name:     "MongoDB Atlas",
-			Homepage: sdk.URL("https://www.mongodb.com/"),
+			Name:     "MongoDB Shell",
+			Homepage: sdk.URL("https://www.mongodb.com/products/shell"),
 		},
 		Credentials: []schema.CredentialType{
-			APIKey(),
 			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
-			MongoDBAtlasCLI(),
 			MongoshCLI(),
 		},
 	}

@@ -1,4 +1,4 @@
-package atlas
+package mongodbatlas
 
 import (
 	"testing"

@@ -1,14 +1,10 @@
-package atlas
+package mongodbshell
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-)
-
-const (
-	index uint = 1
 )
 
 func DatabaseCredentials() schema.CredentialType {
@@ -77,11 +73,4 @@ var argsToProvision = map[string]sdk.FieldName{
 	"--port":     fieldname.Port,
 	"--username": fieldname.Username,
 	"--password": fieldname.Password,
-}
-
-var indexToProvisionAt = map[string]uint{
-	"--host":     index,
-	"--port":     index,
-	"--username": index,
-	"--password": index,
 }
