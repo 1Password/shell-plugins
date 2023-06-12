@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://redis.com/redis-enterprise-cloud/overview/"),
 		},
 		Credentials: []schema.CredentialType{
-			RedisCloudAPIKey(),
+			APIKey(),
 		},
 	}
 }
