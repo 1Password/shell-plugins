@@ -1,4 +1,4 @@
-name: Check signed commits in PR 
+name: Check signed commits in pull request 
 on: pull_request
 
 jobs:
