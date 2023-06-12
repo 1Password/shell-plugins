@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "rediscloud",
 		Platform: schema.PlatformInfo{
 			Name:     "Redis Cloud",
-			Homepage: sdk.URL("https://redis.com/"),
+			Homepage: sdk.URL("https://redis.com/redis-enterprise-cloud/overview/"),
 		},
 		Credentials: []schema.CredentialType{
 			RedisCloudAPIKey(),
