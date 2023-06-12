@@ -13,6 +13,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
+var tokenEnvVarMapping = map[string]sdk.FieldName{
+	"PULUMI_ACCESS_TOKEN": fieldname.Token,
+}
+
 func PulumiAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.PersonalAccessToken,
@@ -23,6 +27,7 @@ func PulumiAccessToken() schema.CredentialType {
 				Name:                fieldname.Token,
 				MarkdownDescription: "Token used to authenticate to Pulumi.",
 				Secret:              true,
+				Optional:            false,
 				Composition: &schema.ValueComposition{
 					Length: 44,
 					Prefix: "pul-",
@@ -32,22 +37,45 @@ func PulumiAccessToken() schema.CredentialType {
 					},
 				},
 			},
-			{
-				Name:                fieldname.Host,
-				MarkdownDescription: "The Pulumi host to authenticate to. Defaults to 'app.pulumi.com'.",
-				Optional:            true,
-			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(tokenEnvVarMapping),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.TryEnvVarPair(tokenEnvVarMapping),
 			TryPulumiConfigFile(),
 		)}
 }
 
-var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"PULUMI_ACCESS_TOKEN": fieldname.Token,
-	"PULUMI_BACKEND_URL":  fieldname.Host,
+const BackendOnlyCredentialName = sdk.CredentialName("Backend Endpoint")
+
+var backendEndpointEnvVarMapping = map[string]sdk.FieldName{
+	"PULUMI_BACKEND_URL": fieldname.Endpoint,
+}
+
+func PulumiBackendEndpoint() schema.CredentialType {
+	return schema.CredentialType{
+		Name:          BackendOnlyCredentialName,
+		DocsURL:       sdk.URL("https://www.pulumi.com/docs/intro/pulumi-service/accounts/"),
+		ManagementURL: sdk.URL("https://app.pulumi.com/account/tokens"),
+		Fields: []schema.CredentialField{
+			{
+				Name:                fieldname.Endpoint,
+				MarkdownDescription: "The URL to the Pulumi state backend. Defaults to 'https://app.pulumi.com'.",
+				Secret:              false,
+				Optional:            false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+		},
+		DefaultProvisioner: provision.EnvVars(backendEndpointEnvVarMapping),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(backendEndpointEnvVarMapping),
+			TryPulumiConfigFile(),
+		)}
 }
 
 // Duplicated from:
@@ -91,8 +119,8 @@ func TryPulumiConfigFile() sdk.Importer {
 				if u.Host != "api.pulumi.com" {
 					out.AddCandidate(sdk.ImportCandidate{
 						Fields: map[sdk.FieldName]string{
-							fieldname.Token: accessToken,
-							fieldname.Host:  backendUrl,
+							fieldname.Token:    accessToken,
+							fieldname.Endpoint: backendUrl,
 						},
 						NameHint: u.Host,
 					})

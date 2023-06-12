@@ -14,6 +14,7 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			PulumiAccessToken(),
+			PulumiBackendEndpoint(),
 		},
 		Executables: []schema.Executable{
 			PulumiCLI(),
