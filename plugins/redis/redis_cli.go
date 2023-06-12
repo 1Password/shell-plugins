@@ -3,7 +3,6 @@ package redis
 import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
@@ -22,11 +21,8 @@ func RedisCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.UserCredentials,
-				Provisioner: provision.ChainProvisioners(
-					provision.EnvVars(defaultEnvVarMapping),
-					redisFlags(argsToProvision),
-				),
+				Name:        credname.UserCredentials,
+				Provisioner: redisFlags(argsToProvision),
 			},
 		},
 	}
