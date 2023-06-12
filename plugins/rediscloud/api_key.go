@@ -1,4 +1,4 @@
-package redis
+package rediscloud
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -40,13 +40,13 @@ func RedisCloudAPIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(envVarMappingForRedisEnterpriseCloud),
+		DefaultProvisioner: provision.EnvVars(envVarMappingForRedisCloud),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(envVarMappingForRedisEnterpriseCloud),
+			importer.TryEnvVarPair(envVarMappingForRedisCloud),
 		)}
 }
 
-var envVarMappingForRedisEnterpriseCloud = map[string]sdk.FieldName{
+var envVarMappingForRedisCloud = map[string]sdk.FieldName{
 	"REDISCLOUD_ACCESS_KEY": fieldname.AccountKey,
 	"REDISCLOUD_SECRET_KEY": fieldname.UserKey,
 }

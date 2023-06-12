@@ -1,4 +1,4 @@
-package redis
+package rediscloud
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,16 +7,13 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "redis",
+		Name: "rediscloud",
 		Platform: schema.PlatformInfo{
-			Name:     "Redis",
-			Homepage: sdk.URL("https://redis.io/"),
+			Name:     "Redis Cloud",
+			Homepage: sdk.URL("https://redis.com/"),
 		},
 		Credentials: []schema.CredentialType{
-			UserCredentials(),
-		},
-		Executables: []schema.Executable{
-			RedisCLI(),
+			RedisCloudAPIKey(),
 		},
 	}
 }
