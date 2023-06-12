@@ -9,7 +9,7 @@ import (
 )
 
 func TestRedisCloudAPIKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, RedisCloudAPIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.AccountKey: "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",
@@ -26,7 +26,7 @@ func TestRedisCloudAPIKeyProvisioner(t *testing.T) {
 }
 
 func TestRedisCloudAPIKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, RedisCloudAPIKey().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
 				"REDISCLOUD_ACCESS_KEY": "5v0mPzRKNcvlwRMi4CjWISt15UfCRxjcNVMPCZfDOJTZEXAMPLE",

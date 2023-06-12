@@ -9,7 +9,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func RedisCloudAPIKey() schema.CredentialType {
+func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://docs.redis.com/latest/rc/api/get-started/manage-api-keys/"),
