@@ -74,6 +74,12 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
+		Description: "Has no more than one credential type defined. Plugins with multiple credential types are not supported yet",
+		Assertion:   len(p.Credentials) <= 1,
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
 		Description: "Credentials referenced in executables are included in the same plugin definition",
 		Assertion:   CredentialReferencesInCredentialList(p),
 		Severity:    ValidationSeverityError,
