@@ -7,21 +7,19 @@ import (
 )
 
 type redisArgsProvisioner struct {
-	AddArgsAtIndex map[string]uint
-	Schema         map[string]sdk.FieldName
+	Schema map[string]sdk.FieldName
 }
 
-func redisFlags(addArgsAtIndex map[string]uint, schema map[string]sdk.FieldName) sdk.Provisioner {
+func redisFlags(schema map[string]sdk.FieldName) sdk.Provisioner {
 	return redisArgsProvisioner{
-		AddArgsAtIndex: addArgsAtIndex,
-		Schema:         schema,
+		Schema: schema,
 	}
 }
 
 func (p redisArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	for argName, fieldName := range p.Schema {
 		if value, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgsAtIndex(p.AddArgsAtIndex[argName], argName, value)
+			out.AddArgsAtIndex(1, argName, value)
 		}
 	}
 }

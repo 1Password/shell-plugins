@@ -9,10 +9,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-const (
-	index uint = 1 // We inject arguments immediately after the redis-cli command, because that's where they're expected by the redis-cli binary. Placing arguments at the end or in the middle of the command will cause redis-cli to fail.
-)
-
 func UserCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.UserCredentials,
@@ -83,10 +79,4 @@ var argsToProvision = map[string]sdk.FieldName{
 	"--user": fieldname.Username,
 	"-h":     fieldname.Host,
 	"-p":     fieldname.Port,
-}
-
-var indexToProvisionAt = map[string]uint{
-	"--user": index,
-	"-h":     index,
-	"-p":     index,
 }
