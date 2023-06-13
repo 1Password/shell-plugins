@@ -1,4 +1,4 @@
-package mongodbshell
+package mongodb
 
 import (
 	"context"

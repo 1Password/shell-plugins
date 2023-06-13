@@ -1,4 +1,4 @@
-package mongodbshell
+package mongodb
 
 import (
 	"github.com/1Password/shell-plugins/sdk"

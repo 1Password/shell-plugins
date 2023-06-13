@@ -1,4 +1,4 @@
-package mongodbshell
+package mongodb
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,7 +7,7 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "mongodbshell",
+		Name: "mongodb",
 		Platform: schema.PlatformInfo{
 			Name:     "MongoDB Shell",
 			Homepage: sdk.URL("https://www.mongodb.com/products/shell"),
