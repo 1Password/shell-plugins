@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"fmt"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -75,8 +77,8 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"REDISCLI_AUTH": fieldname.Password,
 }
 
-var argsToProvision = map[string]sdk.FieldName{
-	"--user": fieldname.Username,
-	"-h":     fieldname.Host,
-	"-p":     fieldname.Port,
+var argsToProvision = []string{
+	fmt.Sprintf("--user %s", fieldname.Username),
+	fmt.Sprintf("-h %s", fieldname.Host),
+	fmt.Sprintf("-p %s", fieldname.Port),
 }

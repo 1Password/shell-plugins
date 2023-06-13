@@ -22,7 +22,7 @@ func RedisCLI() schema.Executable {
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.UserCredentials,
-				Provisioner: redisFlags(argsToProvision),
+				Provisioner: redisProvisioner(),
 			},
 		},
 	}
