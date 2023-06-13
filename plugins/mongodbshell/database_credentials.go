@@ -55,7 +55,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Name:                fieldname.Password,
 				MarkdownDescription: "Password for authenticating to the MongoDB database.",
 				Secret:              true,
-				Optional:            true,
+				Optional:            false,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,
