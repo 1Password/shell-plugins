@@ -14,7 +14,6 @@ func MongoshCLI() schema.Executable {
 		DocsURL: sdk.URL("https://www.mongodb.com/docs/mongodb-shell/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
