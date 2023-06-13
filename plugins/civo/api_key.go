@@ -89,20 +89,6 @@ func TryCivoConfigFile() sdk.Importer {
 	})
 }
 
-// {
-// 	"apikeys": {
-// 	  "newspidey": "Vdi1GHFqXLG47VcfdvfvfvfvfvfvfvfvEgOd",
-// 	},
-// 	"meta": {
-// 	  "admin": false,
-// 	  "current_apikey": "newspidey",
-// 	  "default_region": "LON1",
-// 	  "latest_release_check": "2023-06-11T20:25:06.916682112+05:30",
-// 	  "url": "https://api.civo.com",
-// 	  "last_command_executed": "2023-06-11T20:25:06.916237569+05:30"
-// 	}
-//   }
-
 type Config struct {
 	Properties map[string]json.RawMessage `json:"apikeys"`
 

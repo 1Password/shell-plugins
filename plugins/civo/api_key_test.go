@@ -11,12 +11,14 @@ import (
 func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
-				fieldname.APIKey: "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.APIKey:   "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+				fieldname.APIKeyID: "testdemoname",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"CIVO_API_KEY": "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+					"CIVO_API_KEY":      "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+					"CIVO_API_KEY_NAME": "testdemoname",
 				},
 			},
 		},
