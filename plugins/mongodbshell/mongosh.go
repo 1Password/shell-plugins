@@ -19,7 +19,7 @@ func MongoshCLI() schema.Executable {
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.DatabaseCredentials,
-				Provisioner: mongodbShellFlags(argsToProvision),
+				Provisioner: mongodbShellProvisioner(),
 				Importer:    nil,
 			},
 		},
