@@ -19,7 +19,6 @@ func MongoshCLI() schema.Executable {
 			{
 				Name:        credname.DatabaseCredentials,
 				Provisioner: mongodbShellProvisioner(),
-				Importer:    nil,
 			},
 		},
 	}
