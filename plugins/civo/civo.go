@@ -9,9 +9,9 @@ import (
 
 func CivoCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Civo CLI", // TODO: Check if this is correct
-		Runs:      []string{"civo"},
-		DocsURL:   sdk.URL("https://civo.com/docs/cli"), // TODO: Replace with actual URL
+		Name:    "Civo CLI",
+		Runs:    []string{"civo"},
+		DocsURL: sdk.URL("https://civo.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
