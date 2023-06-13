@@ -2,11 +2,16 @@ package redis
 
 import (
 	"context"
-	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
+
+var argsToProvision = []string{
+	"--user", fieldname.Username.String(),
+	"-h", fieldname.Host.String(),
+	"-p", fieldname.Port.String(),
+}
 
 type redisArgsProvisioner struct {
 }
@@ -19,11 +24,13 @@ func (p redisArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 	if value, ok := in.ItemFields[fieldname.Password]; ok {
 		out.AddEnvVar("REDISCLI_AUTH", value)
 	}
-	for _, arg := range argsToProvision {
-		argName := strings.Split(arg, " ")[0]
-		fieldName := sdk.FieldName(strings.Split(arg, " ")[1])
-		if fieldValue, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgsAtIndex(1, argName, fieldValue)
+	for i, arg := range argsToProvision {
+		if i%2 == 0 {
+			argName := arg
+			fieldName := sdk.FieldName(argsToProvision[i+1])
+			if fieldValue, ok := in.ItemFields[fieldName]; ok {
+				out.AddArgsAtIndex(1, argName, fieldValue)
+			}
 		}
 	}
 }
