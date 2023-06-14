@@ -6,7 +6,6 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -43,7 +42,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.AddArgs("--defaults-file={{ .Path }}")),
+		DefaultProvisioner: nil,
 		Importer: importer.TryAll(
 			TryMySQLConfigFile("/etc/my.cnf"),
 			TryMySQLConfigFile("/etc/mysql/my.cnf"),
