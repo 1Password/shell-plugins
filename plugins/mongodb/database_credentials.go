@@ -1,8 +1,6 @@
 package mongodb
 
 import (
-	"fmt"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
@@ -68,11 +66,4 @@ func DatabaseCredentials() schema.CredentialType {
 		DefaultProvisioner: nil,
 		Importer:           nil,
 	}
-}
-
-var argsToProvision = []string{
-	fmt.Sprintf("--host %s", fieldname.Host),
-	fmt.Sprintf("--port %s", fieldname.Port),
-	fmt.Sprintf("--username %s", fieldname.Username),
-	fmt.Sprintf("--password %s", fieldname.Password),
 }

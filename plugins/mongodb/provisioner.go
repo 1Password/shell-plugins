@@ -2,10 +2,17 @@ package mongodb
 
 import (
 	"context"
-	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
+
+var argsToProvision = []string{
+	"--host", fieldname.Host.String(),
+	"--port", fieldname.Port.String(),
+	"--username", fieldname.Username.String(),
+	"--password", fieldname.Password.String(),
+}
 
 type mongodbShellArgsProvisioner struct {
 }
@@ -15,11 +22,13 @@ func mongodbShellProvisioner() sdk.Provisioner {
 }
 
 func (p mongodbShellArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	for _, arg := range argsToProvision {
-		argName := strings.Split(arg, " ")[0]
-		fieldName := sdk.FieldName(strings.Split(arg, " ")[1])
-		if fieldValue, ok := in.ItemFields[fieldName]; ok {
-			out.AddArgsAtIndex(1, argName, fieldValue)
+	for i, arg := range argsToProvision {
+		if i%2 == 0 {
+			argName := arg
+			fieldName := sdk.FieldName(argsToProvision[i+1])
+			if fieldValue, ok := in.ItemFields[fieldName]; ok {
+				out.AddArgsAtIndex(1, argName, fieldValue)
+			}
 		}
 	}
 }
