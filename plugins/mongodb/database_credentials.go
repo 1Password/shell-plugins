@@ -13,6 +13,19 @@ func DatabaseCredentials() schema.CredentialType {
 		DocsURL: sdk.URL("https://www.mongodb.com/docs/mongodb-shell/connect/"),
 		Fields: []schema.CredentialField{
 			{
+				Name:                fieldname.ConnectionString,
+				MarkdownDescription: "Connection String for the MongoDB database.",
+				Secret:              false,
+				Optional:            true,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
 				Name:                fieldname.Host,
 				MarkdownDescription: "Host address for the MongoDB database.",
 				Secret:              false,
