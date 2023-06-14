@@ -143,6 +143,7 @@ func newPlugin() error {
 		CredentialNameUpperCamelCase string
 		CredentialNameSnakeCase      string
 		TestCredentialExample        string
+		ExecutableSnakeCase          string
 	}{}
 
 	err := survey.Ask(questionnaire, &result)
@@ -170,6 +171,7 @@ func newPlugin() error {
 
 	result.CredentialNameUpperCamelCase = strings.Join(credNameSplit, "")
 	result.CredentialNameSnakeCase = strings.ToLower(strings.Join(credNameSplit, "_"))
+	result.ExecutableSnakeCase = strings.ToLower(strings.ReplaceAll(result.Executable, "-", "_"))
 
 	result.IsNewCredentialName = true
 	for _, existing := range credname.ListAll() {
@@ -488,7 +490,7 @@ func Test{{ .CredentialNameUpperCamelCase }}Importer(t *testing.T) {
 }
 
 var executableTemplate = Template{
-	Filename: "{{ .Executable }}.go",
+	Filename: "{{ .ExecutableSnakeCase }}.go",
 	Contents: `package {{ .Name }}
 
 import (
