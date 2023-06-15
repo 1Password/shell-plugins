@@ -9,7 +9,7 @@ import (
 )
 
 func TestAPIClientCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIClientCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, AkamaiCLI().Uses[0].Provisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.ClientSecret: "abcdE23FNkBxy456z25qx9Yp5CPUxlEfQeTDkfh4QA=I",
