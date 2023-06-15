@@ -2,14 +2,21 @@ package aws
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/service/sso"
+	"github.com/aws/aws-sdk-go-v2/service/ssooidc"
+	"github.com/skratchdot/open-golang/open"
+	"log"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/ssooidc/types"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
@@ -99,8 +106,8 @@ func (p STSProvisioner) Description() string {
 // ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
 func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
-	if awsConfig.HasSSOStartURL() {
-		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
+	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
+		return providerFactory.NewSSOProvider(awsConfig), nil
 	}
 
 	if awsConfig.HasWebIdentity() {
@@ -130,6 +137,7 @@ type STSProviderFactory interface {
 	NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
 	NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
 	NewAccessKeysProvider() aws.CredentialsProvider
+	NewSSOProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
 }
 
 // CacheProviderFactory 's functions return AWS providers that are also handling reading and writing from shell plugin's encrypted cache
@@ -176,6 +184,26 @@ func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelper
 
 func (m CacheProviderFactory) NewAccessKeysProvider() aws.CredentialsProvider {
 	return accessKeysProvider{itemFields: m.ItemFields}
+}
+
+func (m CacheProviderFactory) NewSSOProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+	ssoTempCredCacheKey := getSSOTemporaryCredentialsCacheKey()
+	if m.InCache.Has(ssoTempCredCacheKey) {
+		return NewStsCacheProvider(ssoTempCredCacheKey, m.InCache)
+	}
+
+	cfg := aws.Config{
+		Region: awsConfig.SSORegion,
+	}
+
+	return ssoProvider{
+		OIDCClient:     ssooidc.NewFromConfig(cfg),
+		SSOClient:      sso.NewFromConfig(cfg),
+		StartURL:       awsConfig.SSOStartURL,
+		AccountID:      awsConfig.SSOAccountID,
+		RoleName:       awsConfig.SSORoleName,
+		stsCacheWriter: NewSTSCacheWriter(ssoTempCredCacheKey, m.OutCache),
+	}
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
@@ -354,4 +382,99 @@ func getSTSClient(region string, credsProvider aws.CredentialsProvider) *sts.Cli
 		Credentials: credsProvider,
 	}
 	return sts.NewFromConfig(clientConfig)
+}
+
+type ssoProvider struct {
+	OIDCClient *ssooidc.Client
+	SSOClient  *sso.Client
+	StartURL   string
+	AccountID  string
+	RoleName   string
+	stsCacheWriter
+}
+
+func (p ssoProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	clientCreds, err := p.OIDCClient.RegisterClient(ctx, &ssooidc.RegisterClientInput{
+		ClientName: aws.String("aws-shell-plugin"),
+		ClientType: aws.String("public"),
+	})
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	deviceAuthorization, err := p.OIDCClient.StartDeviceAuthorization(ctx, &ssooidc.StartDeviceAuthorizationInput{
+		ClientId:     clientCreds.ClientId,
+		ClientSecret: clientCreds.ClientSecret,
+		StartUrl:     aws.String(p.StartURL),
+	})
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	log.Printf("Opening your Identity Provider in your default browser (use Ctrl-C to abort)\n%s\n", aws.ToString(deviceAuthorization.VerificationUriComplete))
+	if err := open.Run(aws.ToString(deviceAuthorization.VerificationUriComplete)); err != nil {
+		return aws.Credentials{}, fmt.Errorf("failed to open your default browser: %w", err)
+	}
+
+	// Start polling as described in https://tools.ietf.org/html/draft-ietf-oauth-device-flow-15#section-3.5
+	grantType := aws.String("urn:ietf:params:oauth:grant-type:device_code")
+
+	var slowDownDelay = 5 * time.Second
+	var retryInterval time.Duration
+	if i := deviceAuthorization.Interval; i > 0 {
+		retryInterval = time.Duration(i) * time.Second
+	} else {
+		retryInterval = 5 * time.Second
+	}
+
+	var token *ssooidc.CreateTokenOutput
+	for {
+		t, err := p.OIDCClient.CreateToken(ctx, &ssooidc.CreateTokenInput{
+			ClientId:     clientCreds.ClientId,
+			ClientSecret: clientCreds.ClientSecret,
+			DeviceCode:   deviceAuthorization.DeviceCode,
+			GrantType:    grantType,
+		})
+		if err != nil {
+			var pollingTooOftenErr *types.SlowDownException
+			if errors.As(err, &pollingTooOftenErr) {
+				retryInterval += slowDownDelay
+			}
+
+			var notYetAuthorizedErr *types.AuthorizationPendingException
+			if errors.As(err, &notYetAuthorizedErr) {
+				time.Sleep(retryInterval)
+				continue
+			}
+
+			return aws.Credentials{}, err
+		}
+
+		token = t
+		break
+	}
+	err = exec.Command("open", "-j", "-a", "terminal").Start()
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	resp, err := p.SSOClient.GetRoleCredentials(ctx, &sso.GetRoleCredentialsInput{
+		AccessToken: token.AccessToken,
+		AccountId:   aws.String(p.AccountID),
+		RoleName:    aws.String(p.RoleName),
+	})
+
+	temporaryCredentials := aws.Credentials{
+		AccessKeyID:     aws.ToString(resp.RoleCredentials.AccessKeyId),
+		SecretAccessKey: aws.ToString(resp.RoleCredentials.SecretAccessKey),
+		SessionToken:    aws.ToString(resp.RoleCredentials.SessionToken),
+		Expires:         time.Unix(0, resp.RoleCredentials.Expiration*int64(time.Millisecond)),
+	}
+
+	err = p.stsCacheWriter.Put(temporaryCredentials)
+	if err != nil {
+		return aws.Credentials{}, err
+	}
+
+	return temporaryCredentials, nil
 }

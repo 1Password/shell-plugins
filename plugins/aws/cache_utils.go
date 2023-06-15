@@ -10,6 +10,7 @@ import (
 const (
 	mfaCacheKeyID        = "sts-mfa"
 	assumeRoleCacheKeyID = "sts-assume-role"
+	ssoCacheKey          = "sso"
 )
 
 // stsCacheWriter writes aws temp credentials to cache using the awsCacheKey
@@ -35,4 +36,8 @@ func getRoleCacheKey(roleArn string, accessKeyID string) string {
 
 func getMfaCacheKey(accessKeyID string) string {
 	return fmt.Sprintf("%s|%s", mfaCacheKeyID, accessKeyID)
+}
+
+func getSSOTemporaryCredentialsCacheKey() string {
+	return ssoCacheKey
 }
