@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -76,7 +77,7 @@ func DatabaseCredentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: nil,
+		DefaultProvisioner: provision.NoOp(),
 		Importer:           nil,
 	}
 }
