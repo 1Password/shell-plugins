@@ -3,6 +3,8 @@ package aws
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"time"
 
@@ -183,6 +185,9 @@ func (m CacheProviderFactory) NewAccessKeysProvider() aws.CredentialsProvider {
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
 func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, error) {
+	// Disable log output produced by AWS Vault code
+	log.SetOutput(io.Discard)
+
 	// Read config file from the location set in AWS_CONFIG_FILE env var or from  ~/.aws/config
 	configFile, err := confighelpers.LoadConfigFromEnv()
 	if err != nil {
