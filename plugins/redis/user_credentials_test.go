@@ -17,11 +17,12 @@ func TestUserCredentialsProvisioner(t *testing.T) {
 				fieldname.Host:     "127.0.0.1",
 				fieldname.Port:     "6379",
 			},
+			CommandLine: []string{"redis-cli"},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"REDISCLI_AUTH": "pjtxpc2gaddifapjvalggspojexample",
 				},
-				CommandLine: []string{"-p", "6379", "-h", "127.0.0.1", "--user", "example"},
+				CommandLine: []string{"redis-cli", "-p", "6379", "-h", "127.0.0.1", "--user", "example"}, // Each argument is provisioned at index 1, pushing the existing arguments forward to the next index
 			},
 		},
 	})
