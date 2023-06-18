@@ -45,17 +45,6 @@ func APIToken() schema.CredentialType {
 			TryNirmataConfigFile(),
 		)}
 }
-func configFile(in sdk.ProvisionInput) ([]byte, error) {
-	address := in.ItemFields[fieldname.Address]
-	email := in.ItemFields[fieldname.Email]
-	token := in.ItemFields[fieldname.Token]
-
-	contents := "address: " + address + "\n"
-	contents += "email: " + email + "\n"
-	contents += "token: " + token + "\n"
-
-	return []byte(contents), nil
-}
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NIRMATA_TOKEN": fieldname.Token,
