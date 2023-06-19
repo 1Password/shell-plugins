@@ -458,6 +458,83 @@ func TestSTSProvisioner(t *testing.T) {
 	})
 }
 
+func TestSourceProfileLoop(t *testing.T) {
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
+	// setup profiles in config file
+	file := ini.Empty()
+	profileDev, err := file.NewSection("profile dev")
+	require.NoError(t, err)
+	_, err = profileDev.NewKey("source_profile", "default")
+	require.NoError(t, err)
+
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("source_profile", "prod")
+	require.NoError(t, err)
+
+	profileProd, err := file.NewSection("profile prod")
+	require.NoError(t, err)
+	_, err = profileProd.NewKey("source_profile", "dev")
+	require.NoError(t, err)
+
+	profileStaging, err := file.NewSection("profile staging")
+	require.NoError(t, err)
+	_, err = profileStaging.NewKey("source_profile", "staging")
+	require.NoError(t, err)
+
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "prod",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithEndlessLoop": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Diagnostics: sdk.Diagnostics{Errors: []sdk.Error{{Message: "infinite loop in credential configuration detected. Attempting to load from profile \"prod\" which has already been visited"}}},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "staging",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAcceptedLoop": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+}
+
 func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 	for _, scenario := range []struct {
 		description             string

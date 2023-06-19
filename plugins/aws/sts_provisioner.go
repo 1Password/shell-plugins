@@ -193,6 +193,10 @@ func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, e
 		return nil, err
 	}
 
+	if err = DetectSourceProfileLoop(profile, configFile); err != nil {
+		return nil, err
+	}
+
 	configLoader := confighelpers.ConfigLoader{
 		File:          configFile,
 		ActiveProfile: profile,
@@ -361,4 +365,31 @@ func getSTSClient(region string, credsProvider aws.CredentialsProvider) *sts.Cli
 		Credentials: credsProvider,
 	}
 	return sts.NewFromConfig(clientConfig)
+}
+
+func DetectSourceProfileLoop(profile string, config *confighelpers.ConfigFile) error {
+	visited := make(map[string]bool)
+	sourceProfile := profile
+
+	for sourceProfile != "" {
+		if visited[sourceProfile] {
+			return fmt.Errorf("infinite loop in credential configuration detected. Attempting to load from profile %q which has already been visited", sourceProfile)
+		} else {
+			visited[sourceProfile] = true
+		}
+
+		profileSection, ok := config.ProfileSection(sourceProfile)
+		if !ok {
+			return fmt.Errorf("profile %s does not exist in the config file", sourceProfile)
+		}
+
+		sourceProfile = profileSection.SourceProfile
+
+		// profiles could source credentials from themselves. Ignore this case, as it gets nicely handled later.
+		if profileSection.Name == sourceProfile {
+			break
+		}
+	}
+
+	return nil
 }
