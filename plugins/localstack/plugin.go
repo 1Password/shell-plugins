@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "localstack",
 		Platform: schema.PlatformInfo{
 			Name:     "LocalStack",
-			Homepage: sdk.URL("https://localstack.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://localstack.cloud"),
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
