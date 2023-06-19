@@ -99,7 +99,7 @@ func (p STSProvisioner) Description() string {
 // ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
 func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory) (aws.CredentialsProvider, error) {
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
-	if awsConfig.HasSSOStartURL() {
+	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
 		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
 	}
 
@@ -111,24 +111,31 @@ func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, provide
 		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
 	}
 
+	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
-		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles", "https://github.com/1Password/shell-plugins/issues/212")
+		sourceProfileProvider, err := ChooseTemporaryCredentialsProvider(awsConfig.SourceProfile, providerFactory)
+		if err != nil {
+			return nil, err
+		}
+		sourceCredentialsProvider = sourceProfileProvider
+	} else {
+		sourceCredentialsProvider = providerFactory.NewAccessKeysProvider()
 	}
 
 	if awsConfig.HasRole() {
-		return providerFactory.NewAssumeRoleProvider(awsConfig), nil
+		return providerFactory.NewAssumeRoleProvider(awsConfig, sourceCredentialsProvider), nil
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return providerFactory.NewMFASessionTokenProvider(awsConfig), nil
+		return providerFactory.NewMFASessionTokenProvider(awsConfig, sourceCredentialsProvider), nil
 	}
 
-	return providerFactory.NewAccessKeysProvider(), nil
+	return sourceCredentialsProvider, nil
 }
 
 type STSProviderFactory interface {
-	NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
-	NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
+	NewAssumeRoleProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider
+	NewMFASessionTokenProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider
 	NewAccessKeysProvider() aws.CredentialsProvider
 }
 
@@ -139,7 +146,7 @@ type CacheProviderFactory struct {
 	ItemFields map[sdk.FieldName]string
 }
 
-func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	roleCacheKey := getRoleCacheKey(awsConfig.RoleARN, m.ItemFields[fieldname.AccessKeyID])
 	if m.InCache.Has(roleCacheKey) {
 		return NewStsCacheProvider(roleCacheKey, m.InCache)
@@ -148,13 +155,13 @@ func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Con
 	cacheWriter := NewSTSCacheWriter(roleCacheKey, m.OutCache)
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewMFASessionTokenProvider(awsConfig)), cacheWriter)
+		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewMFASessionTokenProvider(awsConfig, sourcedCredentialsProvider)), cacheWriter)
 	}
 
-	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewAccessKeysProvider()), cacheWriter)
+	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, sourcedCredentialsProvider), cacheWriter)
 }
 
-func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	mfaCacheKey := getMfaCacheKey(m.ItemFields[fieldname.AccessKeyID])
 	if m.InCache.Has(mfaCacheKey) {
 		return NewStsCacheProvider(mfaCacheKey, m.InCache)
@@ -166,7 +173,7 @@ func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelper
 
 	return &mfaSessionTokenProvider{
 		SessionTokenProvider: confighelpers.SessionTokenProvider{
-			StsClient: getSTSClient(awsConfig.Region, m.NewAccessKeysProvider()),
+			StsClient: getSTSClient(awsConfig.Region, sourcedCredentialsProvider),
 			Duration:  awsConfig.NonChainedGetSessionTokenDuration,
 			Mfa:       confighelpers.NewMfa(awsConfig),
 		},

@@ -656,10 +656,10 @@ type mockProviderManager struct {
 	CacheProviderFactory
 }
 
-func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config, srcCredProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	return mockAwsProvider{}
 }
 
-func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config, srcCredProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	return mockAwsProvider{}
 }
