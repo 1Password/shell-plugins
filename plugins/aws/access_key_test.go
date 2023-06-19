@@ -411,7 +411,7 @@ func TestSTSProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, STSProvisioner{
 		profileName: "testSourceSimple",
 		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
-			return &mockProviderManager{itemFields: map[sdk.FieldName]string{
+			return &mockProviderManager{ItemFields: map[sdk.FieldName]string{
 				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
 				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
 			}}
@@ -717,7 +717,7 @@ func (p mockAwsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) 
 }
 
 type mockProviderManager struct {
-	itemFields map[sdk.FieldName]string
+	ItemFields map[sdk.FieldName]string
 }
 
 func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config, srcCredProvider aws.CredentialsProvider) aws.CredentialsProvider {
@@ -729,5 +729,5 @@ func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Conf
 }
 
 func (m mockProviderManager) NewAccessKeysProvider() aws.CredentialsProvider {
-	return accessKeysProvider{itemFields: m.itemFields}
+	return accessKeysProvider{itemFields: m.ItemFields}
 }
