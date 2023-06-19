@@ -252,6 +252,16 @@ func TestAccessKeyDefaultProvisioner(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "awsConfig")
 	t.Setenv("AWS_CONFIG_FILE", configPath)
 
+	// setup profiles in config file
+	file := ini.Empty()
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("region", "us-central-1")
+	require.NoError(t, err)
+
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
