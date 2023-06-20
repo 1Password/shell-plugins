@@ -14,6 +14,7 @@ import (
 )
 
 const defaultProfileName = "default"
+const defaultSessionDuration = 15 * time.Minute
 
 type STSProvisioner struct {
 	profileName        string
@@ -59,14 +60,8 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
-	err = resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig)
-	if err != nil {
-		out.AddError(err)
-		return
-	}
-
 	cacheProviderFactory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
-	tempCredentialsProvider, err := ChooseTemporaryCredentialsProvider(awsConfig, cacheProviderFactory)
+	tempCredentialsProvider, err := ChooseTemporaryCredentialsProvider(awsConfig, cacheProviderFactory, in.ItemFields)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -97,7 +92,12 @@ func (p STSProvisioner) Description() string {
 }
 
 // ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
-func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory) (aws.CredentialsProvider, error) {
+func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string) (aws.CredentialsProvider, error) {
+	err := resolveLocalAnd1PasswordConfigurations(itemFields, awsConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
 	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
 		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
@@ -113,7 +113,7 @@ func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, provide
 
 	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
-		sourceProfileProvider, err := ChooseTemporaryCredentialsProvider(awsConfig.SourceProfile, providerFactory)
+		sourceProfileProvider, err := ChooseTemporaryCredentialsProvider(awsConfig.SourceProfile, providerFactory, itemFields)
 		if err != nil {
 			return nil, err
 		}
@@ -167,10 +167,6 @@ func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelper
 		return NewStsCacheProvider(mfaCacheKey, m.InCache)
 	}
 
-	if awsConfig.NonChainedGetSessionTokenDuration == 0 {
-		awsConfig.NonChainedGetSessionTokenDuration = 15 * time.Minute // default to minimum duration of 15 minutes
-	}
-
 	return &mfaSessionTokenProvider{
 		SessionTokenProvider: confighelpers.SessionTokenProvider{
 			StsClient: getSTSClient(awsConfig.Region, sourcedCredentialsProvider),
@@ -200,6 +196,11 @@ func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, e
 	configLoader := confighelpers.ConfigLoader{
 		File:          configFile,
 		ActiveProfile: profile,
+		// default to minimum duration of 15 minutes for sessions. These can be overwritten by user settings
+		BaseConfig: confighelpers.Config{
+			AssumeRoleDuration:                defaultSessionDuration,
+			NonChainedGetSessionTokenDuration: defaultSessionDuration,
+		},
 	}
 
 	// loads configuration from both environment and config file
@@ -245,10 +246,6 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 		return fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password")
 	}
 
-	if !awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial")
-	}
-
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
 		return fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password")
 	} else if awsConfig.Region == "" {
@@ -279,9 +276,6 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 }
 
 func initAssumeRoleProvider(awsConfig *confighelpers.Config, stsClient *sts.Client, cacheWriter stsCacheWriter) *assumeRoleProvider {
-	if awsConfig.AssumeRoleDuration == 0 {
-		awsConfig.AssumeRoleDuration = 15 * time.Minute // default to minimum duration of 15 minutes
-	}
 	return &assumeRoleProvider{
 		AssumeRoleProvider: confighelpers.AssumeRoleProvider{
 			StsClient:         stsClient,
