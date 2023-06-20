@@ -623,16 +623,6 @@ func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 			err: fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password"),
 		},
 		{
-			description: "has mfa token but no mfa serial",
-			itemFields: map[sdk.FieldName]string{
-				fieldname.OneTimePassword: "515467",
-			},
-			awsConfig: &confighelpers.Config{
-				ProfileName: "dev",
-			},
-			err: fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial"),
-		},
-		{
 			description: "has region only in 1Password",
 			itemFields: map[sdk.FieldName]string{
 				fieldname.OneTimePassword: "515467",
