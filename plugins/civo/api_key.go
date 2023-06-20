@@ -3,7 +3,6 @@ package civo
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -50,7 +49,6 @@ func APIKey() schema.CredentialType {
 			provision.AddArgs(
 				"--config", "{{.Path}}",
 			),
-			provision.AtFixedPath("~/.civo.json"),
 		),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
@@ -63,31 +61,31 @@ func configFile(in sdk.ProvisionInput) ([]byte, error) {
 	defaultRegion := in.ItemFields[fieldname.DefaultRegion]
 
 	// Check if the file already exists
-	filePath := "~/.civo.json"
-	exists, err := fileExists(filePath)
-	if err != nil {
-		return nil, err
-	}
+	// filePath := "~/.civo.json"
+	// exists, err := fileExists(filePath)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	if exists {
-		// Read the existing file
-		contents, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			return nil, err
-		}
+	// if exists {
+	// 	// Read the existing file
+	// 	contents, err := ioutil.ReadFile(filePath)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
 
-		var config Config
-		if err := json.Unmarshal(contents, &config); err != nil {
-			return nil, err
-		}
+	// 	var config Config
+	// 	if err := json.Unmarshal(contents, &config); err != nil {
+	// 		return nil, err
+	// 	}
 
-		// Update the config with the new values
-		config.Properties[apiKeyID] = json.RawMessage(`"` + apiKey + `"`)
-		config.Meta.CurrentAPIKey = apiKeyID
-		config.Meta.DefaultRegion = defaultRegion
+	// 	// Update the config with the new values
+	// 	config.Properties[apiKeyID] = json.RawMessage(`"` + apiKey + `"`)
+	// 	config.Meta.CurrentAPIKey = apiKeyID
+	// 	config.Meta.DefaultRegion = defaultRegion
 
-		return json.MarshalIndent(config, "", "  ")
-	}
+	// 	return json.MarshalIndent(config, "", "  ")
+	// }
 
 	// Create a new config
 	config := Config{

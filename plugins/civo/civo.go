@@ -15,6 +15,7 @@ func CivoCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("update"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
