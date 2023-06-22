@@ -16,6 +16,19 @@ func CLIToken() schema.CredentialType {
 		ManagementURL: sdk.URL("https://cloud.appwrite.io/"),
 		Fields: []schema.CredentialField{
 			{
+				Name:                fieldname.Email,
+				MarkdownDescription: "Email used to authenticate to Appwrite CLI.",
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Length: 50,
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+				},
+			},
+			{
 				Name:                fieldname.Password,
 				MarkdownDescription: "Password used to authenticate to Appwrite CLI.",
 				Secret:              true,
@@ -37,5 +50,6 @@ func CLIToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"APPWRITE_EMAIL":    fieldname.Email,
 	"APPWRITE_PASSWORD": fieldname.Password,
 }
