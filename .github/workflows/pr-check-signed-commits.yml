@@ -1,9 +1,12 @@
 name: Check signed commits in PR 
-on: pull_request
+on: pull_request_target
 
 jobs:
   build:
     name: Check signed commits in PR 
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
