@@ -3,6 +3,8 @@ package aws
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"time"
 
@@ -179,6 +181,14 @@ func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelper
 
 func (m CacheProviderFactory) NewAccessKeysProvider() aws.CredentialsProvider {
 	return accessKeysProvider{itemFields: m.ItemFields}
+}
+
+func ExecuteSilently[G interface{}, e error](f func() (G, e)) func() (G, e) {
+	return func() (G, e) {
+		log.SetOutput(io.Discard)
+		defer log.SetOutput(os.Stderr)
+		return f()
+	}
 }
 
 // getAWSAuthConfigurationForProfile loads specified configurations from both config file and environment
