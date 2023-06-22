@@ -620,7 +620,7 @@ func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 				ProfileName: "dev",
 				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
 			},
-			err: fmt.Errorf("MFA failed: the selected profile requires an OTP because an MFA serial (arn:aws:iam::123456789012:mfa/user) was detected but no 'One-Time Password' field was found in the associated item"),
+			err: fmt.Errorf("MFA failed: an MFA serial (arn:aws:iam::123456789012:mfa/user) was detected on the associated item for the selected profile, but no 'One-Time Password' field was found. Add an OTP to your item to use multi-factor authentication"),
 		},
 		{
 			description: "has region only in 1Password",

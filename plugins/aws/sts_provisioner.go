@@ -243,7 +243,7 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken == "" {
-		return fmt.Errorf("MFA failed: the selected profile requires an OTP because an MFA serial (%s) was detected but no 'One-Time Password' field was found in the associated item", awsConfig.MfaSerial)
+		return fmt.Errorf("MFA failed: an MFA serial (%s) was detected on the associated item for the selected profile, but no 'One-Time Password' field was found. Add an OTP to your item to use multi-factor authentication", awsConfig.MfaSerial)
 	}
 
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
@@ -374,7 +374,7 @@ func DetectSourceProfileLoop(profile string, config *confighelpers.ConfigFile) e
 
 		profileSection, ok := config.ProfileSection(sourceProfile)
 		if !ok {
-			return fmt.Errorf("source profile %s does not exist in the config file", sourceProfile)
+			return fmt.Errorf("source profile %s does not exist in your AWS config file", sourceProfile)
 		}
 
 		sourceProfile = profileSection.SourceProfile
