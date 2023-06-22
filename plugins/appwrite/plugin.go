@@ -10,10 +10,10 @@ func New() schema.Plugin {
 		Name: "appwrite",
 		Platform: schema.PlatformInfo{
 			Name:     "Appwrite",
-			Homepage: sdk.URL("https://appwrite.io"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://appwrite.io"),
 		},
 		Credentials: []schema.CredentialType{
-			APIKey(),
+			CLIToken(),
 		},
 		Executables: []schema.Executable{
 			AppwriteCLI(),

@@ -8,31 +8,31 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 	
-func TestAPIKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestCLITokenProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, CLIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
-				fieldname.APIKey: "5gywx05hyh46gexample",
+				fieldname.Token: "dPmVEzGfQFzWGqakEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"APPWRITE_API_KEY": "5gywx05hyh46gexample",
+					"APPWRITE_TOKEN": "dPmVEzGfQFzWGqakEXAMPLE",
 				},
 			},
 		},
 	})
 }
 
-func TestAPIKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
+func TestCLITokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, CLIToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{ // TODO: Check if this is correct
-				"APPWRITE_API_KEY": "5gywx05hyh46gexample",
+				"APPWRITE_TOKEN": "dPmVEzGfQFzWGqakEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "5gywx05hyh46gexample",
+						fieldname.Token: "dPmVEzGfQFzWGqakEXAMPLE",
 					},
 				},
 			},
@@ -46,7 +46,7 @@ func TestAPIKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 			// 	{
 			// 		Fields: map[sdk.FieldName]string{
-			// 			fieldname.Token: "5gywx05hyh46gexample",
+			// 			fieldname.Token: "dPmVEzGfQFzWGqakEXAMPLE",
 			// 		},
 			// 	},
 			},

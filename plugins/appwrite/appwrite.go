@@ -9,16 +9,16 @@ import (
 
 func AppwriteCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Appwrite CLI", // TODO: Check if this is correct
+		Name:    "Appwrite CLI",
 		Runs:    []string{"appwrite"},
-		DocsURL: sdk.URL("https://appwrite.io/docs/"), // TODO: Replace with actual URL
+		DocsURL: sdk.URL("https://appwrite.io/docs/command-line"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIKey,
+				Name: credname.CLIToken,
 			},
 		},
 	}
