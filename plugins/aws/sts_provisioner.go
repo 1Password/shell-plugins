@@ -61,7 +61,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 
 	cacheProviderFactory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
-	tempCredentialsProvider, err := ChooseTemporaryCredentialsProvider(awsConfig, cacheProviderFactory, in.ItemFields)
+	tempCredentialsProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig, cacheProviderFactory, in.ItemFields)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -91,8 +91,8 @@ func (p STSProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
-// ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
-func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string) (aws.CredentialsProvider, error) {
+// GetTemporaryCredentialsProviderForProfile returns the aws provider that fits the scenario described by the current configuration.
+func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string) (aws.CredentialsProvider, error) {
 	err := resolveLocalAnd1PasswordConfigurations(itemFields, awsConfig)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, provide
 
 	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
-		sourceProfileProvider, err := ChooseTemporaryCredentialsProvider(awsConfig.SourceProfile, providerFactory, itemFields)
+		sourceProfileProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig.SourceProfile, providerFactory, itemFields)
 		if err != nil {
 			return nil, err
 		}
@@ -243,7 +243,7 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken == "" {
-		return fmt.Errorf("MFA failed: an MFA serial (%s) was detected on the associated item for the selected profile, but no 'One-Time Password' field was found. Add an OTP to your item to use multi-factor authentication", awsConfig.MfaSerial)
+		return fmt.Errorf("MFA failed: MFA serial %q was detected on the associated item or in the config file for the selected profile, but no 'One-Time Password' field was found. Learn how to add an OTP field to your item: https://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication", awsConfig.MfaSerial)
 	}
 
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
@@ -374,7 +374,7 @@ func DetectSourceProfileLoop(profile string, config *confighelpers.ConfigFile) e
 
 		profileSection, ok := config.ProfileSection(sourceProfile)
 		if !ok {
-			return fmt.Errorf("source profile %s does not exist in your AWS config file", sourceProfile)
+			return fmt.Errorf("source profile %q does not exist in your AWS config file", sourceProfile)
 		}
 
 		sourceProfile = profileSection.SourceProfile
