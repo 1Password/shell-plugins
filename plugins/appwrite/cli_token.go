@@ -49,6 +49,7 @@ func CLIToken() schema.CredentialType {
 		)}
 }
 
+// required fields
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"APPWRITE_EMAIL":    fieldname.Email,
 	"APPWRITE_PASSWORD": fieldname.Password,
