@@ -207,12 +207,14 @@ func GetProfilesInfo() ([]ProfileInfoToImport, error) {
 
 	// Get the region specified for the "default" profile
 	var defaultRegion string
-	if defaultSection, err := f.GetSection(defaultProfileName); err != nil && defaultSection.HasKey(configFileRegionKey) {
-		key, err := defaultSection.GetKey(configFileRegionKey)
-		if err != nil {
-			return nil, err
+	if f.HasSection(defaultProfileName) {
+		if defaultSection, err := f.GetSection(defaultProfileName); err != nil && defaultSection.HasKey(configFileRegionKey) {
+			key, err := defaultSection.GetKey(configFileRegionKey)
+			if err != nil {
+				return nil, err
+			}
+			defaultRegion = key.String()
 		}
-		defaultRegion = key.String()
 	}
 
 	var profiles []ProfileInfoToImport
