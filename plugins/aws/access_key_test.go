@@ -252,6 +252,16 @@ func TestAccessKeyDefaultProvisioner(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "awsConfig")
 	t.Setenv("AWS_CONFIG_FILE", configPath)
 
+	// setup profiles in config file
+	file := ini.Empty()
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("region", "us-central-1")
+	require.NoError(t, err)
+
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
 	plugintest.TestProvisioner(t, AccessKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
@@ -282,21 +292,36 @@ func TestSTSProvisioner(t *testing.T) {
 	require.NoError(t, err)
 	_, err = profileDev.NewKey("role_arn", "aws:iam::123456789012:role/testRole2")
 	require.NoError(t, err)
+
 	profileProd, err := file.NewSection("profile prod")
 	require.NoError(t, err)
 	_, err = profileProd.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
 	require.NoError(t, err)
+
 	profileDefault, err := file.NewSection("default")
-	require.NoError(t, err)
-	_, err = profileDefault.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
 	require.NoError(t, err)
 	_, err = profileDefault.NewKey("region", "us-central-1")
 	require.NoError(t, err)
+
 	profileTest, err := file.NewSection("profile test")
 	require.NoError(t, err)
 	_, err = profileTest.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
 	require.NoError(t, err)
 	_, err = profileTest.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	require.NoError(t, err)
+
+	profileSourceComplex, err := file.NewSection("profile testSourceComplex")
+	require.NoError(t, err)
+	_, err = profileSourceComplex.NewKey("mfa_serial", "arn:aws:iam::123456789012:mfa/user1")
+	require.NoError(t, err)
+	_, err = profileSourceComplex.NewKey("role_arn", "aws:iam::123456789012:role/testRole")
+	require.NoError(t, err)
+	_, err = profileSourceComplex.NewKey("source_profile", "testSourceSimple")
+	require.NoError(t, err)
+
+	profileSourceSimple, err := file.NewSection("profile testSourceSimple")
+	require.NoError(t, err)
+	_, err = profileSourceSimple.NewKey("source_profile", "default")
 	require.NoError(t, err)
 	err = file.SaveTo(configPath)
 	require.NoError(t, err)
@@ -392,6 +417,132 @@ func TestSTSProvisioner(t *testing.T) {
 			},
 		},
 	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "testSourceSimple",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			}}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithSourceProfileSimple": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXAMPLE",
+					"AWS_SECRET_ACCESS_KEY": "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "testSourceComplex",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithSourceProfileComplex": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
+}
+
+func TestSourceProfileLoop(t *testing.T) {
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
+	// setup profiles in config file
+	file := ini.Empty()
+	profileDev, err := file.NewSection("profile dev")
+	require.NoError(t, err)
+	_, err = profileDev.NewKey("source_profile", "default")
+	require.NoError(t, err)
+
+	profileDefault, err := file.NewSection("default")
+	require.NoError(t, err)
+	_, err = profileDefault.NewKey("source_profile", "prod")
+	require.NoError(t, err)
+
+	profileProd, err := file.NewSection("profile prod")
+	require.NoError(t, err)
+	_, err = profileProd.NewKey("source_profile", "dev")
+	require.NoError(t, err)
+
+	profileStaging, err := file.NewSection("profile staging")
+	require.NoError(t, err)
+	_, err = profileStaging.NewKey("source_profile", "staging")
+	require.NoError(t, err)
+
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "prod",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithEndlessLoop": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Diagnostics: sdk.Diagnostics{Errors: []sdk.Error{{Message: "infinite loop in credential configuration detected. Attempting to load from profile \"prod\" which has already been visited"}}},
+			},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "staging",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"WithAcceptedLoop": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+				fieldname.DefaultRegion:   "us-central-1",
+				fieldname.OneTimePassword: "908789",
+				fieldname.MFASerial:       "arn:aws:iam::123456789012:mfa/user1",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"AWS_ACCESS_KEY_ID":     "AKIAHPIZFMD5EEXSTS",
+					"AWS_SECRET_ACCESS_KEY": "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_SESSION_TOKEN":     "stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY///////stststststst/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					"AWS_DEFAULT_REGION":    "us-central-1",
+				},
+			},
+		},
+	})
 }
 
 func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
@@ -469,17 +620,7 @@ func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 				ProfileName: "dev",
 				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
 			},
-			err: fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password"),
-		},
-		{
-			description: "has mfa token but no mfa serial",
-			itemFields: map[sdk.FieldName]string{
-				fieldname.OneTimePassword: "515467",
-			},
-			awsConfig: &confighelpers.Config{
-				ProfileName: "dev",
-			},
-			err: fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial"),
+			err: fmt.Errorf("MFA failed: MFA serial \"arn:aws:iam::123456789012:mfa/user\" was detected on the associated item or in the config file for the selected profile, but no 'One-Time Password' field was found.\nLearn how to add an OTP field to your item:\nhttps://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication"),
 		},
 		{
 			description: "has region only in 1Password",
@@ -653,13 +794,17 @@ func (p mockAwsProvider) Retrieve(ctx context.Context) (aws.Credentials, error) 
 }
 
 type mockProviderManager struct {
-	CacheProviderFactory
+	ItemFields map[sdk.FieldName]string
 }
 
-func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m mockProviderManager) NewMFASessionTokenProvider(awsConfig *confighelpers.Config, srcCredProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	return mockAwsProvider{}
 }
 
-func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m mockProviderManager) NewAssumeRoleProvider(awsConfig *confighelpers.Config, srcCredProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	return mockAwsProvider{}
+}
+
+func (m mockProviderManager) NewAccessKeysProvider() aws.CredentialsProvider {
+	return accessKeysProvider{itemFields: m.ItemFields}
 }
