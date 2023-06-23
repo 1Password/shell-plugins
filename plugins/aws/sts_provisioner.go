@@ -243,7 +243,9 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken == "" {
-		return fmt.Errorf("MFA failed: MFA serial %q was detected on the associated item or in the config file for the selected profile, but no 'One-Time Password' field was found. Learn how to add an OTP field to your item: https://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication", awsConfig.MfaSerial)
+		return fmt.Errorf(`MFA failed: MFA serial %q was detected on the associated item or in the config file for the selected profile, but no 'One-Time Password' field was found.
+Learn how to add an OTP field to your item:
+https://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication`, awsConfig.MfaSerial)
 	}
 
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
