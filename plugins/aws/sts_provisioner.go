@@ -14,6 +14,7 @@ import (
 )
 
 const defaultProfileName = "default"
+const defaultSessionDuration = 15 * time.Minute
 
 type STSProvisioner struct {
 	profileName        string
@@ -59,14 +60,8 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
-	err = resolveLocalAnd1PasswordConfigurations(in.ItemFields, awsConfig)
-	if err != nil {
-		out.AddError(err)
-		return
-	}
-
 	cacheProviderFactory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
-	tempCredentialsProvider, err := ChooseTemporaryCredentialsProvider(awsConfig, cacheProviderFactory)
+	tempCredentialsProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig, cacheProviderFactory, in.ItemFields)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -96,10 +91,15 @@ func (p STSProvisioner) Description() string {
 	return "Provision environment variables with temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
 
-// ChooseTemporaryCredentialsProvider returns the aws provider that fits the scenario described by the current configuration.
-func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, providerFactory STSProviderFactory) (aws.CredentialsProvider, error) {
+// GetTemporaryCredentialsProviderForProfile returns the aws provider that fits the scenario described by the current configuration.
+func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string) (aws.CredentialsProvider, error) {
+	err := resolveLocalAnd1PasswordConfigurations(itemFields, awsConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
-	if awsConfig.HasSSOStartURL() {
+	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
 		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
 	}
 
@@ -111,24 +111,31 @@ func ChooseTemporaryCredentialsProvider(awsConfig *confighelpers.Config, provide
 		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
 	}
 
+	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
-		return nil, fmt.Errorf(unsupportedMessage, "Sourcing profiles", "https://github.com/1Password/shell-plugins/issues/212")
+		sourceProfileProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig.SourceProfile, providerFactory, itemFields)
+		if err != nil {
+			return nil, err
+		}
+		sourceCredentialsProvider = sourceProfileProvider
+	} else {
+		sourceCredentialsProvider = providerFactory.NewAccessKeysProvider()
 	}
 
 	if awsConfig.HasRole() {
-		return providerFactory.NewAssumeRoleProvider(awsConfig), nil
+		return providerFactory.NewAssumeRoleProvider(awsConfig, sourceCredentialsProvider), nil
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return providerFactory.NewMFASessionTokenProvider(awsConfig), nil
+		return providerFactory.NewMFASessionTokenProvider(awsConfig, sourceCredentialsProvider), nil
 	}
 
-	return providerFactory.NewAccessKeysProvider(), nil
+	return sourceCredentialsProvider, nil
 }
 
 type STSProviderFactory interface {
-	NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
-	NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider
+	NewAssumeRoleProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider
+	NewMFASessionTokenProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider
 	NewAccessKeysProvider() aws.CredentialsProvider
 }
 
@@ -139,7 +146,7 @@ type CacheProviderFactory struct {
 	ItemFields map[sdk.FieldName]string
 }
 
-func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	roleCacheKey := getRoleCacheKey(awsConfig.RoleARN, m.ItemFields[fieldname.AccessKeyID])
 	if m.InCache.Has(roleCacheKey) {
 		return NewStsCacheProvider(roleCacheKey, m.InCache)
@@ -148,25 +155,21 @@ func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Con
 	cacheWriter := NewSTSCacheWriter(roleCacheKey, m.OutCache)
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewMFASessionTokenProvider(awsConfig)), cacheWriter)
+		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewMFASessionTokenProvider(awsConfig, sourcedCredentialsProvider)), cacheWriter)
 	}
 
-	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewAccessKeysProvider()), cacheWriter)
+	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, sourcedCredentialsProvider), cacheWriter)
 }
 
-func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
+func (m CacheProviderFactory) NewMFASessionTokenProvider(awsConfig *confighelpers.Config, sourcedCredentialsProvider aws.CredentialsProvider) aws.CredentialsProvider {
 	mfaCacheKey := getMfaCacheKey(m.ItemFields[fieldname.AccessKeyID])
 	if m.InCache.Has(mfaCacheKey) {
 		return NewStsCacheProvider(mfaCacheKey, m.InCache)
 	}
 
-	if awsConfig.NonChainedGetSessionTokenDuration == 0 {
-		awsConfig.NonChainedGetSessionTokenDuration = 15 * time.Minute // default to minimum duration of 15 minutes
-	}
-
 	return &mfaSessionTokenProvider{
 		SessionTokenProvider: confighelpers.SessionTokenProvider{
-			StsClient: getSTSClient(awsConfig.Region, m.NewAccessKeysProvider()),
+			StsClient: getSTSClient(awsConfig.Region, sourcedCredentialsProvider),
 			Duration:  awsConfig.NonChainedGetSessionTokenDuration,
 			Mfa:       confighelpers.NewMfa(awsConfig),
 		},
@@ -186,9 +189,18 @@ func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, e
 		return nil, err
 	}
 
+	if err = DetectSourceProfileLoop(profile, configFile); err != nil {
+		return nil, err
+	}
+
 	configLoader := confighelpers.ConfigLoader{
 		File:          configFile,
 		ActiveProfile: profile,
+		// default to minimum duration of 15 minutes for sessions. These can be overwritten by user settings
+		BaseConfig: confighelpers.Config{
+			AssumeRoleDuration:                defaultSessionDuration,
+			NonChainedGetSessionTokenDuration: defaultSessionDuration,
+		},
 	}
 
 	// loads configuration from both environment and config file
@@ -231,11 +243,9 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 	}
 
 	if awsConfig.HasMfaSerial() && awsConfig.MfaToken == "" {
-		return fmt.Errorf("MFA failed: an MFA serial was found but no OTP has been set up in 1Password")
-	}
-
-	if !awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return fmt.Errorf("MFA failed: an OTP was found wihtout a corresponding MFA serial")
+		return fmt.Errorf(`MFA failed: MFA serial %q was detected on the associated item or in the config file for the selected profile, but no 'One-Time Password' field was found.
+Learn how to add an OTP field to your item:
+https://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication`, awsConfig.MfaSerial)
 	}
 
 	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
@@ -268,9 +278,6 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 }
 
 func initAssumeRoleProvider(awsConfig *confighelpers.Config, stsClient *sts.Client, cacheWriter stsCacheWriter) *assumeRoleProvider {
-	if awsConfig.AssumeRoleDuration == 0 {
-		awsConfig.AssumeRoleDuration = 15 * time.Minute // default to minimum duration of 15 minutes
-	}
 	return &assumeRoleProvider{
 		AssumeRoleProvider: confighelpers.AssumeRoleProvider{
 			StsClient:         stsClient,
@@ -354,4 +361,31 @@ func getSTSClient(region string, credsProvider aws.CredentialsProvider) *sts.Cli
 		Credentials: credsProvider,
 	}
 	return sts.NewFromConfig(clientConfig)
+}
+
+func DetectSourceProfileLoop(profile string, config *confighelpers.ConfigFile) error {
+	visited := make(map[string]bool)
+	sourceProfile := profile
+
+	for sourceProfile != "" {
+		if visited[sourceProfile] {
+			return fmt.Errorf("infinite loop in credential configuration detected. Attempting to load from profile %q which has already been visited", sourceProfile)
+		} else {
+			visited[sourceProfile] = true
+		}
+
+		profileSection, ok := config.ProfileSection(sourceProfile)
+		if !ok {
+			return fmt.Errorf("source profile %q does not exist in your AWS config file", sourceProfile)
+		}
+
+		sourceProfile = profileSection.SourceProfile
+
+		// profiles could source credentials from themselves. Ignore this case, as it gets gracefully handled later.
+		if profileSection.Name == sourceProfile {
+			break
+		}
+	}
+
+	return nil
 }
