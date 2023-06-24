@@ -15,6 +15,7 @@ func NirmataCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("login"),
 		),
 		Uses: []schema.CredentialUsage{
 			{

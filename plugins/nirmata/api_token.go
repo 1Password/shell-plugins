@@ -36,6 +36,7 @@ func APIToken() schema.CredentialType {
 			{
 				Name:                fieldname.Address,
 				MarkdownDescription: "Url address of Nirmata[https://nirmata.io].",
+				Optional:            true,
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
@@ -48,7 +49,7 @@ func APIToken() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NIRMATA_TOKEN": fieldname.Token,
-	"NIRMATA_URL":   fieldname.URL,
+	"NIRMATA_URL":   fieldname.Address,
 }
 
 func TryNirmataConfigFile() sdk.Importer {
