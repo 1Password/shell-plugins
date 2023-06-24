@@ -15,7 +15,7 @@ func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://www.civo.com/docs/account/api-keys"), 
-		ManagementURL: sdk.URL("https://www.civo.com/api#authentication"), 
+		ManagementURL: sdk.URL("https://dashboard.civo.com/security"), 
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
@@ -30,6 +30,11 @@ func APIKey() schema.CredentialType {
 					},
 				},
 			},
+			{
+				Name:                fieldname.APIKeyID,
+				MarkdownDescription: "The Name of apikey used to authenticate to civo",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
@@ -40,6 +45,8 @@ func APIKey() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"CIVO_TOKEN": fieldname.APIKey, 
+	"CIVO_API_KEY":fieldname.APIKey,
+	"CIVO_API_KEY_NAME":fieldname.APIKeyID,
 }
 
 func TryCivoConfigFile(path string) sdk.Importer {

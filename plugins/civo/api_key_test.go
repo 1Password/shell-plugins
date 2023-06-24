@@ -13,10 +13,13 @@ func TestAPIKeyProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ 
 				fieldname.APIKey: "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+				fieldname.APIKeyID: "civoapikey",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"CIVO_TOKEN": "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+					"CIVO_API_KEY": "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+					"CIVO_API_KEY_NAME": "civoapikey",
 				},
 			},
 		},
@@ -28,11 +31,14 @@ func TestAPIKeyImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{ 
 				"CIVO_TOKEN": "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+				"CIVO_API_KEY": "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+				"CIVO_API_KEY_NAME": "civoapikey",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey: "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+						fieldname.APIKeyID: "civoapikey",
 					},
 				},
 			},
@@ -46,6 +52,7 @@ func TestAPIKeyImporter(t *testing.T) {
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "vvUmolh6TG7VMzCkhfWvOCJfpZMzM6W5hWkjurT63FoEXAMPLE",
+						fieldname.APIKeyID: "civoapikey",
 					},
 				},
 			},
