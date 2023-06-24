@@ -12,20 +12,17 @@ import (
 )
 
 type Config struct {
-	Version           int
-	SSHPreserveHosts  bool `yaml:"sshPreserveHosts"`
 	Profiles          map[string]Profile
 }
 
 type Profile struct {
-	DefaultRegion string `yaml:"defaultRegion"`
 	APIKey        string `yaml:"apiKey"`
 }
 
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://render.com/docs/api_key"),
+		DocsURL:       sdk.URL("https://render.com/docs"),
 		ManagementURL: sdk.URL("https://console.render.com/user/security/tokens"),
 		Fields: []schema.CredentialField{
 			{
@@ -51,7 +48,6 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"RENDER_API_KEY": fieldname.APIKey,
 }
 
 func TryRenderConfigFile() sdk.Importer {
