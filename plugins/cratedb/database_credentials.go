@@ -14,8 +14,8 @@ import (
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.DatabaseCredentials,
-		DocsURL:       sdk.URL("https://cratedb.com/docs/database_credentials"), // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.cratedb.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://crate.io/docs/crate/crash/en/latest/run.html#environment-variables"),
+		ManagementURL: sdk.URL("https://console.cratedb.cloud/account/settings"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
