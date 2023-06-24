@@ -17,6 +17,7 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
+					"CIVO_TOKEN":        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 					"CIVO_API_KEY":      "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 					"CIVO_API_KEY_NAME": "testdemoname",
 				},
@@ -29,6 +30,7 @@ func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
+				"CIVO_TOKEN":        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 				"CIVO_API_KEY":      "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 				"CIVO_API_KEY_NAME": "testdemoname",
 			},
