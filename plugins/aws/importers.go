@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/ini.v1"
@@ -132,24 +133,16 @@ func TryAWSVaultBackends() sdk.Importer {
 			// Use the CredentialKeyring struct from aws-vault to retrieve vaulting backend credentials
 			credentialKeyring := &vault.CredentialKeyring{Keyring: keyring}
 
-			// Load the AWS config file (default location at ~/.aws/config)
-			awsConfigFile, err := awsVault.AwsConfigFile()
+			profilesInfo, err := GetProfilesInfo()
 			if err != nil {
 				attempt.AddError(err)
 				return
 			}
-			configLoader := &vault.ConfigLoader{File: awsConfigFile}
-
-			// Get the region specified for the "default" profile
-			var defaultRegion string
-			if defaultSection, ok := awsConfigFile.ProfileSection("default"); ok {
-				defaultRegion = defaultSection.Region
-			}
 
 			// Iterate through the profiles in the AWS config file and
 			// import any matching credentials stored in the vaulting backend
-			for _, profileName := range awsConfigFile.ProfileNames() {
-				profileFound, err := credentialKeyring.Has(profileName)
+			for _, profile := range profilesInfo {
+				profileFound, err := credentialKeyring.Has(profile.Name)
 				if err != nil {
 					attempt.AddError(err)
 					continue
@@ -158,13 +151,7 @@ func TryAWSVaultBackends() sdk.Importer {
 					continue
 				}
 
-				creds, err := credentialKeyring.Get(profileName)
-				if err != nil {
-					attempt.AddError(err)
-					continue
-				}
-
-				profileConfig, err := configLoader.LoadFromProfile(profileName)
+				creds, err := credentialKeyring.Get(profile.Name)
 				if err != nil {
 					attempt.AddError(err)
 					continue
@@ -173,23 +160,88 @@ func TryAWSVaultBackends() sdk.Importer {
 				fields := make(map[sdk.FieldName]string)
 				fields[fieldname.AccessKeyID] = creds.AccessKeyID
 				fields[fieldname.SecretAccessKey] = creds.SecretAccessKey
-
-				// If a region is specified for the AWS profile, use it.
-				// Otherwise, use the "default" profile region if it's specified
-				if profileConfig.Region != "" {
-					fields[fieldname.DefaultRegion] = profileConfig.Region
-				} else if defaultRegion != "" {
-					fields[fieldname.DefaultRegion] = defaultRegion
-				}
-
+				fields[fieldname.MFASerial] = profile.MfaSerial
+				fields[fieldname.Region] = profile.Region
 				// Only add candidates with required credential fields
 				if fields[fieldname.AccessKeyID] != "" && fields[fieldname.SecretAccessKey] != "" {
 					attempt.AddCandidate(sdk.ImportCandidate{
 						Fields:   fields,
-						NameHint: importer.SanitizeNameHint(profileName),
+						NameHint: importer.SanitizeNameHint(profile.Name),
 					})
 				}
 			}
 		}
 	}
+}
+
+type ProfileInfoToImport struct {
+	Name      string
+	MfaSerial string
+	Region    string
+}
+
+func GetProfilesInfo() ([]ProfileInfoToImport, error) {
+	file := os.Getenv("AWS_CONFIG_FILE")
+	if file == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		file = filepath.Join(home, "/.aws/config")
+	}
+
+	f, err := ini.LoadSources(ini.LoadOptions{
+		AllowNestedValues:   true,
+		InsensitiveSections: false,
+		InsensitiveKeys:     true,
+	}, file)
+	if err != nil {
+		return nil, err
+	}
+
+	const (
+		configFileRegionKey    = "region"
+		profileNamePrefix      = "profile "
+		configFileMfaSerialKey = "mfa_serial"
+	)
+
+	// Get the region specified for the "default" profile
+	var defaultRegion string
+	if f.HasSection(defaultProfileName) {
+		if defaultSection, err := f.GetSection(defaultProfileName); err != nil && defaultSection.HasKey(configFileRegionKey) {
+			key, err := defaultSection.GetKey(configFileRegionKey)
+			if err != nil {
+				return nil, err
+			}
+			defaultRegion = key.String()
+		}
+	}
+
+	var profiles []ProfileInfoToImport
+	for _, section := range f.Sections() {
+		var region, mfaSerial string
+		if section.HasKey(configFileMfaSerialKey) {
+			key, err := section.GetKey(configFileMfaSerialKey)
+			if err != nil {
+				return nil, err
+			}
+			mfaSerial = key.String()
+		}
+		if section.HasKey(configFileRegionKey) {
+			key, err := section.GetKey(configFileRegionKey)
+			if err != nil {
+				return nil, err
+			}
+			region = key.String()
+		} else {
+			region = defaultRegion
+		}
+		profiles = append(profiles, ProfileInfoToImport{
+			Name:      strings.TrimPrefix(section.Name(), profileNamePrefix),
+			MfaSerial: mfaSerial,
+			Region:    region,
+		})
+	}
+
+	return profiles, nil
 }
