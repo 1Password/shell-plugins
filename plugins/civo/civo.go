@@ -16,6 +16,7 @@ func CivoCLI() schema.Executable {
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
 			needsauth.NotForExactArgs("config"),
+			needsauth.NotWhenContainsArgs("apikey", "save"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
