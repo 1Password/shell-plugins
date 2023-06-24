@@ -23,7 +23,7 @@ func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
 		DocsURL:       sdk.URL("https://render.com/docs"),
-		ManagementURL: sdk.URL("https://console.render.com/user/security/tokens"),
+		ManagementURL: sdk.URL("https://dashboard.render.com/u/settings#api-keys"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
