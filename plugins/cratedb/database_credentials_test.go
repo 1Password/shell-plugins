@@ -27,12 +27,12 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{ // TODO: Check if this is correct
-				"CRATEDB": "yqch",
+				"CRATEPW": "eog-l4ogPoIO4kX8ICHC*6kP",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.: "yqch",
+						fieldname.Password: "eog-l4ogPoIO4kX8ICHC*6kP",
 					},
 				},
 			},
