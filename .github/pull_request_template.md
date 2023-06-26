@@ -57,5 +57,7 @@ The AWS plugin now checks for the `AWS_SHARED_CREDENTIALS_FILE` environment vari
 For more examples, have a look over 1Password CLI's past release notes: 
 https://app-updates.agilebits.com/product_history/CLI2
 -->  
+## Additional information
 
+- [ ] Check this box if this is a Hashnode Hackathon submission
 
