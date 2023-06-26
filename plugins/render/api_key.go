@@ -9,6 +9,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -39,15 +40,24 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.TempFile(renderConfig, provision.AtFixedPath(ConfigPath())),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryRenderConfigFile(),
 		),
 	}
 }
 
-var defaultEnvVarMapping = map[string]sdk.FieldName{
+// var defaultEnvVarMapping = map[string]sdk.FieldName{
+// }
+func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
+	config := Config{
+
+	}
+	contents, err := yaml.Marshal(&config)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(contents), nil
 }
 
 func TryRenderConfigFile() sdk.Importer {
