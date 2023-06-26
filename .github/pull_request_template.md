@@ -59,5 +59,5 @@ https://app-updates.agilebits.com/product_history/CLI2
 -->  
 ## Additional information
 
-- [ ] Check this box if this is a Hashnode Hackathon submission
+- [ ] Check this box if this is a [Hashnode Hackathon](https://hashnode.com/hackathons/1password) submission
 
