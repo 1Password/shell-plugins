@@ -14,8 +14,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://deta.com/docs/api_key"), // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.deta.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://deta.space/docs/en"), // TODO: Replace with actual URL
+		ManagementURL: sdk.URL("https://deta.space"), // TODO: Replace with actual URL
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
