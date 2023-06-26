@@ -47,7 +47,7 @@ func TestAPIKeyImporter(t *testing.T) {
 		"config file": {
 			Files: map[string]string{
 
-				"~/.civo.json": plugintest.LoadFixture(t, "civo.json"),
+				"~/.civo.json": plugintest.LoadFixture(t, ".civo.json"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 
