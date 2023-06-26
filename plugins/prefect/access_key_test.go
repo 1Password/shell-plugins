@@ -37,19 +37,5 @@ func TestAccessKeyImporter(t *testing.T) {
 				},
 			},
 		},
-		// TODO: If you implemented a config file importer, add a test file example in prefect/test-fixtures
-		// and fill the necessary details in the test template below.
-		"config file": {
-			Files: map[string]string{
-				// "~/path/to/config.yml": plugintest.LoadFixture(t, "config.yml"),
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				// 	{
-				// 		Fields: map[sdk.FieldName]string{
-				// 			fieldname.Token: "pnu_dOXnQZOBq4Sst6hIesrdcbYVbnu1XEXAMPLE",
-				// 		},
-				// 	},
-			},
-		},
 	})
 }
