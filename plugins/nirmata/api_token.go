@@ -14,8 +14,8 @@ import (
 func APIToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://nirmata.com/docs/api_token"),               // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.nirmata.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://downloads.nirmata.io/nctl/downloads/"),
+		ManagementURL: sdk.URL("https://www.nirmata.io/security/login.html"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
