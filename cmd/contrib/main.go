@@ -191,24 +191,25 @@ func newPlugin() error {
 
 	// As a placeholder, assume the field name is the short version (max 7 chars) of the credential name, starting from the last word.
 	//
+	// When the last word of the credential name is greater than seven characters, the last word is used as the field name.
+	//
 	// For example:
 	// "Personal Access Token" => "Token"
 	// "Secret Key" => "Key"
 	// "API Key" => "API Key"
-	//
-	// When the last word of the credential name is greater than seven characters, the last word is used as the field name
-	var fieldNameSplit []string
+	// "GitHub API Key" => "API Key"
+	// "Credentials" => "Credentials"
 	lengthCutoff := 7
-	for i := range credNameSplit {
-		word := credNameSplit[len(credNameSplit)-1-i]
+	fieldNameSplit := []string{credNameSplit[len(credNameSplit)-1]}
+	for i := range credNameSplit[:len(credNameSplit)-1] {
+		// Skip credNameSplit's last word because it's already added to fieldNameSplit
 		if i == 0 {
-			fieldNameSplit = append([]string{word}, fieldNameSplit...)
 			continue
 		}
+		word := credNameSplit[len(credNameSplit)-1-i]
 		if len(strings.Join(append(fieldNameSplit, word), " ")) > lengthCutoff {
 			break
 		}
-
 		fieldNameSplit = append([]string{word}, fieldNameSplit...)
 	}
 	result.FieldName = strings.Join(fieldNameSplit, " ")
