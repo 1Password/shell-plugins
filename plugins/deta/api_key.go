@@ -46,7 +46,7 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 // TODO: Check if the platform stores the API Key in a local config file, and if so,
 // implement the function below to add support for importing it.
 func TryDetaConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return importer.TryFile("~/.detaspace/space_tokens", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		// var config Config
 		// if err := contents.ToYAML(&config); err != nil {
 		// 	out.AddError(err)
