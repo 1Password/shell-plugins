@@ -46,37 +46,11 @@ func DatabaseCredentials() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryCrateDBConfigFile(),
+			
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"CRATEPW": fieldname.Password, // TODO: Check if this is correct
+	"CRATEPW": fieldname.Password, 
 }
 
-// TODO: Check if the platform stores the Database Credentials in a local config file, and if so,
-// implement the function below to add support for importing it.
-func TryCrateDBConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
-
-		// if config. == "" {
-		// 	return
-		// }
-
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.: config.,
-		// 	},
-		// })
-	})
-}
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	 string
-// }
