@@ -11,7 +11,7 @@ func PrefectCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "Prefect",
 		Runs:    []string{"prefect"},
-		DocsURL: sdk.URL("https://docs.prefect.io/2.10.13/"),
+		DocsURL: sdk.URL("https://docs.prefect.io/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

@@ -1,6 +1,8 @@
 package prefect
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -12,7 +14,7 @@ import (
 func AccessKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AccessKey,
-		DocsURL:       sdk.URL("https://docs.prefect.io/2.10.13/cloud/users/api-keys/"),
+		DocsURL:       sdk.URL("https://docs.prefect.io/cloud/users/api-keys/"),
 		ManagementURL: sdk.URL("https://app.prefect.cloud/my/api-keys"),
 		Fields: []schema.CredentialField{
 			{
@@ -33,21 +35,41 @@ func AccessKey() schema.CredentialType {
 				Name:                fieldname.URL,
 				MarkdownDescription: "URL for the Prefect workspace.",
 				Secret:              false,
-				Composition: &schema.ValueComposition{
-					Length: 124,
-					Prefix: "https://api.prefect.cloud/api/accounts/",
-					Charset: schema.Charset{
-						Uppercase: false,
-						Lowercase: true,
-						Digits:    true,
-					},
-				},
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 		)}
+}
+
+func TryPrefectConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToTOML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		for profileName, configProfile := range config.Profile {
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields: map[sdk.FieldName]string{
+					fieldname.APIKey: configProfile.APIKey,
+					fieldname.URL:    configProfile.URL,
+				},
+				NameHint: importer.SanitizeNameHint(profileName),
+			})
+		}
+	})
+}
+
+type ConfigProfile struct {
+	URL    string `toml:"PREFECT_API_URL"`
+	APIKey string `toml:"PREFECT_API_KEY"`
+}
+
+type Config struct {
+	Profile map[string]ConfigProfile
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
