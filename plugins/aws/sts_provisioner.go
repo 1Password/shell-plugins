@@ -3,6 +3,8 @@ package aws
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"time"
 
@@ -54,7 +56,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
-	awsConfig, err := getAWSAuthConfigurationForProfile(profile)
+	awsConfig, err := ExecuteSilently(getAWSAuthConfigurationForProfile)(profile)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -67,7 +69,7 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
-	tempCredentials, err := tempCredentialsProvider.Retrieve(ctx)
+	tempCredentials, err := ExecuteSilently(tempCredentialsProvider.Retrieve)(ctx)
 	if err != nil {
 		out.AddError(err)
 		return
@@ -388,4 +390,12 @@ func DetectSourceProfileLoop(profile string, config *confighelpers.ConfigFile) e
 	}
 
 	return nil
+}
+
+func ExecuteSilently[input interface{}, output interface{}, e error](f func(input) (output, e)) func(input) (output, e) {
+	return func(i input) (output, e) {
+		log.SetOutput(io.Discard)
+		defer log.SetOutput(os.Stderr)
+		return f(i)
+	}
 }
