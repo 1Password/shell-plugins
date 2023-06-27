@@ -13,10 +13,15 @@ func TestAPITokenProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ 
 				fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+				fieldname.OrgURL: "https://huggingface.co",
+				fieldname.Endpoint: "https://api-inference.huggingface.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"HUGGINGFACE_TOKEN": "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+					"HF_ENDPOINT": "https://huggingface.co",
+					"HF_INFERENCE_ENDPOINT": "https://api-inference.huggingface.com",
+
 				},
 			},
 		},
@@ -28,9 +33,32 @@ func TestAPITokenImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{ 
 				"HUGGINGFACE_TOKEN": "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+				"HF_ENDPOINT": "https://huggingface.co",
+				"HF_INFERENCE_ENDPOINT": "https://api-inference.huggingface.com",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.OrgURL: "https://huggingface.co",
+						fieldname.Endpoint: "https://api-inference.huggingface.com",
+					},
+				},
+			},
+		},
+		"token file": {
+			Files: map[string]string{
+				"~/.cache/huggingface/token": plugintest.LoadFixture(t, "token"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					NameHint: "balaji_ceg@outlook.com",
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+					},
+				},
+				{
+					NameHint: "balaji_ceg@outlook.com",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 					},
