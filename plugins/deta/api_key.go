@@ -40,7 +40,7 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"DETA_API_KEY": fieldname.APIKey, // TODO: Check if this is correct
+	// "DETA_API_KEY": fieldname.APIKey, // TODO: Check if this is correct
 }
 
 // TODO: Check if the platform stores the API Key in a local config file, and if so,
