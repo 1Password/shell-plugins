@@ -11,7 +11,7 @@ func CivoCLI() schema.Executable {
 	return schema.Executable{
 		Name:      "Civo CLI", 
 		Runs:      []string{"civo"},
-		DocsURL:   sdk.URL("https://www.civo.com/docs/overview/civo-cli"), 
+		DocsURL:   sdk.URL("https://www.civo.com/docs/civo-cli"), 
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

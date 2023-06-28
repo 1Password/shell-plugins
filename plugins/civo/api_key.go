@@ -47,6 +47,7 @@ func APIKey() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"CIVO_TOKEN": fieldname.APIKey, 
+	//"CIVO_API_KEY_NAME": fieldname.APIKeyID,
 }
 
 var secondEnvVarMapping = map[string]sdk.FieldName{
@@ -79,5 +80,5 @@ func TryCivoConfigFile(path string) sdk.Importer {
 }
 
 type Config struct {
-	APIKeys  map[string]string `json:"apikeys"`
+	APIKeys  map[string]string `json:"apikey"`
 }
