@@ -59,7 +59,7 @@ func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
 }
 
 func TryRenderConfigFile() sdk.Importer {
-	return importer.TryFile(".render/config.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+	return importer.TryFile("~/.render/config.yaml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToYAML(&config); err != nil {
 			out.AddError(err)
