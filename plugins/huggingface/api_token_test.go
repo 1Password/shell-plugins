@@ -12,9 +12,9 @@ func TestAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ 
-				fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
-				fieldname.OrgURL: "https://huggingface.co",
-				fieldname.Endpoint: "https://api-inference.huggingface.com",
+				fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+				fieldname.Endpoint: "https://huggingface.co",
+				fieldname.API_URL: "https://api-inference.huggingface.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -39,9 +39,9 @@ func TestAPITokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
-						fieldname.OrgURL: "https://huggingface.co",
-						fieldname.Endpoint: "https://api-inference.huggingface.com",
+						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.Endpoint: "https://huggingface.co",
+						fieldname.API_URL: "https://api-inference.huggingface.com",
 					},
 				},
 			},
@@ -54,13 +54,13 @@ func TestAPITokenImporter(t *testing.T) {
 				{
 					NameHint: "balaji_ceg@outlook.com",
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 					},
 				},
 				{
 					NameHint: "balaji_ceg@outlook.com",
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 					},
 				},
 			},
