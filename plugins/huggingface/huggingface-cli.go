@@ -15,6 +15,8 @@ func HuggingFaceCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("login"),
+			needsauth.NotWhenContainsArgs("logout"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
