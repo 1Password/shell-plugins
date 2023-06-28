@@ -9,7 +9,7 @@ import (
 )
 	
 func TestAPITokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, UserAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ 
 				fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
@@ -29,7 +29,7 @@ func TestAPITokenProvisioner(t *testing.T) {
 }
 
 func TestAPITokenImporter(t *testing.T) {
-	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
+	plugintest.TestImporter(t, UserAccessToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{ 
 				"HUGGINGFACE_TOKEN": "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
