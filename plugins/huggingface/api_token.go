@@ -11,14 +11,14 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func APIToken() schema.CredentialType {
+func User_Access_Token() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://huggingface.co/docs/huggingface_hub/quick-start"), 
+		DocsURL:       sdk.URL("https://huggingface.co/docs/hub/security-tokens"), 
 		ManagementURL: sdk.URL("https://huggingface.co/settings/tokens"), 
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Token,
+				Name:                fieldname.User_Access_Token,
 				MarkdownDescription: "Token used to authenticate to HuggingFace.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -27,11 +27,12 @@ func APIToken() schema.CredentialType {
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
+						Symbols:   true,
 					},
 				},
 			},
 			{
-				Name:                fieldname.OrgURL,
+				Name:                fieldname.Endpoint,
 				MarkdownDescription: "Endpoint used to connect to HuggingFace CLI",
 				Optional:            true,
 				Secret:              false,
@@ -45,7 +46,7 @@ func APIToken() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.Website,
+				Name:                fieldname.API_URL,
 				MarkdownDescription: "HF Inference Endpoint used to connect to HuggingFace CLI",
 				Optional:            true,
 				Secret:              false,
@@ -62,25 +63,24 @@ func APIToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryHFtokenFile(),
+			TryHuggingFaceTokenFile(),
 		),}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"HUGGING_FACE_HUB_TOKEN": fieldname.Token, 
-	"HF_ENDPOINT": fieldname.OrgURL,
-	"HF_INFERENCE_ENDPOINT": fieldname.Endpoint,
-
+	"HUGGING_FACE_HUB_TOKEN": fieldname.User_Access_Token, 
+	"HF_ENDPOINT": fieldname.Endpoint,
+	"HF_INFERENCE_ENDPOINT": fieldname.API_URL,
 }
 
 
-func TryHFtokenFile() sdk.Importer {
+func TryHuggingFaceTokenFile() sdk.Importer {
 	return importer.TryFile("~/.cache/huggingface/token", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		fileData := string(contents)
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.Token: fileData ,
+				fieldname.User_Access_Token: fileData,
 			},
 		})
 	})
