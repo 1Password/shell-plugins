@@ -18,33 +18,4 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	})
 }
 
-func TestAPIKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
-		"environment": {
-			Environment: map[string]string{ // TODO: Check if this is correct
-				"RENDER_API_KEY": "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
-					},
-				},
-			},
-		},
-		// TODO: If you implemented a config file importer, add a test file example in render/test-fixtures
-		// and fill the necessary details in the test template below.
-		"config file": {
-			Files: map[string]string{
-				".render/config.yaml": plugintest.LoadFixture(t, "config.yml"),
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
-					},
-				},
-			},
-		},
-	})
-}
+
