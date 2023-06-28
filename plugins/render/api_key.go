@@ -47,8 +47,6 @@ func APIKey() schema.CredentialType {
 	}
 }
 
-// var defaultEnvVarMapping = map[string]sdk.FieldName{
-// }
 func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := Config{
 
