@@ -11,14 +11,14 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func User_Access_Token() schema.CredentialType {
+func UserAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIToken,
 		DocsURL:       sdk.URL("https://huggingface.co/docs/hub/security-tokens"), 
 		ManagementURL: sdk.URL("https://huggingface.co/settings/tokens"), 
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.User_Access_Token,
+				Name:                fieldname.UserAccessToken,
 				MarkdownDescription: "Token used to authenticate to HuggingFace.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -46,7 +46,7 @@ func User_Access_Token() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.API_URL,
+				Name:                fieldname.APIUrl,
 				MarkdownDescription: "HF Inference Endpoint used to connect to HuggingFace CLI",
 				Optional:            true,
 				Secret:              false,
@@ -68,9 +68,9 @@ func User_Access_Token() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"HUGGING_FACE_HUB_TOKEN": fieldname.User_Access_Token, 
+	"HUGGING_FACE_HUB_TOKEN": fieldname.UserAccessToken, 
 	"HF_ENDPOINT": fieldname.Endpoint,
-	"HF_INFERENCE_ENDPOINT": fieldname.API_URL,
+	"HF_INFERENCE_ENDPOINT": fieldname.APIUrl,
 }
 
 
@@ -80,7 +80,7 @@ func TryHuggingFaceTokenFile() sdk.Importer {
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.User_Access_Token: fileData,
+				fieldname.UserAccessToken: fileData,
 			},
 		})
 	})

@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://huggingface.co"),
 		},
 		Credentials: []schema.CredentialType{
-			User_Access_Token(),
+			UserAccessToken(),
 		},
 		Executables: []schema.Executable{
 			HuggingFaceCLI(),
