@@ -12,9 +12,9 @@ func TestAPITokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, UserAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ 
-				fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+				fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 				fieldname.Endpoint: "https://huggingface.co",
-				fieldname.API_URL: "https://api-inference.huggingface.com",
+				fieldname.APIUrl: "https://api-inference.huggingface.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
