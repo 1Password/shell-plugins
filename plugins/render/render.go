@@ -17,9 +17,9 @@ func ConfigPath() string {
 
 func RenderCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Render CLI", // TODO: Check if this is correct
+		Name:      "Render CLI", 
 		Runs:      []string{"render"},
-		DocsURL:   sdk.URL("https://render.com/docs/cli"), // TODO: Replace with actual URL
+		DocsURL:   sdk.URL("https://render.com/docs/cli"), 
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
