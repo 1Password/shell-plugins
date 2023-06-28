@@ -29,9 +29,8 @@ func UserLogin() schema.CredentialType {
 				Secret:              true,
 			},
 		},
-		DefaultProvisioner: provision.TempFile(dockerConfig, provision.AddArgs("--config={{ .Path }}")),
-
-		Importer: importer.TryAll(TryDockerConfigFile()),
+		DefaultProvisioner: provision.TempFile(dockerConfig, provision.AtFixedPath("~/.docker/config.json")),
+		Importer:           importer.TryAll(TryDockerConfigFile()),
 	}
 }
 
@@ -52,10 +51,10 @@ func dockerConfig(in sdk.ProvisionInput) ([]byte, error) {
 	return []byte(content), nil
 }
 
-var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"DOCKER_USERNAME": fieldname.Username,
-	"DOCKER_PASSWORD": fieldname.Password,
-}
+// var defaultEnvVarMapping = map[string]sdk.FieldName{
+// 	"DOCKER_USERNAME": fieldname.Username,
+// 	"DOCKER_PASSWORD": fieldname.Password,
+// }
 
 func TryDockerConfigFile() sdk.Importer {
 	return importer.TryFile("~/.docker/config.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
