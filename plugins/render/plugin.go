@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "render",
 		Platform: schema.PlatformInfo{
 			Name:     "Render",
-			Homepage: sdk.URL("https://render.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://render.com"),
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
