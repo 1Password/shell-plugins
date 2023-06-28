@@ -16,8 +16,8 @@ import (
 func UserLogin() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.UserLogin,
-		DocsURL:       sdk.URL("https://docker.com/docs/user_login"),              // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.docker.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://docker.com/docs/user_login"),
+		ManagementURL: sdk.URL("https://console.docker.com/user/security/tokens"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Username,
@@ -29,11 +29,27 @@ func UserLogin() schema.CredentialType {
 				Secret:              true,
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAll(
+		DefaultProvisioner: provision.TempFile(dockerConfig, provision.AddArgs("--config={{ .Path }}")),
 
-			TryDockerConfigFile(),
-		)}
+		Importer: importer.TryAll(TryDockerConfigFile()),
+	}
+}
+
+func dockerConfig(in sdk.ProvisionInput) ([]byte, error) {
+	content := "{\n"
+	content += "  \"auths\": {\n"
+
+	if username, ok := in.ItemFields[fieldname.Username]; ok {
+		auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + in.ItemFields[fieldname.Password]))
+		content += "    \"https://index.docker.io/v1/\": {\n"
+		content += "      \"auth\": \"" + auth + "\"\n"
+		content += "    },\n"
+	}
+
+	content += "  }\n"
+	content += "}\n"
+
+	return []byte(content), nil
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
