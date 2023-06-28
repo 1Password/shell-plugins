@@ -48,7 +48,14 @@ func APIKey() schema.CredentialType {
 }
 
 func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{}
+	config := Config{
+		Profiles: map[string]Profile{
+			"default": {
+				APIKey: in.ItemFields[fieldname.APIKey],
+			},
+		},
+	}
+	
 	contents, err := yaml.Marshal(&config)
 	if err != nil {
 		return nil, err
