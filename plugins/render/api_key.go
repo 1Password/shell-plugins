@@ -13,11 +13,11 @@ import (
 )
 
 type Config struct {
-	Profiles          map[string]Profile
+	Profiles map[string]Profile
 }
 
 type Profile struct {
-	APIKey        string `yaml:"apiKey"`
+	APIKey string `yaml:"apiKey"`
 }
 
 func APIKey() schema.CredentialType {
@@ -48,9 +48,7 @@ func APIKey() schema.CredentialType {
 }
 
 func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{
-
-	}
+	config := Config{}
 	contents, err := yaml.Marshal(&config)
 	if err != nil {
 		return nil, err

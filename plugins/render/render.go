@@ -1,12 +1,13 @@
 package render
 
 import (
-	"os"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
+	"os"
 )
+
 func ConfigPath() string {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
@@ -17,9 +18,9 @@ func ConfigPath() string {
 
 func RenderCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Render CLI", 
-		Runs:      []string{"render"},
-		DocsURL:   sdk.URL("https://render.com/docs/cli"), 
+		Name:    "Render CLI",
+		Runs:    []string{"render"},
+		DocsURL: sdk.URL("https://render.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
