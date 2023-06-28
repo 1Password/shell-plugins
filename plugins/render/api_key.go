@@ -64,15 +64,18 @@ func TryRenderConfigFile() sdk.Importer {
 			return
 		}
 
-		profile, ok := config.Profiles["default"]
-		if !ok || profile.APIKey == "" {
-			return
-		}
+		for profileName, profile := range config.Profiles {
+			if profile.APIKey == "" {
+				continue
+			}
 
-		out.AddCandidate(sdk.ImportCandidate{
-			Fields: map[sdk.FieldName]string{
-				fieldname.APIKey: profile.APIKey,
-			},
-		})
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields: map[sdk.FieldName]string{
+					fieldname.APIKey: profile.APIKey,
+				},
+				NameHint: importer.SanitizeNameHint(profileName),
+			})
+		}
 	})
 }
+
