@@ -39,9 +39,9 @@ func TestAPITokenImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 						fieldname.Endpoint: "https://huggingface.co",
-						fieldname.API_URL: "https://api-inference.huggingface.com",
+						fieldname.APIUrl: "https://api-inference.huggingface.com",
 					},
 				},
 			},
@@ -54,13 +54,13 @@ func TestAPITokenImporter(t *testing.T) {
 				{
 					NameHint: "balaji_ceg@outlook.com",
 					Fields: map[sdk.FieldName]string{
-						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 					},
 				},
 				{
 					NameHint: "balaji_ceg@outlook.com",
 					Fields: map[sdk.FieldName]string{
-						fieldname.User_Access_Token: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+						fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
 					},
 				},
 			},
