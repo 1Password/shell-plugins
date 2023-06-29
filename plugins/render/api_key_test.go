@@ -17,7 +17,7 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			ExpectedOutput: sdk.ProvisionOutput{
 				Files: map[string]sdk.OutputFile{
 					"~/.render/config.yaml": {
-						Contents: []byte(plugintest.LoadFixture(t, "config.yaml")+ "\n"),
+						Contents: []byte(plugintest.LoadFixture(t, "config.yaml") + "\n"),
 					},
 				},
 			},
