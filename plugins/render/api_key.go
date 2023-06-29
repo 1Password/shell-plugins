@@ -41,7 +41,7 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.TempFile(renderConfig, provision.AtFixedPath("~/.render/config.yaml")),
-		Importer: TryRenderConfigFile(),
+		Importer:           TryRenderConfigFile(),
 	}
 }
 
@@ -53,7 +53,7 @@ func renderConfig(in sdk.ProvisionInput) ([]byte, error) {
 			},
 		},
 	}
-	
+
 	contents, err := yaml.Marshal(&config)
 	if err != nil {
 		return nil, err
@@ -83,4 +83,3 @@ func TryRenderConfigFile() sdk.Importer {
 		}
 	})
 }
-

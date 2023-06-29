@@ -1,1 +1,3 @@
-apiKey: rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i
+profiles:
+  default:
+    apiKey: rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i

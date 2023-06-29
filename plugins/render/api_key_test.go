@@ -16,16 +16,14 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Files: map[string]sdk.OutputFile{
-					"~/.render/config.yaml":{
+					"~/.render/config.yaml": {
 						Contents: []byte(plugintest.LoadFixture(t, "config.yaml")),
 					},
 				},
 			},
 		},
-		
 	})
 }
-
 
 func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
