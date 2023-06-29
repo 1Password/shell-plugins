@@ -17,3 +17,21 @@ func TestAPIKeyProvisioner(t *testing.T) {
 		},
 	})
 }
+
+
+func TestAPIKeyImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
+		"config file": {
+			Files: map[string]string{
+				"~/.render/config.yaml": plugintest.LoadFixture(t, "config.yaml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.APIKey: "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
+					},
+				},
+			},
+		},
+	})
+}
