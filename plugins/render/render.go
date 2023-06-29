@@ -15,6 +15,11 @@ func RenderCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("config"),
+			needsauth.NotWhenContainsArgs("jobs"),
+			needsauth.NotWhenContainsArgs("deploys"),
+			needsauth.NotWhenContainsArgs("repo"),
+			needsauth.NotWhenContainsArgs("services"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
