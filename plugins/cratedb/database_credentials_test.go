@@ -11,13 +11,21 @@ import (
 func TestDatabaseCredentialsProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
-				fieldname.: "yqch",
+			ItemFields: map[sdk.FieldName]string{ 
+				fieldname.Password: "1<34&f0rg3t@me",
+				fieldname.Username: "admin",
+				fieldname.Host: "https://love.aks1.eastus2.azure.cratedb.net:4200",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"CRATEDB": "yqch",
+					"CRATEPW": "1<34&f0rg3t@me",
 				},
+				CommandLine: []string{
+					"--username",
+					"admin",
+					"--host",
+					"https://love.aks1.eastus2.azure.cratedb.net:4200"
+				}
 			},
 		},
 	})
