@@ -1,6 +1,1 @@
-version: 1
-sshPreserveHosts: true
-profiles:
-  default:
-    defaultRegion: oregon
-    apiKey: rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i
+apiKey: rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i
