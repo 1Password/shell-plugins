@@ -38,7 +38,7 @@ func TestAPITokenImporter(t *testing.T) {
 				ExpectedCandidates: []sdk.ImportCandidate{
 					{
 						Fields: map[sdk.FieldName]string{
-							fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE",
+							fieldname.UserAccessToken: "hf_yVvZeburdKtnwkVCWPXimmNwaFuEXAMPLE\n",
 						},
 					},
 				},
