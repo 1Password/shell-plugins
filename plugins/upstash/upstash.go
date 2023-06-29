@@ -9,9 +9,9 @@ import (
 
 func UpstashCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Upstash CLI", 
-		Runs:      []string{"upstash"},
-		DocsURL:   sdk.URL("https://github.com/upstash/cli"), 
+		Name:    "Upstash CLI",
+		Runs:    []string{"upstash"},
+		DocsURL: sdk.URL("https://github.com/upstash/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
