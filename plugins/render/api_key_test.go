@@ -14,7 +14,15 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey: "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
 			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Files: map[string]sdk.OutputFile{
+					ConfigPath(): {
+						Contents: []byte(plugintest.LoadFixture(t, "config.yaml")),
+					},
+				},
+			},
 		},
+		
 	})
 }
 
