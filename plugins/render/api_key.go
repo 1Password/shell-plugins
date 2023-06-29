@@ -41,9 +41,7 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.TempFile(renderConfig, provision.AtFixedPath(ConfigPath())),
-		Importer: importer.TryAll(
-			TryRenderConfigFile(),
-		),
+		Importer: TryRenderConfigFile(),
 	}
 }
 
