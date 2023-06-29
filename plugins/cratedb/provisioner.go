@@ -24,7 +24,14 @@ func (p crateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 		out.AddEnvVar("CRATEPW", value)
 	}
 	
-	out.CommandLine = append(out.CommandLine[1:], argsToProvision...)
+	for i, arg := range argsToProvision {
+		if i%2 == 0 {
+			argName := arg
+			fieldName := sdk.FieldName(argsToProvision[i+1])
+			if fieldValue, ok := in.ItemFields[fieldName]; ok {
+				out.AddArgs(argName, fieldValue)
+			}
+		}
 	
 }
 
@@ -33,5 +40,5 @@ func (p crateArgsProvisioner) Deprovision(ctx context.Context, in sdk.Deprovisio
 }
 
 func (p crateArgsProvisioner) Description() string {
-	return "Provision crate secrets as command-line arguments."
+	return "Provision CrateDB username, host as command-line arguments && Password as Env ."
 }

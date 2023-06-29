@@ -33,11 +33,9 @@ func DatabaseCredentials() schema.CredentialType {
 				Secret:              true,
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
-			
-		)}
+		DefaultProvisioner: provision.NoOp(),
+		Importer: importer.TryEnvVarPair(defaultEnvVarMapping),
+		}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
