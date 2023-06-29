@@ -8,8 +8,8 @@ import (
 )
 
 var argsToProvision = []string{
-	"--username", fieldname.Username.String(),
-	"--hosts", fieldname.Host.String(),
+	"--username", fieldname.Username,
+	"--hosts", fieldname.Host,
 }
 
 type crateArgsProvisioner struct {
