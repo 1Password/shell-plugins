@@ -13,12 +13,12 @@ func TestAPIKeyProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey: "d68850db-69f7-qxe9pubcmjnqfgyexample",
-				fieldname.Email:  "fakememail12@gmail.com",
+				fieldname.Email:  "wendy@appleseed.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"UPSTASH_API_KEY": "d68850db-69f7-qxe9pubcmjnqfgyexample",
-					"UPSTASH_EMAIL":   "fakememail12@gmail.com",
+					"UPSTASH_EMAIL":  "wendy@appleseed.com",
 				},
 			},
 		},
@@ -30,13 +30,13 @@ func TestAPIKeyImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{
 				"UPSTASH_API_KEY": "d68850db-69f7-qxe9pubcmjnqfgyexample",
-				"UPSTASH_EMAIL":   "fakememail12@gmail.com",
+				"UPSTASH_EMAIL":   "wendy@appleseed.com",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey: "d68850db-69f7-qxe9pubcmjnqfgyexample",
-						fieldname.Email:  "fakememail12@gmail.com",
+						fieldname.Email:  "wendy@appleseed.com",
 					},
 				},
 			},
@@ -50,7 +50,7 @@ func TestAPIKeyImporter(t *testing.T) {
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey: "d68850db-69f7-qxe9pubcmjnqfgyexample",
-						fieldname.Email:  "fakememail12@gmail.com",
+						fieldname.Email:  "wendy@appleseed.com",
 					},
 				},
 			},

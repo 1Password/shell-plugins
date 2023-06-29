@@ -26,6 +26,7 @@ func APIKey() schema.CredentialType {
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
+						Symbols:   true,
 					},
 				},
 			},
