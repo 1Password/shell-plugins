@@ -40,7 +40,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(renderConfig, provision.AtFixedPath(ConfigPath())),
+		DefaultProvisioner: provision.TempFile(renderConfig, provision.AtFixedPath("~/.render/config.yaml")),
 		Importer: TryRenderConfigFile(),
 	}
 }
