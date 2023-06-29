@@ -13,13 +13,10 @@ func TestAPIKeyProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey:   "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-				fieldname.APIKeyID: "testdemoname",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"CIVO_TOKEN":        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-					"CIVO_API_KEY":      "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-					"CIVO_API_KEY_NAME": "testdemoname",
 				},
 			},
 		},
@@ -55,7 +52,6 @@ func TestAPIKeyImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey:        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 						fieldname.APIKeyID:      "testdemoname",
-						fieldname.DefaultRegion: "LON1",
 					},
 				},
 			},

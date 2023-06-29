@@ -1,11 +1,5 @@
 {
     "apikeys": {
-      "newspidey": "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE"
-    },
-    "meta": {
-    
-      "current_apikey": "newspidey1",
-      "default_region": "LON1"
-   
+      "testdemoname": "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE"
     }
-  }
+}
