@@ -7,11 +7,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-var argsToProvision = []string{
-	"--username", fieldname.Username,
-	"--hosts", fieldname.Host,
-}
-
 type crateArgsProvisioner struct {
 }
 
@@ -24,16 +19,19 @@ func (p crateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 		out.AddEnvVar("CRATEPW", value)
 	}
 	
-	for i, arg := range argsToProvision {
-		if i%2 == 0 {
-			argName := arg
-			fieldName := sdk.FieldName(argsToProvision[i+1])
-			if fieldValue, ok := in.ItemFields[fieldName]; ok {
-				out.AddArgs(argName, fieldValue)
-			}
-		}
+	var user, host string
+	if fieldValue, ok := in.ItemFields[fieldname.Username]; ok {
+		user=fieldValue
+	}
+	if fieldValue, ok := in.ItemFields[fieldname.Host]; ok {
+		host=fieldValue
+	}
+		commandLine := []string{out.CommandLine[0], "--username", user, "--hosts", host, }
+		commandLine = append(commandLine, out.CommandLine[1:]...)
+		out.CommandLine = commandLine
 	
 }
+
 
 func (p crateArgsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: credentials get wiped automatically when the process exits.
