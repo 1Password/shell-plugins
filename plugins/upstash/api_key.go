@@ -14,7 +14,7 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://docs.upstash.com/redis/account/developerapi#create-an-api-key"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://docs.upstash.com/redis/account/developerapi#create-an-api-key"), 
 		ManagementURL: sdk.URL("https://console.upstash.com/account/api"), 
 		Fields: []schema.CredentialField{
 			{
@@ -57,7 +57,7 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 func TryUpstashConfigFile() sdk.Importer {
 	return importer.TryFile("~/.upstash.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
-		if err := contents.ToYAML(&config); err != nil {
+		if err := contents.ToJSON(&config); err != nil {
 			out.AddError(err)
 			return
 		}
