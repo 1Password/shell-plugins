@@ -12,11 +12,11 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.APIKey:   "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+				fieldname.APIKey: "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"CIVO_TOKEN":        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
+					"CIVO_TOKEN": "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 				},
 			},
 		},
@@ -27,15 +27,12 @@ func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"CIVO_TOKEN":        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-				"CIVO_API_KEY":      "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-				"CIVO_API_KEY_NAME": "testdemoname",
+				"CIVO_TOKEN": "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey:   "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-						fieldname.APIKeyID: "testdemoname",
+						fieldname.APIKey: "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 					},
 				},
 			},
@@ -47,12 +44,11 @@ func TestAPIKeyImporter(t *testing.T) {
 				"~/.civo.json": plugintest.LoadFixture(t, ".civo.json"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
-
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey:        "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
-						fieldname.APIKeyID:      "testdemoname",
+						fieldname.APIKey: "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 					},
+					NameHint:"testdemoname",
 				},
 			},
 		},

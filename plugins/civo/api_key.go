@@ -30,28 +30,16 @@ func APIKey() schema.CredentialType {
 					},
 				},
 			},
-			{
-				Name:                fieldname.APIKeyID,
-				MarkdownDescription: "The Name of apikey used to authenticate to civo",
-				Optional:            true,
-			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			importer.TryEnvVarPair(secondEnvVarMapping),
 			TryCivoConfigFile("~/.civo.json"),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"CIVO_TOKEN":        fieldname.APIKey,
-	//"CIVO_API_KEY_NAME": fieldname.APIKeyID,
-}
-
-var secondEnvVarMapping = map[string]sdk.FieldName{
-    "CIVO_API_KEY"     : fieldname.APIKey,
-    "CIVO_API_KEY_NAME": fieldname.APIKeyID,
+	"CIVO_TOKEN": fieldname.APIKey,
 }
 
 func TryCivoConfigFile(path string) sdk.Importer {
