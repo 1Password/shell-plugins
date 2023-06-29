@@ -14,8 +14,8 @@ import (
 func UserAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIToken,
-		DocsURL:       sdk.URL("https://huggingface.co/docs/hub/security-tokens"), 
-		ManagementURL: sdk.URL("https://huggingface.co/settings/tokens"), 
+		DocsURL:       sdk.URL("https://huggingface.co/docs/hub/security-tokens"),
+		ManagementURL: sdk.URL("https://huggingface.co/settings/tokens"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.UserAccessToken,
@@ -23,7 +23,7 @@ func UserAccessToken() schema.CredentialType {
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 37,
-					Prefix: "hf_", 
+					Prefix: "hf_",
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -64,15 +64,14 @@ func UserAccessToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryHuggingFaceTokenFile(),
-		),}
+		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"HUGGING_FACE_HUB_TOKEN": fieldname.UserAccessToken, 
-	"HF_ENDPOINT": fieldname.Endpoint,
-	"HF_INFERENCE_ENDPOINT": fieldname.APIUrl,
+	"HUGGING_FACE_HUB_TOKEN": fieldname.UserAccessToken,
+	"HF_ENDPOINT":            fieldname.Endpoint,
+	"HF_INFERENCE_ENDPOINT":  fieldname.APIUrl,
 }
-
 
 func TryHuggingFaceTokenFile() sdk.Importer {
 	return importer.TryFile("~/.cache/huggingface/token", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {

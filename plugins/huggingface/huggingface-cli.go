@@ -9,9 +9,9 @@ import (
 
 func HuggingFaceCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "HuggingFace CLI", 
-		Runs:      []string{"huggingface-cli"},
-		DocsURL:   sdk.URL("https://huggingface.co/docs/huggingface_hub/quick-start"),
+		Name:    "HuggingFace CLI",
+		Runs:    []string{"huggingface-cli"},
+		DocsURL: sdk.URL("https://huggingface.co/docs/huggingface_hub/quick-start"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
