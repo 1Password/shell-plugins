@@ -23,12 +23,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                fieldname.Port,
-				MarkdownDescription: "Port used to connect to CrateDB.",
-				Optional:            true,
-			},
-			{
-				Name:                fieldname.User,
+				Name:                fieldname.Username,
 				MarkdownDescription: "CrateDB user to authenticate as.",
 				Optional:            true,
 			},
@@ -36,11 +31,6 @@ func DatabaseCredentials() schema.CredentialType {
 				Name:                fieldname.Password,
 				MarkdownDescription: "Password used to authenticate to CrateDB.",
 				Secret:              true,
-			},
-			{
-				Name:                fieldname.Database,
-				MarkdownDescription: "Database name to connect to.",
-				Optional:            true,
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
