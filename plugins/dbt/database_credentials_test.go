@@ -1,4 +1,4 @@
-package dbtredshift
+package dbt
 
 import (
 	"testing"

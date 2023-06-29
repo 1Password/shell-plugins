@@ -1,4 +1,4 @@
-package dbtredshift
+package dbt
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,16 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "dbtredshift",
+		Name: "dbt",
 		Platform: schema.PlatformInfo{
-			Name:     "DBT Redshift",
+			Name:     "DBT",
 			Homepage: sdk.URL("https://www.getdbt.com"),
 		},
 		Credentials: []schema.CredentialType{
 			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
-			dbtredshiftCLI(),
+			dbtCLI(),
 		},
 	}
 }

@@ -1,4 +1,4 @@
-package dbtredshift
+package dbt
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,11 +7,11 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func dbtredshiftCLI() schema.Executable {
+func dbtCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "dbtredshift",
+		Name:    "dbt",
 		Runs:    []string{"dbt"},
-		DocsURL: sdk.URL("https://docs.getdbt.com/docs/core/connect-data-platform/redshift-setup"),
+		DocsURL: sdk.URL("https://docs.getdbt.com/docs/core/connect-data-platform/about-core-connections"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

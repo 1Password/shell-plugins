@@ -1,4 +1,4 @@
-package dbtredshift
+package dbt
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -16,25 +16,28 @@ func DatabaseCredentials() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
-				MarkdownDescription: "Redshift host to connect to.",
+				MarkdownDescription: "Host to connect to.",
+				Optional:            true,
 			},
 			{
 				Name:                fieldname.Port,
-				MarkdownDescription: "Port used to connect to Redshift.",
+				MarkdownDescription: "Port used to connect to.",
 				Optional:            true,
 			},
 			{
 				Name:                fieldname.User,
-				MarkdownDescription: "Redshift user to authenticate as.",
+				MarkdownDescription: "User to authenticate as.",
+				Optional:            true,
 			},
 			{
 				Name:                fieldname.Password,
-				MarkdownDescription: "Password used to authenticate to Redshift.",
+				MarkdownDescription: "Password used to authenticate to.",
 				Secret:              true,
 			},
 			{
 				Name:                fieldname.Database,
 				MarkdownDescription: "Database name to connect to.",
+				Optional:            true,
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
