@@ -14,8 +14,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://docs.upstash.com/redis/account/developerapi#create-an-api-key"), 
-		ManagementURL: sdk.URL("https://console.upstash.com/account/api"), 
+		DocsURL:       sdk.URL("https://docs.upstash.com/redis/account/developerapi#create-an-api-key"),
+		ManagementURL: sdk.URL("https://console.upstash.com/account/api"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
@@ -42,7 +42,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-        DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryUpstashConfigFile(),
@@ -50,8 +50,8 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"UPSTASH_API_KEY": fieldname.APIKey, 
-	"UPSTASH_EMAIL" : fieldname.Email,
+	"UPSTASH_API_KEY": fieldname.APIKey,
+	"UPSTASH_EMAIL":   fieldname.Email,
 }
 
 func TryUpstashConfigFile() sdk.Importer {
@@ -69,13 +69,13 @@ func TryUpstashConfigFile() sdk.Importer {
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
 				fieldname.APIKey: config.APIKey,
-				fieldname.Email : config.Email,
+				fieldname.Email:  config.Email,
 			},
 		})
 	})
 }
 
 type Config struct {
-	APIKey string  `json:"apiKey"`
-	Email  string  `json:"email"`
+	APIKey string `json:"apiKey"`
+	Email  string `json:"email"`
 }

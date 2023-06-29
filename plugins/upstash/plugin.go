@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "upstash",
 		Platform: schema.PlatformInfo{
 			Name:     "Upstash",
-			Homepage: sdk.URL("https://upstash.com"), 
+			Homepage: sdk.URL("https://upstash.com"),
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
