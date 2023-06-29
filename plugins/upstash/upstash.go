@@ -15,7 +15,8 @@ func UpstashCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.NotForExactArgs("config"),
+			needsauth.NotWhenContainsArgs("--config"),
+			needsauth.NotWhenContainsArgs("-c"),
 			needsauth.NotWhenContainsArgs("auth"),
 		),
 		Uses: []schema.CredentialUsage{
