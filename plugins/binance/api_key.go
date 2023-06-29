@@ -12,8 +12,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://github.com/binance/binance-cli"), 
-		ManagementURL: sdk.URL("https://www.binance.com/en/my/settings/api-management"), 
+		DocsURL:       sdk.URL("https://github.com/binance/binance-cli"),
+		ManagementURL: sdk.URL("https://www.binance.com/en/my/settings/api-management"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
@@ -49,7 +49,6 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"BINANCE_API_KEY": fieldname.APIKey, 
-	"BINANCE_API_SECRET": fieldname.APISecret, 
+	"BINANCE_API_KEY":    fieldname.APIKey,
+	"BINANCE_API_SECRET": fieldname.APISecret,
 }
-

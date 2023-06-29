@@ -9,9 +9,9 @@ import (
 
 func BinanceCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Binance CLI", 
-		Runs:      []string{"binance-cli"},
-		DocsURL:   sdk.URL("https://github.com/binance/binance-cli"), 
+		Name:    "Binance CLI",
+		Runs:    []string{"binance-cli"},
+		DocsURL: sdk.URL("https://github.com/binance/binance-cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
