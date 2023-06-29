@@ -11,7 +11,7 @@ import (
 func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey: "rnd_Z7xMKp4NX1FoQNRyBpZs9yxDbu3i",
 			},
 		},
