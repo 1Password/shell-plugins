@@ -95,7 +95,6 @@ func TryScalewayConfigFile() sdk.Importer {
 			return
 		}
 
-
 		if config.AccessKey == "" || config.SecretKey == "" {
 			return
 		}
@@ -104,7 +103,7 @@ func TryScalewayConfigFile() sdk.Importer {
 		fields[fieldname.AccessKeyID] = config.AccessKey
 		fields[fieldname.SecretAccessKey] = config.SecretKey
 		if config.DefaultOrganizationID != "" {
-		fields[fieldname.DefaultOrganization] = config.DefaultOrganizationID
+			fields[fieldname.DefaultOrganization] = config.DefaultOrganizationID
 		}
 		if config.DefaultRegion != "" {
 			fields[fieldname.DefaultRegion] = config.DefaultRegion
@@ -119,11 +118,10 @@ func TryScalewayConfigFile() sdk.Importer {
 }
 
 type Config struct {
-	AccessKey             string            `yaml:"access_key"`
-	SecretKey             string            `yaml:"secret_key"`
-	DefaultOrganizationID string            `yaml:"default_organization_id"`
-	DefaultProjectID      string            `yaml:"default_project_id"`
-	DefaultRegion         string            `yaml:"default_region"`
-	DefaultZone           string            `yaml:"default_zone"`
+	AccessKey             string `yaml:"access_key"`
+	SecretKey             string `yaml:"secret_key"`
+	DefaultOrganizationID string `yaml:"default_organization_id"`
+	DefaultProjectID      string `yaml:"default_project_id"`
+	DefaultRegion         string `yaml:"default_region"`
+	DefaultZone           string `yaml:"default_zone"`
 }
-
