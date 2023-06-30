@@ -12,8 +12,8 @@ func TestUserLoginProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, UserLogin().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Username: "cheithanya",
-				fieldname.Password: "Dockerforch@123",
+				fieldname.Username: "Stream",
+				fieldname.Password: "Stream@087",
 				//	fieldname.URL:      "https://index.docker.io/v1/",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -35,8 +35,8 @@ func TestUserLoginImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Username: "cheithanya",
-						fieldname.Password: "Dockerforch@123",
+						fieldname.Username: "Stream",
+						fieldname.Password: "Stream@087",
 					},
 				},
 			},
