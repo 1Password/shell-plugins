@@ -36,25 +36,20 @@ func UserLogin() schema.CredentialType {
 
 func dockerConfig(in sdk.ProvisionInput) ([]byte, error) {
 	content := "{\n"
-	content += "  \"auths\": {\n"
+	content += "\"auths\":{\n"
 
 	if username, ok := in.ItemFields[fieldname.Username]; ok {
 		auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + in.ItemFields[fieldname.Password]))
-		content += "    \"https://index.docker.io/v1/\": {\n"
-		content += "      \"auth\": \"" + auth + "\"\n"
-		content += "    },\n"
+		content += "\"https://index.docker.io/v1/\":{\n"
+		content += "\"auth\":\"" + auth + "\"\n"
+		content += "}\n"
 	}
 
-	content += "  }\n"
+	content += "}\n"
 	content += "}\n"
 
 	return []byte(content), nil
 }
-
-// var defaultEnvVarMapping = map[string]sdk.FieldName{
-// 	"DOCKER_USERNAME": fieldname.Username,
-// 	"DOCKER_PASSWORD": fieldname.Password,
-// }
 
 func TryDockerConfigFile() sdk.Importer {
 	return importer.TryFile("~/.docker/config.json", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
@@ -79,6 +74,7 @@ func TryDockerConfigFile() sdk.Importer {
 			username, password := parseCredentials(credentials)
 			if username != "" {
 				out.AddCandidate(sdk.ImportCandidate{
+					NameHint: "",
 					Fields: map[sdk.FieldName]string{
 						fieldname.Username: username,
 						fieldname.Password: password,
