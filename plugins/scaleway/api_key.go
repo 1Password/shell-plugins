@@ -125,15 +125,5 @@ type Config struct {
 	DefaultProjectID      string            `yaml:"default_project_id"`
 	DefaultRegion         string            `yaml:"default_region"`
 	DefaultZone           string            `yaml:"default_zone"`
-	ActiveProfile         string            `yaml:"active_profile,omitempty"`
-	Profiles              map[string]Profile `yaml:"profiles,omitempty"`
 }
 
-type Profile struct {
-	AccessKey             string `yaml:"access_key"`
-	SecretKey             string `yaml:"secret_key"`
-	DefaultOrganizationID string `yaml:"default_organization_id"`
-	DefaultProjectID      string `yaml:"default_project_id"`
-	DefaultZone           string `yaml:"default_zone"`
-	DefaultRegion         string `yaml:"default_region"`
-}
