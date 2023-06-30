@@ -32,6 +32,7 @@ func APIToken() schema.CredentialType {
 			{
 				Name:                fieldname.Email,
 				MarkdownDescription: "Email address registered in Nirmata.",
+				Optional:            true,
 			},
 			{
 				Name:                fieldname.Address,
@@ -65,13 +66,13 @@ func TryNirmataConfigFile() sdk.Importer {
 			if section.HasKey("address") && section.Key("address").Value() != "" {
 				fields[fieldname.Address] = section.Key("address").Value()
 			}
-			if section.HasKey("email") && section.Key("email").Value() != "" {
-				fields[fieldname.Email] = section.Key("email").Value()
-			}
+			// if section.HasKey("email") && section.Key("email").Value() != "" {
+			// 	fields[fieldname.Email] = section.Key("email").Value()
+			// }
 			if section.HasKey("token") && section.Key("token").Value() != "" {
 				fields[fieldname.Token] = section.Key("token").Value()
 			}
-			if fields[fieldname.Address] != "" && fields[fieldname.Email] != "" && fields[fieldname.Token] != "" {
+			if fields[fieldname.Token] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields: fields,
 				})
@@ -83,7 +84,6 @@ func TryNirmataConfigFile() sdk.Importer {
 }
 
 type Config struct {
-	Address string
-	Email   string
 	Token   string
+	Address string
 }
