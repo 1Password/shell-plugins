@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "cratedb",
 		Platform: schema.PlatformInfo{
 			Name:     "CrateDB",
-			Homepage: sdk.URL("https://crate.io/"), 
+			Homepage: sdk.URL("https://crate.io/"),
 		},
 		Credentials: []schema.CredentialType{
 			DatabaseCredentials(),

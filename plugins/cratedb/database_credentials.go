@@ -1,7 +1,6 @@
 package cratedb
 
 import (
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -33,11 +32,10 @@ func DatabaseCredentials() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.NoOp(),
-		Importer: importer.TryEnvVarPair(defaultEnvVarMapping),
-		}
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
+	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"CRATEPW": fieldname.Password, 
+	"CRATEPW": fieldname.Password,
 }
-
