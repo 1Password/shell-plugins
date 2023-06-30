@@ -48,7 +48,7 @@ func TestAPIKeyImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.APIKey: "XFIx85McyfCQc490j1tBa5b5s2XiWerNdOdfnkrOnchEXAMPLE",
 					},
-					NameHint:"testdemoname",
+					NameHint: "testdemoname",
 				},
 			},
 		},

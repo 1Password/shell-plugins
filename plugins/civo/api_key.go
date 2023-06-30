@@ -2,8 +2,8 @@ package civo
 
 import (
 	"context"
-	
-    "github.com/1Password/shell-plugins/sdk"
+
+	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
