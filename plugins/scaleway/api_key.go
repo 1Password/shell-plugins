@@ -95,7 +95,6 @@ func TryScalewayConfigFile() sdk.Importer {
 			return
 		}
 
-		// TODO : Handle multiple profiles
 
 		if config.AccessKey == "" || config.SecretKey == "" {
 			return
@@ -104,7 +103,9 @@ func TryScalewayConfigFile() sdk.Importer {
 		fields := make(map[sdk.FieldName]string)
 		fields[fieldname.AccessKeyID] = config.AccessKey
 		fields[fieldname.SecretAccessKey] = config.SecretKey
+		if config.DefaultOrganizationID != "" {
 		fields[fieldname.DefaultOrganization] = config.DefaultOrganizationID
+		}
 		if config.DefaultRegion != "" {
 			fields[fieldname.DefaultRegion] = config.DefaultRegion
 		}
@@ -125,10 +126,10 @@ type Config struct {
 	DefaultRegion         string            `yaml:"default_region"`
 	DefaultZone           string            `yaml:"default_zone"`
 	ActiveProfile         string            `yaml:"active_profile,omitempty"`
-	Profiles              map[string]Profil `yaml:"profiles,omitempty"`
+	Profiles              map[string]Profile `yaml:"profiles,omitempty"`
 }
 
-type Profil struct {
+type Profile struct {
 	AccessKey             string `yaml:"access_key"`
 	SecretKey             string `yaml:"secret_key"`
 	DefaultOrganizationID string `yaml:"default_organization_id"`
