@@ -18,7 +18,7 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"UPSTASH_API_KEY": "d68850db-69f7-qxe9pubcmjnqfgyexample",
-					"UPSTASH_EMAIL":  "wendy@appleseed.com",
+					"UPSTASH_EMAIL":   "wendy@appleseed.com",
 				},
 			},
 		},
