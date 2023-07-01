@@ -19,7 +19,7 @@ func CrateDBCLI() schema.Executable {
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.DatabaseCredentials,
-				Provisioner: crateProvisioner(),
+				Provisioner: CrateArgsProvisioner{} ,
 			},
 		},
 	}

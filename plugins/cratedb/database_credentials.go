@@ -18,12 +18,12 @@ func DatabaseCredentials() schema.CredentialType {
 			{
 				Name:                fieldname.Host,
 				MarkdownDescription: "CrateDB host to connect to.",
-				Optional:            true,
+				Optional:            false,
 			},
 			{
 				Name:                fieldname.Username,
 				MarkdownDescription: "CrateDB user to authenticate as.",
-				Optional:            true,
+				Optional:            false,
 			},
 			{
 				Name:                fieldname.Password,
