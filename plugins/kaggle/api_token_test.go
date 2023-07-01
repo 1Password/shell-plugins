@@ -17,7 +17,7 @@ func TestAPITokenProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"KAGGLE_TOKEN":    "z2pifkruzgbb17plmz2gux21fexample",
+					"KAGGLE_KEY":      "z2pifkruzgbb17plmz2gux21fexample",
 					"KAGGLE_USERNAME": "username",
 				},
 			},

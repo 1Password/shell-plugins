@@ -46,6 +46,6 @@ func APIToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"KAGGLE_TOKEN":    fieldname.Token,
+	"KAGGLE_KEY":      fieldname.Token,
 	"KAGGLE_USERNAME": fieldname.Username,
 }
