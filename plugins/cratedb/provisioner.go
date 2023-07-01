@@ -7,14 +7,14 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-type crateArgsProvisioner struct {
+type CrateArgsProvisioner struct {
 }
 
 func crateProvisioner() sdk.Provisioner {
-	return crateArgsProvisioner{}
+	return CrateArgsProvisioner{}
 }
 
-func (p crateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	if value, ok := in.ItemFields[fieldname.Password]; ok {
 		out.AddEnvVar("CRATEPW", value)
 	}
@@ -26,17 +26,16 @@ func (p crateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 	if fieldValue, ok := in.ItemFields[fieldname.Host]; ok {
 		host=fieldValue
 	}
-		commandLine := []string{out.CommandLine[0], "--username", user, "--hosts", host, }
-		commandLine = append(commandLine, out.CommandLine[1:]...)
-		out.CommandLine = commandLine
+
+	out.CommandLine = []string{"--username", user, "--hosts", host, }
+
 	
 }
 
-
-func (p crateArgsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+func (p CrateArgsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
 	// Nothing to do here: credentials get wiped automatically when the process exits.
 }
 
-func (p crateArgsProvisioner) Description() string {
+func (p CrateArgsProvisioner) Description() string {
 	return "Provision CrateDB username, host as command-line arguments && Password as Env ."
 }
