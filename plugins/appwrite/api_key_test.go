@@ -18,7 +18,7 @@ func TestAPIKeyProvisioner(t *testing.T) {
 			ExpectedOutput: sdk.ProvisionOutput{
 				Files: map[string]sdk.OutputFile{
 					ConfigPath(): {
-						Contents: []byte(plugintest.LoadFixture(t, "import_prefs.json")),
+						Contents: []byte(plugintest.LoadFixture(t, "prefs.json")),
 					},
 				},
 			},
@@ -30,7 +30,7 @@ func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"Appwrite prefs file": {
 			Files: map[string]string{
-				ConfigPath(): plugintest.LoadFixture(t, "import_prefs.json"),
+				ConfigPath(): plugintest.LoadFixture(t, "prefs.json"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
