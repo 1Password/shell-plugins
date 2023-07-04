@@ -2,7 +2,6 @@ package appwrite
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"encoding/json"
@@ -76,9 +75,6 @@ func TryAppwriteConfigFile() sdk.Importer {
 			out.AddError(err)
 			return
 		}
-
-		fmt.Println("Printing the imported file")
-		fmt.Println(config)
 
 		if config.APIKey == "" {
 			return
