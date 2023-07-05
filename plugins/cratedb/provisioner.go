@@ -10,9 +10,7 @@ import (
 type CrateArgsProvisioner struct {
 }
 
-func crateProvisioner() sdk.Provisioner {
-	return CrateArgsProvisioner{}
-}
+
 
 func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	if value, ok := in.ItemFields[fieldname.Password]; ok {
