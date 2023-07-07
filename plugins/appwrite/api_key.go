@@ -2,7 +2,6 @@ package appwrite
 
 import (
 	"context"
-	"os"
 
 	"encoding/json"
 
@@ -15,12 +14,7 @@ import (
 )
 
 func ConfigPath() string {
-	configDir, err := os.UserHomeDir()
-	if err != nil {
-		return "~/.appwrite/prefs.json"
-	}
-
-	return configDir + "/.appwrite/prefs.json"
+	return "~/.appwrite/prefs.json"
 }
 
 func APIKey() schema.CredentialType {
@@ -49,9 +43,8 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.TempFile(appwriteConfig, provision.AtFixedPath(ConfigPath())),
-		Importer: importer.TryAll(
-			TryAppwriteConfigFile(),
-		)}
+		Importer:           TryAppwriteConfigFile(),
+	}
 }
 
 func appwriteConfig(in sdk.ProvisionInput) ([]byte, error) {
@@ -60,7 +53,7 @@ func appwriteConfig(in sdk.ProvisionInput) ([]byte, error) {
 		Endpoint: in.ItemFields[fieldname.Endpoint],
 	}
 
-	contents, err := json.MarshalIndent(&config, "", "  ")
+	contents, err := json.Marshal(&config)
 	if err != nil {
 		return nil, err
 	}
