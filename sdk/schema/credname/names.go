@@ -9,6 +9,7 @@ const (
 	APIToken             = sdk.CredentialName("API Token")
 	AccessKey            = sdk.CredentialName("Access Key")
 	AccessToken          = sdk.CredentialName("Access Token")
+	ApplicationKey       = sdk.CredentialName("Application Key")
 	AppPassword          = sdk.CredentialName("App Password")
 	AppToken             = sdk.CredentialName("App Token")
 	AuthToken            = sdk.CredentialName("Auth Token")
@@ -31,6 +32,7 @@ func ListAll() []sdk.CredentialName {
 		APIToken,
 		AccessKey,
 		AccessToken,
+		ApplicationKey,
 		AppPassword,
 		AppToken,
 		AuthToken,
