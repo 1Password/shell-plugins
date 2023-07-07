@@ -19,7 +19,7 @@ func AppwriteCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("login"),
 			needsauth.NotWhenContainsArgs("logout"),
 			needsauth.NotForExactArgs("deploy"),
-			needsauth.NotForExactArgs("projects"),
+			needsauth.NotWhenContainsArgs("projects"),
 			needsauth.NotForExactArgs("storage"),
 			needsauth.NotForExactArgs("teams"),
 			needsauth.NotForExactArgs("users"),
