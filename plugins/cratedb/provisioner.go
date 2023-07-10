@@ -25,7 +25,7 @@ func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 		host=fieldValue
 	}
 
-	out.CommandLine = []string{"--username", user, "--hosts", host, }
+	out.CommandLine = []string{ "--hosts", host, "--username", user,}
 
 	
 }
