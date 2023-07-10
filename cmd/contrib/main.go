@@ -634,5 +634,5 @@ func generateRegistryJSON() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join("plugins", "plugins.json"), b, 0600)
+	return os.WriteFile(filepath.Join("plugins", "registry.json"), b, 0600)
 }
