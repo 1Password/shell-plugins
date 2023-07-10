@@ -77,6 +77,14 @@ func main() {
 		}
 		return
 	}
+
+	if command == "registry.json" {
+		err := generateRegistryJSON()
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 }
 
 func isPluginCommand(command string) (isPluginCommand bool, pluginName string, pluginCommand string) {
@@ -619,4 +627,12 @@ func transformCredentialName(ans any) (newAns any) {
 	}
 
 	return ans
+}
+
+func generateRegistryJSON() error {
+	b, err := plugins.RegistryJSON()
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join("plugins", "plugins.json"), b, 0600)
 }

@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 )
@@ -116,4 +117,24 @@ func (p Plugin) DeepValidate() []ValidationReport {
 	}
 
 	return reports
+}
+
+func (p Plugin) MarshalJSON() ([]byte, error) {
+	if len(p.Credentials) == 0 {
+		return nil, nil
+	}
+	plugin := struct {
+		PlatformName  string `json:"platform_name"`
+		ManagementURL string `json:"management_url"`
+	}{
+		PlatformName: p.Platform.Name,
+		ManagementURL: func() string {
+			if p.Credentials[0].ManagementURL != nil {
+				return p.Credentials[0].ManagementURL.String()
+			} else {
+				return ""
+			}
+		}(),
+	}
+	return json.Marshal(plugin)
 }
