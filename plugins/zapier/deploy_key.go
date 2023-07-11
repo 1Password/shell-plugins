@@ -2,7 +2,6 @@ package zapier
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -31,12 +30,16 @@ func DeployKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(
-			zapierConfig,
-			provision.AtFixedPath("~/.zapierrc"),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryZapierConfigFile(),
 		),
-		Importer: TryZapierConfigFile(),
 	}
+}
+
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"ZAPIER_DEPLOY_KEY": fieldname.Key,
 }
 
 func TryZapierConfigFile() sdk.Importer {
@@ -61,15 +64,4 @@ func TryZapierConfigFile() sdk.Importer {
 
 type Config struct {
 	DeployKey string `json:"deployKey"`
-}
-
-func zapierConfig(in sdk.ProvisionInput) ([]byte, error) {
-	config := Config{
-		DeployKey: in.ItemFields[fieldname.Key],
-	}
-	contents, err := json.MarshalIndent(&config, "", "  ")
-	if err != nil {
-		return nil, err
-	}
-	return []byte(contents), nil
 }
