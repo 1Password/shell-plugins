@@ -14,7 +14,6 @@ func CrateDBCLI() schema.Executable {
 		DocsURL: sdk.URL("https://crate.io/docs/crate/crash/en/latest/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
