@@ -44,7 +44,7 @@ func TestDeployKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Key: "bd0moxtb5vk3koppai1f3ituiexample",
+						fieldname.Key: "g22y9yajfqqcogilnrnm5lxv6example",
 					},
 				},
 			},
