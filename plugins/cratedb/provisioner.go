@@ -24,8 +24,9 @@ func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 	if fieldValue, ok := in.ItemFields[fieldname.Host]; ok {
 		host=fieldValue
 	}
+	// commandLine := []string
 
-	out.CommandLine = []string{ "--hosts", host, "--username", user,}
+	out.CommandLine = append{out.CommandLine ,  "--hosts", host, "--username", user,}
 
 	
 }
