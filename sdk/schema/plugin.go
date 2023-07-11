@@ -125,7 +125,7 @@ func (p Plugin) MarshalJSON() ([]byte, error) {
 	}
 	plugin := struct {
 		PlatformName  string `json:"platform_name"`
-		ManagementURL string `json:"management_url"`
+		ManagementURL string `json:"management_url,omitempty"`
 	}{
 		PlatformName: p.Platform.Name,
 		ManagementURL: func() string {
