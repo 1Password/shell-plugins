@@ -26,7 +26,8 @@ func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 	}
 	// commandLine := []string
 
-	out.CommandLine = append{out.CommandLine ,  "--hosts", host, "--username", user,}
+	out.CommandLine = append(out.CommandLine, []string{"--hosts", host, "--username", user}...)
+
 
 	
 }
