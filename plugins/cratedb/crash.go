@@ -12,9 +12,7 @@ func CrateDBCLI() schema.Executable {
 		Name:    "CrateDB Shell",
 		Runs:    []string{"crash"},
 		DocsURL: sdk.URL("https://crate.io/docs/crate/crash/en/latest/"),
-		NeedsAuth: needsauth.IfAll(
-			needsauth.NotForHelpOrVersion(),
-		),
+		NeedsAuth: needsauth.needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.DatabaseCredentials,
