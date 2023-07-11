@@ -12,8 +12,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://beta.openai.com/docs"),
-		ManagementURL: sdk.URL("https://beta.openai.com/account/api-keys"),
+		DocsURL:       sdk.URL("https://platform.openai.com/docs"),
+		ManagementURL: sdk.URL("https://platform.openai.com/account/api-keys"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
