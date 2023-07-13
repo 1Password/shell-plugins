@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
@@ -13,21 +12,13 @@ var registry = []schema.Plugin{}
 
 func RegistryJSON() ([]byte, error) {
 	var listToJSON []schema.Plugin
-
 	// Only include plugins that contain at least one credential.
 	for _, p := range List() {
 		if len(p.Credentials) > 0 {
 			listToJSON = append(listToJSON, p)
 		}
 	}
-	timedRegistry := struct {
-		Plugins   []schema.Plugin `json:"registry"`
-		Timestamp time.Time       `json:"timestamp"`
-	}{
-		Plugins:   listToJSON,
-		Timestamp: time.Now(),
-	}
-	return json.MarshalIndent(timedRegistry, "", "\t")
+	return json.MarshalIndent(listToJSON, "", "\t")
 }
 
 func List() []schema.Plugin {
