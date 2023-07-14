@@ -9,7 +9,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - run: env
+      - run: echo "${{ github.event.number }}"
 
       - name: Check signed commits in PR
         uses: 1Password/check-signed-commits-action@v1
