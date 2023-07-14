@@ -9,14 +9,14 @@ import (
 
 func CrateDBCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "CrateDB Shell",
-		Runs:    []string{"crash"},
-		DocsURL: sdk.URL("https://crate.io/docs/crate/crash/en/latest/"),
+		Name:      "CrateDB Shell",
+		Runs:      []string{"crash"},
+		DocsURL:   sdk.URL("https://crate.io/docs/crate/crash/en/latest/"),
 		NeedsAuth: needsauth.needsauth.NotForHelpOrVersion(),
 		Uses: []schema.CredentialUsage{
 			{
 				Name:        credname.DatabaseCredentials,
-				Provisioner: CrateArgsProvisioner{} ,
+				Provisioner: CrateArgsProvisioner{},
 			},
 		},
 	}

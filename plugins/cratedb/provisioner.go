@@ -10,26 +10,18 @@ import (
 type CrateArgsProvisioner struct {
 }
 
-
-
 func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	if value, ok := in.ItemFields[fieldname.Password]; ok {
 		out.AddEnvVar("CRATEPW", value)
 	}
-	
-	var user, host string
-	if fieldValue, ok := in.ItemFields[fieldname.Username]; ok {
-		user=fieldValue
+
+	user, userFound := in.ItemFields[fieldname.Username]
+	host, hostFound := in.ItemFields[fieldname.Host]
+	if userFound && hostFound {
+		commandLine := []string{out.CommandLine[0], "--user", user, "--host", host}
+		commandLine = append(commandLine, out.CommandLine[1:]...)
+		out.CommandLine = commandLine
 	}
-	if fieldValue, ok := in.ItemFields[fieldname.Host]; ok {
-		host=fieldValue
-	}
-	// commandLine := []string
-
-	out.CommandLine = append(out.CommandLine, []string{"--hosts", host, "--username", user}...)
-
-
-	
 }
 
 func (p CrateArgsProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
