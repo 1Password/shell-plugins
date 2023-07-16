@@ -112,16 +112,45 @@ func TryScalewayConfigFile() sdk.Importer {
 			fields[fieldname.DefaultZone] = config.DefaultZone
 		}
 		out.AddCandidate(sdk.ImportCandidate{
-			Fields: fields,
+			Fields:   fields,
+			NameHint: importer.SanitizeNameHint("default"),
 		})
+
+		for profileName, profile := range config.Profiles {
+			profileFields := make(map[sdk.FieldName]string)
+			profileFields[fieldname.AccessKeyID] = profile.AccessKey
+			profileFields[fieldname.SecretAccessKey] = profile.SecretKey
+			if profile.DefaultOrganizationID != "" {
+				profileFields[fieldname.DefaultOrganization] = profile.DefaultOrganizationID
+			}
+			if profile.DefaultRegion != "" {
+				profileFields[fieldname.DefaultRegion] = profile.DefaultRegion
+			}
+			if profile.DefaultZone != "" {
+				profileFields[fieldname.DefaultZone] = profile.DefaultZone
+			}
+
+			out.AddCandidate(sdk.ImportCandidate{
+				Fields:   profileFields,
+				NameHint: importer.SanitizeNameHint(profileName),
+			})
+		}
 	})
 }
 
 type Config struct {
+	AccessKey             string             `yaml:"access_key"`
+	SecretKey             string             `yaml:"secret_key"`
+	DefaultOrganizationID string             `yaml:"default_organization_id"`
+	DefaultRegion         string             `yaml:"default_region"`
+	DefaultZone           string             `yaml:"default_zone"`
+	Profiles              map[string]Profile `yaml:"profiles"`
+}
+
+type Profile struct {
 	AccessKey             string `yaml:"access_key"`
 	SecretKey             string `yaml:"secret_key"`
 	DefaultOrganizationID string `yaml:"default_organization_id"`
-	DefaultProjectID      string `yaml:"default_project_id"`
 	DefaultRegion         string `yaml:"default_region"`
 	DefaultZone           string `yaml:"default_zone"`
 }
