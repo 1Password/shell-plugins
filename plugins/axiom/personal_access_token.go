@@ -30,9 +30,8 @@ func PersonalAccessToken() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
-		)}
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
+	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{

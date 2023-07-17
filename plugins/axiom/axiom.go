@@ -11,7 +11,7 @@ func AxiomCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "Axiom CLI",
 		Runs:    []string{"axiom"},
-		DocsURL: sdk.URL("https://axiom.com/docs/cli"),
+		DocsURL: sdk.URL("https://axiom.co/docs/reference/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
