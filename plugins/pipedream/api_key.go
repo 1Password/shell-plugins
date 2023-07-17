@@ -14,8 +14,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://pipedream.com/docs/api_key"),                 // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.pipedream.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://pipedream.com/docs/api_key"),
+		ManagementURL: sdk.URL("https://console.pipedream.com/user/security/tokens"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,

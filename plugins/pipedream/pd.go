@@ -15,6 +15,8 @@ func PipedreamCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("-p"),
+			needsauth.NotWhenContainsArgs("--profile"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
