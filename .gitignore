@@ -1,6 +1,9 @@
 # Auto-generated with `make registry`
 plugins/plugins.go
 
+# Auto-generated with `make registry.json`
+plugins/registry.json
+
 # GoLand
 .idea
 

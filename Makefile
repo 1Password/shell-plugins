@@ -25,6 +25,9 @@ registry:
 validate: registry
 	go run cmd/contrib/main.go $@
 
+registry.json: registry
+	go run cmd/contrib/main.go $@
+
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)
