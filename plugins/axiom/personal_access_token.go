@@ -28,6 +28,30 @@ func PersonalAccessToken() schema.CredentialType {
 					},
 				},
 			},
+			{
+				Name:                fieldname.Organization,
+				MarkdownDescription: "The organization ID of the organization the access token is valid for. Only valid for Axiom Cloud.",
+				Secret:              false,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+						Specific:  []rune{'-'},
+					},
+				},
+			},
+			{
+				Name:                fieldname.Deployment,
+				MarkdownDescription: "Deployment to use.",
+				Secret:              false,
+				Optional:            true,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Digits:    true,
+					},
+				},
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
@@ -35,5 +59,7 @@ func PersonalAccessToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"AXIOM_TOKEN": fieldname.Token,
+	"AXIOM_TOKEN":      fieldname.Token,
+	"AXIOM_ORG_ID":     fieldname.Organization,
+	"AXIOM_DEPLOYMENT": fieldname.Deployment,
 }
