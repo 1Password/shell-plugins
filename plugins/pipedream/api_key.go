@@ -33,6 +33,7 @@ func APIKey() schema.CredentialType {
 				Name:                fieldname.OrgID,
 				MarkdownDescription: "OrgId for the Pipedream organization.",
 				Secret:              true,
+				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Length: 9,
 					Charset: schema.Charset{
@@ -71,9 +72,10 @@ func TryPipedreamConfigFile() sdk.Importer {
 				fields[fieldname.OrgID] = section.Key("org_id").Value()
 			}
 
-			if fields[fieldname.APIKey] != "" && fields[fieldname.OrgID] != "" {
+			if fields[fieldname.APIKey] != "" {
 				out.AddCandidate(sdk.ImportCandidate{
-					Fields: fields,
+					Fields:   fields,
+					NameHint: importer.SanitizeNameHint(section.Name()),
 				})
 			}
 		}
