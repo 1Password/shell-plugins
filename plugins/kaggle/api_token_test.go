@@ -24,3 +24,36 @@ func TestAPITokenProvisioner(t *testing.T) {
 		},
 	})
 }
+
+func TestAPITokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
+		"environment": {
+			Environment: map[string]string{
+				"KAGGLE_KEY":      "z2pifkruzgbb17plmz2gux21fexample",
+				"KAGGLE_USERNAME": "username",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token:    "z2pifkruzgbb17plmz2gux21fexample",
+						fieldname.Username: "username",
+					},
+				},
+			},
+		},
+		"config file": {
+			Files: map[string]string{
+				"~/.kaggle/kaggle.json": plugintest.LoadFixture(t, "config.json"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token:    "z2pifkruzgbb17plmz2gux21fexample",
+						fieldname.Username: "username",
+					},
+					NameHint: "username",
+				},
+			},
+		},
+	})
+}
