@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "influxdb",
 		Platform: schema.PlatformInfo{
 			Name:     "InfluxDB",
-			Homepage: sdk.URL(" https://www.influxdata.com/"),
+			Homepage: sdk.URL("https://www.influxdata.com/"),
 		},
 		Credentials: []schema.CredentialType{
 			DatabaseCredentials(),
