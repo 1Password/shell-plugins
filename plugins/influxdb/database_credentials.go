@@ -12,7 +12,7 @@ import (
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.DatabaseCredentials,
-		DocsURL: sdk.URL("https://docs.influxdata.com/influxdb/v2.7/reference/cli/influx/config/create/"),
+		DocsURL: sdk.URL("https://docs.influxdata.com/influxdb/cloud/reference/cli/influx/config/"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
