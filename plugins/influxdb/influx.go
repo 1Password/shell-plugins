@@ -11,7 +11,7 @@ func InfluxDBCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "InfluxDB CLI",
 		Runs:    []string{"influx"},
-		DocsURL: sdk.URL("https://docs.influxdata.com/influxdb/"),
+		DocsURL: sdk.URL("https://docs.influxdata.com/influxdb/cloud/tools/influx-cli/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
