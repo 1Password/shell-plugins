@@ -43,8 +43,7 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
+		Importer: importer.TryEnvVarPair(defaultEnvVarMapping,
 		)}
 }
 
