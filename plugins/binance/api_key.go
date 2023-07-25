@@ -43,8 +43,7 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryEnvVarPair(defaultEnvVarMapping,
-		)}
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
