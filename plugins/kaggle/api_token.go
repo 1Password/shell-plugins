@@ -32,7 +32,7 @@ func APIToken() schema.CredentialType {
 			{
 				Name:                fieldname.Username,
 				MarkdownDescription: "Username to authenticate to Kaggle.",
-				Secret:              true,
+				Secret:              false,
 				Composition: &schema.ValueComposition{
 					Charset: schema.Charset{
 						Lowercase: true,
