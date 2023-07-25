@@ -32,7 +32,7 @@ func APIKey() schema.CredentialType {
 			{
 				Name:                fieldname.OrgID,
 				MarkdownDescription: "OrgId for the Pipedream organization.",
-				Secret:              true,
+				Secret:              false,
 				Optional:            true,
 				Composition: &schema.ValueComposition{
 					Length: 9,
