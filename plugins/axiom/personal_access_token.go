@@ -21,7 +21,6 @@ func PersonalAccessToken() schema.CredentialType {
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 41,
-					Prefix: "xapt-",
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
