@@ -36,6 +36,7 @@ const (
 	Mode            = sdk.FieldName("Mode")
 	Namespace       = sdk.FieldName("Namespace")
 	OneTimePassword = sdk.FieldName("One-Time Password")
+	OrgID           = sdk.FieldName("Org ID")
 	OrgURL          = sdk.FieldName("Org URL")
 	Organization    = sdk.FieldName("Organization")
 	Password        = sdk.FieldName("Password")
@@ -86,6 +87,7 @@ func ListAll() []sdk.FieldName {
 		Mode,
 		Namespace,
 		OneTimePassword,
+		OrgID,
 		OrgURL,
 		Organization,
 		Password,
