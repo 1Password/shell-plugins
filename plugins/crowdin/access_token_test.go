@@ -11,7 +11,7 @@ import (
 func TestAccessTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, AccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:       "pt2sk1g1nqfervdjk8av8r88wvjsprzzck4vws97n5r7fn8ad0l3pe45k09fecy152ra6c8sgexample",
 				fieldname.ProjectID:   "123",
 				fieldname.HostAddress: "https://testOrg.crowdin.com",
@@ -30,7 +30,7 @@ func TestAccessTokenProvisioner(t *testing.T) {
 func TestAccessTokenImporter(t *testing.T) {
 	plugintest.TestImporter(t, AccessToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
-			Environment: map[string]string{ // TODO: Check if this is correct
+			Environment: map[string]string{
 				"CROWDIN_PERSONAL_TOKEN": "pt2sk1g1nqfervdjk8av8r88wvjsprzzck4vws97n5r7fn8ad0l3pe45k09fecy152ra6c8sgexample",
 				"CROWDIN_PROJECT_ID":     "123",
 				"CROWDIN_BASE_URL":       "https://testOrg.crowdin.com",
