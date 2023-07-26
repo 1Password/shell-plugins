@@ -13,7 +13,7 @@ func TestAccessTokenProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
 				fieldname.Token:       "pt2sk1g1nqfervdjk8av8r88wvjsprzzck4vws97n5r7fn8ad0l3pe45k09fecy152ra6c8sgexample",
-				fieldname.OrgID:       "123",
+				fieldname.ProjectID:   "123",
 				fieldname.HostAddress: "https://testOrg.crowdin.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -39,7 +39,7 @@ func TestAccessTokenImporter(t *testing.T) {
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token:       "pt2sk1g1nqfervdjk8av8r88wvjsprzzck4vws97n5r7fn8ad0l3pe45k09fecy152ra6c8sgexample",
-						fieldname.OrgID:       "123",
+						fieldname.ProjectID:   "123",
 						fieldname.HostAddress: "https://testOrg.crowdin.com",
 					},
 				},
