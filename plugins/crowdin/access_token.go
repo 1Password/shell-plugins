@@ -58,6 +58,6 @@ func AccessToken() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"CROWDIN_PERSONAL_TOKEN": fieldname.Token,
-	"CROWDIN_PROJECT_ID":     fieldname.OrgID,
+	"CROWDIN_PROJECT_ID":     fieldname.ProjectID,
 	"CROWDIN_BASE_URL":       fieldname.HostAddress,
 }
