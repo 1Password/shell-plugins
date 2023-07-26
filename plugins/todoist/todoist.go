@@ -14,7 +14,6 @@ func TodoistCLI() schema.Executable {
 		DocsURL: sdk.URL("https://github.com/sachaos/todoist"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
