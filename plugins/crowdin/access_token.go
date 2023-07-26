@@ -40,6 +40,15 @@ func AccessToken() schema.CredentialType {
 				Name:                fieldname.HostAddress,
 				MarkdownDescription: "Base URL (for Crowdin Enterprise)",
 				Optional:            true,
+				Composition: &schema.ValueComposition{
+					Charset: schema.Charset{
+						Lowercase: true,
+						Uppercase: true,
+						Digits:    true,
+						Symbols:   true,
+					},
+					Prefix: "https://",
+				},
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
