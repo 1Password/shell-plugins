@@ -15,7 +15,7 @@ import (
 func AccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AccessToken,
-		DocsURL:       nil,
+		DocsURL:       sdk.URL("https://github.com/ipinfo/cli#installation"),
 		ManagementURL: sdk.URL("https://ipinfo.io/account/token"),
 		Fields: []schema.CredentialField{
 			{
