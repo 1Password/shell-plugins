@@ -12,7 +12,12 @@ func SpaceliftCLI() schema.Executable {
 		Name:      "Spacelift CLI",
 		Runs:      []string{"spacectl"},
 		DocsURL:   sdk.URL("https://github.com/spacelift-io/spacectl"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("h"),
+			needsauth.NotWhenContainsArgs("profile"),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
