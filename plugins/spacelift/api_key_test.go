@@ -7,20 +7,20 @@ import (
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
-	
+
 func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Endpoint: "https://end.point",
-				fieldname.APIKeyID: "abc123",
+				fieldname.Endpoint:     "https://end.point",
+				fieldname.APIKeyID:     "abc123",
 				fieldname.APIKeySecret: "def456",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"SPACELIFT_API_KEY_ENDPOINT": "https://end.point",
-					"SPACELIFT_API_KEY_ID": "abc123",
-					"SPACELIFT_API_KEY_SECRET": "def456",
+					"SPACELIFT_API_KEY_ID":       "abc123",
+					"SPACELIFT_API_KEY_SECRET":   "def456",
 				},
 			},
 		},
@@ -32,14 +32,14 @@ func TestAPIKeyImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{
 				"SPACELIFT_API_KEY_ENDPOINT": "xhdw",
-				"SPACELIFT_API_KEY_ID": "abc123",
-				"SPACELIFT_API_KEY_SECRET": "def456",
+				"SPACELIFT_API_KEY_ID":       "abc123",
+				"SPACELIFT_API_KEY_SECRET":   "def456",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Endpoint: "xhdw",
-						fieldname.APIKeyID: "abc123",
+						fieldname.Endpoint:     "xhdw",
+						fieldname.APIKeyID:     "abc123",
 						fieldname.APIKeySecret: "def456",
 					},
 				},

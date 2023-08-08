@@ -61,8 +61,8 @@ func APIKey() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SPACELIFT_API_KEY_ENDPOINT": fieldname.Endpoint,
-	"SPACELIFT_API_KEY_ID": fieldname.APIKeyID,
-	"SPACELIFT_API_KEY_SECRET": fieldname.APIKeySecret,
+	"SPACELIFT_API_KEY_ID":       fieldname.APIKeyID,
+	"SPACELIFT_API_KEY_SECRET":   fieldname.APIKeySecret,
 }
 
 func TrySpaceliftConfigFile() sdk.Importer {

@@ -9,9 +9,9 @@ import (
 
 func SpaceliftCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Spacelift CLI",
-		Runs:      []string{"spacectl"},
-		DocsURL:   sdk.URL("https://github.com/spacelift-io/spacectl"),
+		Name:    "Spacelift CLI",
+		Runs:    []string{"spacectl"},
+		DocsURL: sdk.URL("https://github.com/spacelift-io/spacectl"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
