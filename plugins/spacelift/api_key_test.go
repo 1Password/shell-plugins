@@ -12,9 +12,9 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Endpoint:     "https://end.point",
-				fieldname.APIKeyID:     "abc123",
-				fieldname.APIKeySecret: "def456",
+				fieldname.Endpoint:  "https://end.point",
+				fieldname.APIKeyID:  "abc123",
+				fieldname.APISecret: "def456",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
@@ -38,9 +38,9 @@ func TestAPIKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Endpoint:     "xhdw",
-						fieldname.APIKeyID:     "abc123",
-						fieldname.APIKeySecret: "def456",
+						fieldname.Endpoint:  "xhdw",
+						fieldname.APIKeyID:  "abc123",
+						fieldname.APISecret: "def456",
 					},
 				},
 			},
@@ -53,9 +53,9 @@ func TestAPIKeyImporter(t *testing.T) {
 				{
 					NameHint: "apikey",
 					Fields: map[sdk.FieldName]string{
-						fieldname.Endpoint:     "https://notmycorp.app.spacelift.io",
-						fieldname.APIKeyID:     "key_id_value",
-						fieldname.APIKeySecret: "key_secret_value",
+						fieldname.Endpoint:  "https://notmycorp.app.spacelift.io",
+						fieldname.APIKeyID:  "key_id_value",
+						fieldname.APISecret: "key_secret_value",
 					},
 				},
 			},

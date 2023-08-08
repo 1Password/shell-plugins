@@ -41,7 +41,7 @@ func APIKey() schema.CredentialType {
 				},
 			},
 			{
-				Name:                fieldname.APIKeySecret,
+				Name:                fieldname.APISecret,
 				MarkdownDescription: "The secret for your API key. Only available when the secret is created.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -62,7 +62,7 @@ func APIKey() schema.CredentialType {
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SPACELIFT_API_KEY_ENDPOINT": fieldname.Endpoint,
 	"SPACELIFT_API_KEY_ID":       fieldname.APIKeyID,
-	"SPACELIFT_API_KEY_SECRET":   fieldname.APIKeySecret,
+	"SPACELIFT_API_KEY_SECRET":   fieldname.APISecret,
 }
 
 func TrySpaceliftConfigFile() sdk.Importer {
@@ -81,9 +81,9 @@ func TrySpaceliftConfigFile() sdk.Importer {
 			out.AddCandidate(sdk.ImportCandidate{
 				NameHint: name,
 				Fields: map[sdk.FieldName]string{
-					fieldname.Endpoint:     profile.Credentials.Endpoint,
-					fieldname.APIKeyID:     profile.Credentials.KeyID,
-					fieldname.APIKeySecret: profile.Credentials.KeySecret,
+					fieldname.Endpoint:  profile.Credentials.Endpoint,
+					fieldname.APIKeyID:  profile.Credentials.KeyID,
+					fieldname.APISecret: profile.Credentials.KeySecret,
 				},
 			})
 		}
