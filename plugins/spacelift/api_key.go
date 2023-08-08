@@ -74,14 +74,16 @@ func TrySpaceliftConfigFile() sdk.Importer {
 		}
 
 		for name, profile := range config.Profiles {
-			if profile.Credentials.Endpoint == "" {
+			if profile.Credentials.Type != 1 {
 				continue
 			}
 
 			out.AddCandidate(sdk.ImportCandidate{
 				NameHint: name,
 				Fields: map[sdk.FieldName]string{
-					fieldname.Endpoint: profile.Credentials.Endpoint,
+					fieldname.Endpoint:     profile.Credentials.Endpoint,
+					fieldname.APIKeyID:     profile.Credentials.KeyID,
+					fieldname.APIKeySecret: profile.Credentials.KeySecret,
 				},
 			})
 		}
@@ -97,5 +99,8 @@ type SpaceCLIProfile struct {
 }
 
 type SpaceCLIProfileCredentials struct {
-	Endpoint string `json:"endpoint"`
+	Endpoint  string `json:"endpoint"`
+	Type      int    `json:"type"`
+	KeyID     string `json:"key_id"`
+	KeySecret string `json:"key_secret"`
 }

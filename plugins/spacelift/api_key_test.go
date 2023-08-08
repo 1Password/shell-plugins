@@ -51,9 +51,11 @@ func TestAPIKeyImporter(t *testing.T) {
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
-					NameHint: "dev",
+					NameHint: "apikey",
 					Fields: map[sdk.FieldName]string{
-						fieldname.Endpoint: "https://mycorp.app.spacelift.io",
+						fieldname.Endpoint:     "https://notmycorp.app.spacelift.io",
+						fieldname.APIKeyID:     "key_id_value",
+						fieldname.APIKeySecret: "key_secret_value",
 					},
 				},
 			},
