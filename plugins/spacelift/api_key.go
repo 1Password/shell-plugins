@@ -34,6 +34,7 @@ func APIKey() schema.CredentialType {
 				MarkdownDescription: "The ID of your Spacelift API key. Available via the Spacelift application.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
+					Length: 26,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Digits:    true,
@@ -45,6 +46,7 @@ func APIKey() schema.CredentialType {
 				MarkdownDescription: "The secret for your API key. Only available when the secret is created.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
+					Length: 64,
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
