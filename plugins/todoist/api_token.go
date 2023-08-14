@@ -68,7 +68,7 @@ func todoistConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := Config{
 		Token: in.ItemFields[fieldname.Token],
 	}
-	contents, err := json.MarshalIndent(&config, "", "  ")
+	contents, err := json.Marshal(&config)
 	if err != nil {
 		return nil, err
 	}
