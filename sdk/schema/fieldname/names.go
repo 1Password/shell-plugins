@@ -44,6 +44,7 @@ const (
 	PublicKey       = sdk.FieldName("Public Key")
 	PrivateKey      = sdk.FieldName("Private Key")
 	ProjectID       = sdk.FieldName("Project ID")
+	Project         = sdk.FieldName("Project")
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
@@ -96,6 +97,7 @@ func ListAll() []sdk.FieldName {
 		PublicKey,
 		PrivateKey,
 		ProjectID,
+		Project,
 		Region,
 		Secret,
 		SecretAccessKey,
