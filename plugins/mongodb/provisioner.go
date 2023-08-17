@@ -72,13 +72,13 @@ func (p mongodbShellArgsProvisioner) Provision(ctx context.Context, in sdk.Provi
 	}
 
 	if value, ok := in.ItemFields[fieldname.Host]; ok && !commandLineContainsHostArgument && !connectionStringProvisioned {
-		commandLine := []string{out.CommandLine[0], "-h", value}
+		commandLine := []string{out.CommandLine[0], "--host", value}
 		commandLine = append(commandLine, out.CommandLine[1:]...)
 		out.CommandLine = commandLine
 	}
 
 	if value, ok := in.ItemFields[fieldname.Port]; ok && !commandLineContainsPortArgument && !connectionStringProvisioned {
-		commandLine := []string{out.CommandLine[0], "-p", value}
+		commandLine := []string{out.CommandLine[0], "--port", value}
 		commandLine = append(commandLine, out.CommandLine[1:]...)
 		out.CommandLine = commandLine
 	}
