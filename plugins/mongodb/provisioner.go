@@ -33,7 +33,7 @@ func (p mongodbShellArgsProvisioner) Provision(ctx context.Context, in sdk.Provi
 	connectionStringProvisioned := false
 
 	for _, arg := range out.CommandLine {
-		if strings.HasPrefix(arg, "mongodb+srv://") {
+		if strings.HasPrefix(arg, "mongodb://") || strings.HasPrefix(arg, "mongodb+srv://") {
 			connectionStringProvisioned = true
 			break
 		}
