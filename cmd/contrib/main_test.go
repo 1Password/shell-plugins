@@ -34,7 +34,7 @@ type FieldNameSplitFromCredNameSplit struct {
 	CredNameSplit  []string
 }
 
-func TestValidateFieldNameSplitFromCredNameSplitReturnError(t *testing.T) {
+func TestValidateFieldNameSplitFromCredNameSplit(t *testing.T) {
 	lengthCutoff := 7
 	cases := []FieldNameSplitFromCredNameSplit{
 		{
