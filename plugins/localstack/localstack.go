@@ -9,9 +9,9 @@ import (
 
 func LocalStackCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "LocalStack CLI",
-		Runs:      []string{"localstack"},
-		DocsURL:   sdk.URL("https://docs.localstack.cloud/getting-started/installation/#localstack-cli"),
+		Name:    "LocalStack CLI",
+		Runs:    []string{"localstack"},
+		DocsURL: sdk.URL("https://docs.localstack.cloud/getting-started/installation/#localstack-cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
