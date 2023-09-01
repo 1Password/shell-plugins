@@ -2,6 +2,7 @@ package ansiblevault
 
 import (
 	"context"
+	"fmt"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -37,6 +38,8 @@ func passwordFile(in sdk.ProvisionInput) ([]byte, error) {
 	contents := ""
 	if password, ok := in.ItemFields[fieldname.Password]; ok {
 		contents += password
+	} else {
+		return nil, fmt.Errorf("unable to find password field")
 	}
 	return []byte(contents), nil
 }
