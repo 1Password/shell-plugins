@@ -9,12 +9,11 @@ import (
 
 func VerticaCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Vertica CLI",
-		Runs:      []string{"vsql"},
-		DocsURL:   sdk.URL("https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/ConnectingToVertica/vsql/UsingVsql.htm"), 
+		Name:    "Vertica CLI",
+		Runs:    []string{"vsql"},
+		DocsURL: sdk.URL("https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/ConnectingToVertica/vsql/UsingVsql.htm"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{

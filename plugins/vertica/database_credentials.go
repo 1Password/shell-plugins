@@ -1,8 +1,6 @@
 package vertica
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -13,9 +11,8 @@ import (
 
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.DatabaseCredentials,
-		DocsURL:       sdk.URL("https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/ConnectingToVertica/vsql/Install/InstallingTheVsqlClient.htm"), 
-		ManagementURL: sdk.URL("https://www.vertica.com/try/"), 
+		Name:    credname.DatabaseCredentials,
+		DocsURL: sdk.URL("https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/AdministratorsGuide/DBUsersAndPrivileges/Users/CreatingADatabaseUser.htm"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
@@ -30,7 +27,6 @@ func DatabaseCredentials() schema.CredentialType {
 			{
 				Name:                fieldname.Username,
 				MarkdownDescription: "Vertica user to authenticate as.",
-				Optional:            true,
 			},
 			{
 				Name:                fieldname.Password,
@@ -40,18 +36,16 @@ func DatabaseCredentials() schema.CredentialType {
 			{
 				Name:                fieldname.Database,
 				MarkdownDescription: "Database name to connect to.",
-				Optional:            true,
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer: importer.TryAllimporter.TryEnvVarPair(defaultEnvVarMapping)}
+		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"VSQL_USER": fieldname.Username, 
-	"VSQL_PASSWORD": fieldname.Password, 
-	"VSQL_HOST": fieldname.Host, 
-	"VSQL_PORT": fieldname.Port, 
-	"VSQL_DATABASE": fieldname.Database, 
+	"VSQL_USER":     fieldname.Username,
+	"VSQL_PASSWORD": fieldname.Password,
+	"VSQL_HOST":     fieldname.Host,
+	"VSQL_PORT":     fieldname.Port,
+	"VSQL_DATABASE": fieldname.Database,
 }
-
