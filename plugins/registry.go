@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -8,6 +9,17 @@ import (
 )
 
 var registry = []schema.Plugin{}
+
+func RegistryJSON() ([]byte, error) {
+	var listToJSON []schema.Plugin
+	// Only include plugins that contain at least one credential.
+	for _, p := range List() {
+		if len(p.Credentials) > 0 {
+			listToJSON = append(listToJSON, p)
+		}
+	}
+	return json.MarshalIndent(listToJSON, "", "\t")
+}
 
 func List() []schema.Plugin {
 	list := make([]schema.Plugin, len(registry))

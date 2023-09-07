@@ -4,6 +4,7 @@ import "github.com/1Password/shell-plugins/sdk"
 
 // Credential field names.
 const (
+
 	APIHost             = sdk.FieldName("API Host")
 	APIKey              = sdk.FieldName("API Key")
 	APIKeyID            = sdk.FieldName("API Key ID")
@@ -53,6 +54,9 @@ const (
 	User                = sdk.FieldName("User")
 	Username            = sdk.FieldName("Username")
 	Website             = sdk.FieldName("Website")
+
+	
+
 )
 
 func ListAll() []sdk.FieldName {
@@ -90,12 +94,15 @@ func ListAll() []sdk.FieldName {
 		Mode,
 		Namespace,
 		OneTimePassword,
+		OrgID,
 		OrgURL,
 		Organization,
 		Password,
 		Port,
 		PublicKey,
 		PrivateKey,
+		ProjectID,
+		Project,
 		Region,
 		Secret,
 		SecretAccessKey,

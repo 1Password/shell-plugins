@@ -1,4 +1,4 @@
-package postgresql
+package pipedream
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "pipedream",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Pipedream",
+			Homepage: sdk.URL("https://pipedream.com"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
+			PipedreamCLI(),
 		},
 	}
 }

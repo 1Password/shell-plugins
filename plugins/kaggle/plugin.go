@@ -1,4 +1,4 @@
-package postgresql
+package kaggle
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "kaggle",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Kaggle",
+			Homepage: sdk.URL("https://kaggle.com"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			APIToken(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
+			KaggleCLI(),
 		},
 	}
 }

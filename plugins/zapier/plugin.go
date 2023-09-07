@@ -1,4 +1,4 @@
-package postgresql
+package zapier
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "zapier",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Zapier",
+			Homepage: sdk.URL("https://zapier.com"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			DeployKey(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
+			ZapierCLI(),
 		},
 	}
 }
