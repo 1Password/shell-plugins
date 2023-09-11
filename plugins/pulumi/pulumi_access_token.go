@@ -2,7 +2,9 @@ package pulumi
 
 import (
 	"context"
+	"fmt"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -38,7 +40,7 @@ func PulumiAccessToken() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: DeleteSecretsFile(provision.EnvVars(defaultEnvVarMapping)),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryPulumiConfigFile(),
@@ -108,4 +110,32 @@ func TryPulumiConfigFile() sdk.Importer {
 
 		}
 	})
+}
+
+// DeleteSecretsFileProvisioner removes the Pulumi credentials file before letting the real provisioner do its magic.
+type DeleteSecretsFileProvisioner struct {
+	sdk.Provisioner
+
+	RealProvisioner sdk.Provisioner
+}
+
+func DeleteSecretsFile(provisioner sdk.Provisioner) sdk.Provisioner {
+	return DeleteSecretsFileProvisioner{
+		RealProvisioner: provisioner,
+	}
+}
+
+func (p DeleteSecretsFileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	// delete the current credentials file.
+	os.Remove(fmt.Sprintf("%s/%s", in.HomeDir, ".pulumi/credentials.json"))
+	// call the real provisioner
+	p.RealProvisioner.Provision(ctx, in, out)
+}
+
+func (p DeleteSecretsFileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+	// Nothing to do here.
+}
+
+func (p DeleteSecretsFileProvisioner) Description() string {
+	return ""
 }
