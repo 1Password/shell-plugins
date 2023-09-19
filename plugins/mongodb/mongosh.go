@@ -1,4 +1,4 @@
-package atlas
+package mongodb
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,18 +7,18 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func MongoDBAtlasCLI() schema.Executable {
+func MongoshCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "MongoDB Atlas CLI",
-		Runs:    []string{"atlas"},
-		DocsURL: sdk.URL("https://www.mongodb.com/docs/atlas/cli/stable/"),
+		Name:    "MongoDB Shell",
+		Runs:    []string{"mongosh"},
+		DocsURL: sdk.URL("https://www.mongodb.com/docs/mongodb-shell/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIKey,
+				Name:        credname.DatabaseCredentials,
+				Provisioner: mongodbShellProvisioner(),
 			},
 		},
 	}
