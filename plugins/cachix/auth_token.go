@@ -53,7 +53,7 @@ func TryCachixConfigFile() sdk.Importer {
 		fileString = strings.Trim(fileString, "{}")
 		// Remove spaces to make parsing simpler
 		fileString = strings.Join(strings.Fields(fileString), "")
-		// There should be 3 fields: authToken, hostname, binaryCaches
+		// Split fields into separate strings
 		keyVals := strings.Split(fileString, ",")
 
 		for i := range keyVals {
