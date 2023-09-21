@@ -27,6 +27,7 @@ const (
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
 	DefaultRegion   = sdk.FieldName("Default Region")
+	Deployment      = sdk.FieldName("Deployment")
 	Email           = sdk.FieldName("Email")
 	Endpoint        = sdk.FieldName("Endpoint")
 	Host            = sdk.FieldName("Host")
@@ -81,6 +82,7 @@ func ListAll() []sdk.FieldName {
 		Credentials,
 		Database,
 		DefaultRegion,
+		Deployment,
 		Endpoint,
 		Host,
 		HostAddress,
