@@ -3,6 +3,7 @@ package ansiblevault
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -10,7 +11,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
-	"os"
 )
 
 func Password() schema.CredentialType {
