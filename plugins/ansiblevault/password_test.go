@@ -32,7 +32,7 @@ func TestPasswordImporter(t *testing.T) {
 	plugintest.TestImporter(t, Password().Importer, map[string]plugintest.ImportCase{
 		"default": {
 			Files: map[string]string{
-				".ansible-vault": plugintest.LoadFixture(t, ".ansible-vault"),
+				"~/.ansible-vault": plugintest.LoadFixture(t, ".ansible-vault"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
