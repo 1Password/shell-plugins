@@ -189,21 +189,18 @@ func newPlugin() error {
 		}
 	}
 
-	// As a placeholder, assume the field name is the short version (max 7 chars) of the credential name, starting
-	// from the last word. For example:
+	// As a placeholder, assume the field name is the short version (max 7 chars) of the credential name, starting from the last word.
+	//
+	// When the last word of the credential name is greater than seven characters, the last word is used as the field name.
+	//
+	// For example:
 	// "Personal Access Token" => "Token"
 	// "Secret Key" => "Key"
 	// "API Key" => "API Key"
-	var fieldNameSplit []string
+	// "GitHub API Key" => "API Key"
+	// "Credentials" => "Credentials"
 	lengthCutoff := 7
-	for i := range credNameSplit {
-		word := credNameSplit[len(credNameSplit)-1-i]
-		if len(strings.Join(append(fieldNameSplit, word), " ")) > lengthCutoff {
-			break
-		}
-
-		fieldNameSplit = append([]string{word}, fieldNameSplit...)
-	}
+	fieldNameSplit := fieldNameSplitFromCredNameSplit(credNameSplit, lengthCutoff)
 	result.FieldName = strings.Join(fieldNameSplit, " ")
 	result.FieldNameUpperCamelCase = strings.Join(fieldNameSplit, "")
 	result.CredentialEnvVarName = strings.ToUpper(strings.Join(append([]string{result.Name}, fieldNameSplit...), "_"))
@@ -635,4 +632,29 @@ func generateRegistryJSON() error {
 		return err
 	}
 	return os.WriteFile(filepath.Join("plugins", "registry.json"), b, 0600)
+}
+
+// fieldNameSplitFromCredNameSplit takes in a credential name split array and returns a field name split array.
+//
+// As a placeholder, assume the field name is the short version (max 7 chars, including space between words) of the credential name, starting from the last word.
+//
+// When the last word of the credential name is greater than seven characters, the last word is used as the field name.
+//
+// For example:
+//
+//	"Personal Access Token" => "Token"
+//	"Secret Key" => "Key"
+//	"API Key" => "API Key"
+//	"GitHub API Key" => "API Key"
+//	"Credentials" => "Credentials"
+func fieldNameSplitFromCredNameSplit(credNameSplit []string, lengthCutoff int) []string {
+	fieldNameSplit := []string{credNameSplit[len(credNameSplit)-1]}
+	for i := len(credNameSplit) - 2; i >= 0; i-- {
+		word := credNameSplit[i]
+		if len(strings.Join(append(fieldNameSplit, word), " ")) > lengthCutoff {
+			break
+		}
+		fieldNameSplit = append([]string{word}, fieldNameSplit...)
+	}
+	return fieldNameSplit
 }
