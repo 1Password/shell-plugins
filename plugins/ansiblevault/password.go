@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -48,7 +49,7 @@ func TryPasswordFile() sdk.Importer {
 		file = "~/.ansible-vault"
 	}
 	return importer.TryFile(file, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		password := contents.ToString()
+		password := strings.TrimSuffix(contents.ToString(), "\n")
 		if password == "" {
 			return
 		}
