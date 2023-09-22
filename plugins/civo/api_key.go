@@ -43,7 +43,6 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 }
 
 func TryCivoConfigFile(path string) sdk.Importer {
-
 	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var config Config
 		if err := contents.ToJSON(&config); err != nil {
