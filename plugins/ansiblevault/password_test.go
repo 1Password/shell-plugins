@@ -16,12 +16,12 @@ func TestPasswordProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Files: map[string]sdk.OutputFile{
-					".ansible-vault": {
+					"/tmp/.ansible-vault": {
 						Contents: []byte(plugintest.LoadFixture(t, ".ansible-vault")),
 					},
 				},
 				Environment: map[string]string{
-					"ANSIBLE_VAULT_PASSWORD_FILE": ".ansible-vault",
+					"ANSIBLE_VAULT_PASSWORD_FILE": "/tmp/.ansible-vault",
 				},
 			},
 		},
