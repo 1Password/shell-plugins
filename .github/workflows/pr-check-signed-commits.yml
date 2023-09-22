@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "${{ github.event.number }}"
+      - run: echo "${{ github.event.pull_request.commits_url }}"
 
       - name: Check signed commits in PR
-        uses: 1Password/check-signed-commits-action@v1
+        uses: 1Password/check-signed-commits-action@b7e71bf197182760f12d7386161d28aa781a4eb5
