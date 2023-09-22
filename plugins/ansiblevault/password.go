@@ -37,7 +37,7 @@ func Password() schema.CredentialType {
 
 func passwordFile(in sdk.ProvisionInput) ([]byte, error) {
 	if password, ok := in.ItemFields[fieldname.Password]; ok {
-		return []byte(password), nil
+		return []byte(password + "\n"), nil
 	}
 	return nil, fmt.Errorf("unable to find password field")
 }
