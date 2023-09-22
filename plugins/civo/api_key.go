@@ -48,7 +48,6 @@ func TryCivoConfigFile(path string) sdk.Importer {
 		if err := contents.ToJSON(&config); err != nil {
 			out.AddError(err)
 			return
-
 		}
 
 		if len(config.Properties) == 0 {
