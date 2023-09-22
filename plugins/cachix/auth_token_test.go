@@ -34,6 +34,18 @@ func TestAuthTokenImporter(t *testing.T) {
 				},
 			},
 		},
+		"Cache config file": {
+			Files: map[string]string{
+				"~/.config/cachix/cachix.dhall": plugintest.LoadFixture(t, "cachix.dhall"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI3OGRlOTA4Yi03MjhiLTRiMjUtODA1Yi1hNTRjODIxMWQ1ZjMiLCJzY29wZXMiOiJ0eCJ9.A0XjByVJtp2Di0Ui7M5KjiG1OinYW8PwVKRw5N4YETE",
+					},
+				},
+			},
+		},
 	})
 }
 
