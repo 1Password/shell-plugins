@@ -19,6 +19,7 @@ func New() schema.Plugin {
 			Psql(),
 			Pg_dump(),
 			Pg_restore(),
+			Pgcli(),
 		},
 	}
 }
