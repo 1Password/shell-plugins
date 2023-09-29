@@ -10,7 +10,7 @@ import (
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
-		"default": {
+		"yugabyte": {
 			Environment: map[string]string{
 				"PGHOST":     "localhost",
 				"PGPORT":     "5432",
@@ -23,7 +23,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.Host:     "localhost",
 						fieldname.Port:     "5432",
-						fieldname.User:     "root",
+						fieldname.Username: "root",
 						fieldname.Password: "123456",
 						fieldname.Database: "test",
 					},
@@ -39,7 +39,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Host:     "localhost",
 				fieldname.Port:     "5432",
-				fieldname.User:     "root",
+				fieldname.Username: "root",
 				fieldname.Password: "123456",
 				fieldname.Database: "test",
 			},
@@ -53,5 +53,6 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				},
 			},
 		},
-	})
+	},
+	)
 }

@@ -1,8 +1,6 @@
 package yugabytedb
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -14,8 +12,8 @@ import (
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.DatabaseCredentials,
-		DocsURL:       sdk.URL("https://docs.yugabyte.com/preview/admin/ysqlsh/#connect-to-a-database"), 
-		ManagementURL: sdk.URL("https://cloud.yugabyte.com/"), 
+		DocsURL:       sdk.URL("https://docs.yugabyte.com/preview/admin/ysqlsh/#connect-to-a-database"),
+		ManagementURL: sdk.URL("https://cloud.yugabyte.com/clusters"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,
@@ -27,8 +25,8 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                fieldname.User,
-				MarkdownDescription: "Yugabyte user to authenticate as.",
+				Name:                fieldname.Username,
+				MarkdownDescription: "Yugabyte user to get authenticate.",
 			},
 			{
 				Name:                fieldname.Password,
@@ -37,7 +35,7 @@ func DatabaseCredentials() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.Database,
-				MarkdownDescription: "Database name to connect to.",
+				MarkdownDescription: "Database name to connect to Yugabyte.",
 				Optional:            true,
 			},
 		},
@@ -45,10 +43,11 @@ func DatabaseCredentials() schema.CredentialType {
 		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
 	}
 }
+
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"PGHOST":     fieldname.Host,
 	"PGPORT":     fieldname.Port,
-	"PGUSER":     fieldname.User,
+	"PGUSER":     fieldname.Username,
 	"PGPASSWORD": fieldname.Password,
 	"PGDATABASE": fieldname.Database,
 }

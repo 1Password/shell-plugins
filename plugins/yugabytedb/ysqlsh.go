@@ -9,12 +9,11 @@ import (
 
 func YugabyteDBCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "YugabyteDB SQL Shell",
-		Runs:      []string{"ysqlsh"},
-		DocsURL:   sdk.URL("https://docs.yugabyte.com/preview/admin/ysqlsh/"), 
+		Name:    "YugabyteDB SQL Shell",
+		Runs:    []string{"ysqlsh"},
+		DocsURL: sdk.URL("https://docs.yugabyte.com/preview/admin/ysqlsh/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
