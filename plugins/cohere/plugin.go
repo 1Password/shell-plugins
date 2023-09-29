@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "cohere",
 		Platform: schema.PlatformInfo{
 			Name:     "Cohere",
-			Homepage: sdk.URL("https://cohere.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://cohere.com"),
 		},
 		Credentials: []schema.CredentialType{
 			Credentials(),

@@ -9,12 +9,14 @@ import (
 
 func CohereCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Cohere CLI", 
-		Runs:      []string{"co"},
-		DocsURL:   sdk.URL("https://docs.cohere.com/reference/command"), 
+		Name:    "Cohere CLI",
+		Runs:    []string{"co"},
+		DocsURL: sdk.URL("https://docs.cohere.com/reference/command"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("config"),
+			needsauth.NotWhenContainsArgs("ping"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
