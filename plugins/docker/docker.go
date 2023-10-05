@@ -9,9 +9,9 @@ import (
 
 func DockerCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Docker CLI",
-		Runs:      []string{"docker"},
-		DocsURL:   sdk.URL("https://docs.docker.com/engine/reference/commandline/docker/"),
+		Name:    "Docker CLI",
+		Runs:    []string{"docker"},
+		DocsURL: sdk.URL("https://docs.docker.com/engine/reference/commandline/docker/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
@@ -19,7 +19,7 @@ func DockerCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.Credentials,
+				Name:        credname.Credentials,
 				Provisioner: dockerProvisioner{},
 			},
 		},
