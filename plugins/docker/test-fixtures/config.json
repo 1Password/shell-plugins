@@ -1,0 +1,5 @@
+{
+	"ServerURL": "https://index.docker.io/v1",
+	"Username": "david",
+	"Secret": "passw0rd1"
+}
