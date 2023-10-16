@@ -1,4 +1,4 @@
-package sentry
+package civo
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,20 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func SentryCLI() schema.Executable {
+func CivoCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Sentry CLI",
-		Runs:    []string{"sentry-cli"},
-		DocsURL: sdk.URL("https://docs.sentry.io/product/cli/"),
+		Name:    "Civo CLI",
+		Runs:    []string{"civo"},
+		DocsURL: sdk.URL("https://www.civo.com/docs/overview/civo-cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWhenContainsArgs("--auth-token"),
-			needsauth.NotWhenContainsArgs("--api-key"),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("config"),
+			needsauth.NotWhenContainsArgs("apikey", "save"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AuthToken,
+				Name: credname.APIKey,
 			},
 		},
 	}

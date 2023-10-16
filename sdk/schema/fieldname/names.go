@@ -27,6 +27,7 @@ const (
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
 	DefaultRegion   = sdk.FieldName("Default Region")
+	Deployment      = sdk.FieldName("Deployment")
 	Email           = sdk.FieldName("Email")
 	Endpoint        = sdk.FieldName("Endpoint")
 	Host            = sdk.FieldName("Host")
@@ -43,6 +44,8 @@ const (
 	Port            = sdk.FieldName("Port")
 	PublicKey       = sdk.FieldName("Public Key")
 	PrivateKey      = sdk.FieldName("Private Key")
+	ProjectID       = sdk.FieldName("Project ID")
+	Project         = sdk.FieldName("Project")
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
@@ -79,6 +82,7 @@ func ListAll() []sdk.FieldName {
 		Credentials,
 		Database,
 		DefaultRegion,
+		Deployment,
 		Endpoint,
 		Host,
 		HostAddress,
@@ -94,6 +98,8 @@ func ListAll() []sdk.FieldName {
 		Port,
 		PublicKey,
 		PrivateKey,
+		ProjectID,
+		Project,
 		Region,
 		Secret,
 		SecretAccessKey,

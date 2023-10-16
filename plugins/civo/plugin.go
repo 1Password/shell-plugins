@@ -1,4 +1,4 @@
-package postgresql
+package civo
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "civo",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Civo",
+			Homepage: sdk.URL("https://www.civo.com"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
-			Pgcli(),
+			CivoCLI(),
 		},
 	}
 }

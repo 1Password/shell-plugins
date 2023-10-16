@@ -1,4 +1,4 @@
-package sentry
+package crowdin
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,19 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func SentryCLI() schema.Executable {
+func CrowdinCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Sentry CLI",
-		Runs:    []string{"sentry-cli"},
-		DocsURL: sdk.URL("https://docs.sentry.io/product/cli/"),
+		Name:    "Crowdin CLI",
+		Runs:    []string{"crowdin"},
+		DocsURL: sdk.URL("https://crowdin.github.io/crowdin-cli/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWhenContainsArgs("--auth-token"),
-			needsauth.NotWhenContainsArgs("--api-key"),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("init"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AuthToken,
+				Name: credname.AccessToken,
 			},
 		},
 	}

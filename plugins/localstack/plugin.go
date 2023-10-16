@@ -1,4 +1,4 @@
-package postgresql
+package localstack
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "localstack",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "LocalStack",
+			Homepage: sdk.URL("https://localstack.cloud"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			APIKey(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
-			Pgcli(),
+			LocalStackCLI(),
 		},
 	}
 }

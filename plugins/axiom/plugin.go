@@ -1,4 +1,4 @@
-package postgresql
+package axiom
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "axiom",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Axiom",
+			Homepage: sdk.URL("https://axiom.co"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			PersonalAccessToken(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
-			Pgcli(),
+			AxiomCLI(),
 		},
 	}
 }

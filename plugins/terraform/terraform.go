@@ -26,6 +26,8 @@ func TerraformCLI() schema.Executable {
 				Optional: true,
 				NeedsAuth: needsauth.IfAny(
 					needsauth.ForCommand("refresh"),
+					needsauth.ForCommand("init"),
+					needsauth.ForCommand("state", "list"),
 					needsauth.ForCommand("plan"),
 					needsauth.ForCommand("apply"),
 					needsauth.ForCommand("destroy"),

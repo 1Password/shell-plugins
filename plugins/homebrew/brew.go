@@ -19,6 +19,10 @@ func HomebrewCLI() schema.Executable {
 				needsauth.ForCommand("bump"),
 				needsauth.ForCommand("bump-cask-pr"),
 				needsauth.ForCommand("bump-formula-pr"),
+				needsauth.ForCommand("update"),
+				needsauth.ForCommand("upgrade"),
+				needsauth.ForCommand("install"),
+				needsauth.ForCommand("reinstall"),
 			),
 		),
 		Uses: []schema.CredentialUsage{

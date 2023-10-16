@@ -1,4 +1,4 @@
-package postgresql
+package vertica
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "vertica",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Vertica",
+			Homepage: sdk.URL("https://www.vertica.com/"),
 		},
 		Credentials: []schema.CredentialType{
 			DatabaseCredentials(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
-			Pgcli(),
+			VerticaCLI(),
 		},
 	}
 }

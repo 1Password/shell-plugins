@@ -100,7 +100,7 @@ No documentation work is required on your end. If your plugin is accepted, a tec
 If you need help, found a bug, or have an idea for an awesome plugin that you'd like to discuss with us first, you can reach out to us here:
 
 * Create an [issue](https://github.com/1Password/shell-plugins/issues) in this repo.
-* Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1z0rd7lro-fx4LPkQwUF89~PzpDGPe1A).
+* Join the [Developer Slack workspace](https://developer.1password.com/joinslack).
 
 ## 📣 Contributions Beta Notice
 

@@ -1,4 +1,4 @@
-package sentry
+package vertica
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,17 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func SentryCLI() schema.Executable {
+func VerticaCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Sentry CLI",
-		Runs:    []string{"sentry-cli"},
-		DocsURL: sdk.URL("https://docs.sentry.io/product/cli/"),
+		Name:    "Vertica CLI",
+		Runs:    []string{"vsql"},
+		DocsURL: sdk.URL("https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/ConnectingToVertica/vsql/UsingVsql.htm"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWhenContainsArgs("--auth-token"),
-			needsauth.NotWhenContainsArgs("--api-key"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AuthToken,
+				Name: credname.DatabaseCredentials,
 			},
 		},
 	}

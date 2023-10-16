@@ -1,4 +1,4 @@
-package sentry
+package axiom
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,18 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func SentryCLI() schema.Executable {
+func AxiomCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Sentry CLI",
-		Runs:    []string{"sentry-cli"},
-		DocsURL: sdk.URL("https://docs.sentry.io/product/cli/"),
+		Name:    "Axiom CLI",
+		Runs:    []string{"axiom"},
+		DocsURL: sdk.URL("https://axiom.co/docs/reference/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWhenContainsArgs("--auth-token"),
-			needsauth.NotWhenContainsArgs("--api-key"),
+			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AuthToken,
+				Name: credname.PersonalAccessToken,
 			},
 		},
 	}

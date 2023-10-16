@@ -1,4 +1,4 @@
-package postgresql
+package crowdin
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -7,19 +7,16 @@ import (
 
 func New() schema.Plugin {
 	return schema.Plugin{
-		Name: "postgresql",
+		Name: "crowdin",
 		Platform: schema.PlatformInfo{
-			Name:     "PostgreSQL",
-			Homepage: sdk.URL("https://postgresql.org"),
+			Name:     "Crowdin",
+			Homepage: sdk.URL("https://crowdin.com"),
 		},
 		Credentials: []schema.CredentialType{
-			DatabaseCredentials(),
+			AccessToken(),
 		},
 		Executables: []schema.Executable{
-			Psql(),
-			Pg_dump(),
-			Pg_restore(),
-			Pgcli(),
+			CrowdinCLI(),
 		},
 	}
 }

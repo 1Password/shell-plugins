@@ -1,6 +1,9 @@
 package cachix
 
 import (
+	"context"
+	"strings"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -33,9 +36,41 @@ func AuthToken() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryCachixConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"CACHIX_AUTH_TOKEN": fieldname.Token,
+}
+
+func TryCachixConfigFile() sdk.Importer {
+	return importer.TryFile("~/.config/cachix/cachix.dhall", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var token string
+
+		fileString := contents.ToString()
+		// The dhall config file contains a single block with variables inside
+		fileString = strings.Trim(fileString, "{}")
+		// Remove spaces to make parsing simpler
+		fileString = strings.Join(strings.Fields(fileString), "")
+		// Split fields into separate strings
+		keyVals := strings.Split(fileString, ",")
+
+		for i := range keyVals {
+			kvPair := strings.Split(keyVals[i], "=")
+			if len(kvPair) != 2 {
+				continue
+			}
+			kvPair[1] = strings.Trim(kvPair[1], "\"")
+			if strings.Contains(kvPair[0], "authToken") {
+				token = kvPair[1]
+			}
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: map[sdk.FieldName]string{
+				fieldname.Token: token,
+			},
+		})
+	})
 }
