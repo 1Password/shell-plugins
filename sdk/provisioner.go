@@ -107,6 +107,20 @@ func (out *ProvisionOutput) AddArgs(args ...string) {
 	out.CommandLine = append(out.CommandLine, args...)
 }
 
+// AddArgsAtIndex can be used to add additional arguments to the command line of the provision output, at a specific index.
+func (out *ProvisionOutput) AddArgsAtIndex(index uint, args ...string) {
+	// Provision arguments at the end of the command line input to prevent out of bound errors. But, this isn't entirely a concern is the case of redis-cli where we always provision at index 1 and "redis-cli" is the minimum-required command
+	if index >= uint(len(out.CommandLine)) {
+		out.CommandLine = append(out.CommandLine, args...)
+		return
+	}
+	newCommandLine := []string{}
+	newCommandLine = append(newCommandLine, out.CommandLine[:index]...)
+	newCommandLine = append(newCommandLine, args...)
+	newCommandLine = append(newCommandLine, out.CommandLine[index:]...)
+	out.CommandLine = newCommandLine
+}
+
 // AddSecretFile can be used to add a file containing secrets to the provision output.
 func (out *ProvisionOutput) AddSecretFile(path string, contents []byte) {
 	out.AddFile(path, OutputFile{
