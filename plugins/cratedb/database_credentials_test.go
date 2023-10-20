@@ -24,10 +24,10 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				},
 				CommandLine: []string{
 					"crash",
-					"--hosts",
-					"https://love.aks1.eastus2.azure.cratedb.net:4200",
-					"--username",
+					"--user",
 					"admin",
+					"--host",
+					"https://love.aks1.eastus2.azure.cratedb.net:4200",
 				},
 			},
 		},
