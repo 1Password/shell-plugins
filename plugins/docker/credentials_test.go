@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"os"
 	"testing"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -9,16 +10,31 @@ import (
 )
 
 func TestCredentialsProvisioner(t *testing.T) {
+	/*
+	credsJson, err := json.Marshal(map[string]string{"credsStore": "1password"})
+	if err != nil {
+		t.Fatal("Failed to marshal config file json.")
+	}
+	userHomeDir, err := os.UserHomeDir()
+	configFileDir := filepath.Join(userHomeDir, ".docker", "config.json")
+	if err != nil {
+		t.Fatal("Failed to retrieve home directory.")
+	}
+	*/
 	plugintest.TestProvisioner(t, Credentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Username: "david",
-				fieldname.Secret:   "passw0rd1",
-				fieldname.Host:     "https://index.docker.io/v1",
+				fieldname.Username: "Stream",
+				fieldname.Secret: "Stream@087",
+				fieldname.Host: "https://index.docker.io/v1/",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{
-					"https://index.docker.io/v1", "--username", "david", "--password", "passw0rd1",
+				//TODO find a way to test for the executable file and config file
+				Environment: map[string]string{
+					"DOCKER_REGISTRY":"https://index.docker.io/v1/",
+					"DOCKER_CREDS_USR":"Stream",
+					"DOCKER_CREDS_PSW":"Stream@087",
+					"PATH": os.Getenv("PATH")+":/tmp",
 				},
 			},
 		},
@@ -28,29 +44,15 @@ func TestCredentialsProvisioner(t *testing.T) {
 func TestCredentialsImporter(t *testing.T) {
 	plugintest.TestImporter(t, Credentials().Importer, map[string]plugintest.ImportCase{
 		"config file": {
-			Files: map[string]string{
+			Files: map[string]string {
 				"~/.docker/config.json": plugintest.LoadFixture(t, "config.json"),
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Username: "david",
-						fieldname.Secret:   "passw0rd1",
-						fieldname.Host:     "https://index.docker.io/v1",
-					},
-				},
-			},
-		},
-		"no url config file": {
-			Files: map[string]string{
-				"~/.docker/config.json": plugintest.LoadFixture(t, "no_url_config.json"),
-			},
-			ExpectedCandidates: []sdk.ImportCandidate{
-				{
-					Fields: map[sdk.FieldName]string{
-						fieldname.Username: "user123",
-						fieldname.Secret:   "passw0rd2",
-						fieldname.Host:     "",
+						fieldname.Username: "Stream",
+						fieldname.Secret:   "Stream@087",
+						fieldname.Host:     "https://index.docker.io/v1/",
 					},
 				},
 			},

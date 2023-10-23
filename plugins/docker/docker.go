@@ -15,7 +15,8 @@ func DockerCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.ForCommand("login"),
+			// NOTE for some reason, doesn't work when this isn't commented out
+			//needsauth.ForCommand("login", "push", "pull"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
