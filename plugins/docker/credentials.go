@@ -56,7 +56,7 @@ func TryDockerConfigFile() sdk.Importer {
 		}
 
 		// Credit: Fixed with code from:
-		// https://github.com/1Password/shell-plugins/pull/301/files#diff-9d1e3341794f3990528aebd795097bfc281f6e2acf3ec92f5a0bb02e9740ba9e 
+		// https://github.com/1Password/shell-plugins/pull/301/files#diff-9d1e3341794f3990528aebd795097bfc281f6e2acf3ec92f5a0bb02e9740ba9e
 		for url, auth := range config.Auths {
 			authBytes, err := base64.StdEncoding.DecodeString(auth.Auth)
 			if err != nil {
@@ -70,8 +70,8 @@ func TryDockerConfigFile() sdk.Importer {
 				out.AddCandidate(sdk.ImportCandidate{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Username: username,
-						fieldname.Secret: secret,
-						fieldname.Host: hostUrl,
+						fieldname.Secret:   secret,
+						fieldname.Host:     hostUrl,
 					},
 				})
 			}
@@ -98,13 +98,11 @@ func (p dockerProvisioner) Provision(ctx context.Context, input sdk.ProvisionInp
 
 	executablePath := filepath.Join(input.TempDir, "docker-credential-1password")
 
-
 	err = os.WriteFile(executablePath, []byte(bashScript), 0777)
 	if err != nil {
 		output.AddError(err)
 		return
 	}
-	
 
 	//output.AddFile(executablePath, sdk.OutputFile{Contents: []byte(bashScript)})
 	err = os.MkdirAll(filepath.Join(input.HomeDir, ".docker"), os.ModePerm)
@@ -112,7 +110,7 @@ func (p dockerProvisioner) Provision(ctx context.Context, input sdk.ProvisionInp
 		output.AddError(fmt.Errorf("Config dir creation: %w", err))
 		return
 	}
-	
+
 	//output.AddNonSecretFile(configFilePath, configFileContents)
 	err = os.WriteFile(configFilePath, configFileContents, 0666)
 	if err != nil {
@@ -144,7 +142,7 @@ type AuthConfig struct {
 	} `json:"auths"`
 }
 
-// Credit: copied from https://github.com/1Password/shell-plugins/pull/301/files#diff-9d1e3341794f3990528aebd795097bfc281f6e2acf3ec92f5a0bb02e9740ba9e 
+// Credit: copied from https://github.com/1Password/shell-plugins/pull/301/files#diff-9d1e3341794f3990528aebd795097bfc281f6e2acf3ec92f5a0bb02e9740ba9e
 func parseCredentials(credentials string) (username string, password string) {
 	parts := strings.SplitN(credentials, ":", 2)
 	if len(parts) == 2 {
