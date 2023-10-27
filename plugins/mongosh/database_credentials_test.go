@@ -11,6 +11,7 @@ import (
 func TestUserLoginProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
+			CommandLine: []string{"mongosh", "test.js"},
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Username: "aexample",
 				fieldname.Password: "apassword",
@@ -19,7 +20,7 @@ func TestUserLoginProvisioner(t *testing.T) {
 				fieldname.Database: "example",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"--username", "aexample", "--password", "apassword", "--host", "example.org", "--port", "2121", "example"},
+				CommandLine: []string{"mongosh", "--username", "aexample", "--password", "apassword", "--host", "example.org", "--port", "2121", "example", "test.js"},
 			},
 		},
 	})

@@ -51,27 +51,41 @@ func (m mongoshProvisioner) Description() string {
 }
 
 func (m mongoshProvisioner) Provision(ctx context.Context, input sdk.ProvisionInput, output *sdk.ProvisionOutput) {
-	if username, ok := input.ItemFields[fieldname.Username]; ok {
-		output.AddArgs("--username", username)
-	}
-
-	if password, ok := input.ItemFields[fieldname.Password]; ok {
-		output.AddArgs("--password", password)
-	}
-
-	if host, ok := input.ItemFields[fieldname.Host]; ok {
-		output.AddArgs("--host", host)
+	// We add the params in reverse order as we always want the DB at the end of the list
+	if db, ok := input.ItemFields[fieldname.Database]; ok {
+		addFirstArgs(output, db)
 	}
 
 	if port, ok := input.ItemFields[fieldname.Port]; ok {
-		output.AddArgs("--port", port)
+		addFirstArgs(output, "--port", port)
 	}
 
-	if db, ok := input.ItemFields[fieldname.Database]; ok {
-		output.AddArgs(db)
+	if host, ok := input.ItemFields[fieldname.Host]; ok {
+		addFirstArgs(output, "--host", host)
 	}
+
+	if password, ok := input.ItemFields[fieldname.Password]; ok {
+		addFirstArgs(output, "--password", password)
+	}
+
+	if username, ok := input.ItemFields[fieldname.Username]; ok {
+		addFirstArgs(output, "--username", username)
+	}
+
 }
 
 func (m mongoshProvisioner) Deprovision(ctx context.Context, input sdk.DeprovisionInput, output *sdk.DeprovisionOutput) {
 	// No-op
+}
+
+// AddArgs can be used to add additional arguments to the command line of the provision output.
+func addFirstArgs(output *sdk.ProvisionOutput, args ...string) {
+	if len(output.CommandLine) <= 1 {
+		output.AddArgs(args...)
+	} else {
+		command := []string{output.CommandLine[0]}
+		command = append(command, args...)
+		command = append(command, output.CommandLine[1:]...)
+		output.CommandLine = command
+	}
 }
