@@ -14,8 +14,8 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://shodan.com/docs/api_key"), // TODO: Replace with actual URL
-		ManagementURL: sdk.URL("https://console.shodan.com/user/security/tokens"), // TODO: Replace with actual URL
+		DocsURL:       sdk.URL("https://developer.shodan.io/api/requirements"),
+		ManagementURL: sdk.URL("https://account.shodan.io"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
@@ -31,40 +31,27 @@ func APIKey() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		DefaultProvisioner: provision.TempFile(
+			provision.FieldAsFile(fieldname.APIKey),
+			provision.AtFixedPath("~/.config/shodan/api_key"),
+		),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryShodanConfigFile(),
 		)}
 }
 
-var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"SHODAN_API_KEY": fieldname.APIKey, // TODO: Check if this is correct
-}
-
-// TODO: Check if the platform stores the API Key in a local config file, and if so,
-// implement the function below to add support for importing it.
 func TryShodanConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
+	return importer.TryFile("~/.config/shodan/api_key", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		apiKey := contents.ToString()
 
-		// if config.APIKey == "" {
-		// 	return
-		// }
+		if apiKey == "" {
+			return
+		}
 
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.APIKey: config.APIKey,
-		// 	},
-		// })
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: map[sdk.FieldName]string{
+				fieldname.APIKey: apiKey,
+			},
+		})
 	})
 }
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	APIKey string
-// }
