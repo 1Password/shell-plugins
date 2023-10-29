@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "shopify",
 		Platform: schema.PlatformInfo{
 			Name:     "Shopify",
-			Homepage: sdk.URL("https://shopify.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://shopify.com"),
 		},
 		Credentials: []schema.CredentialType{
 			CLIToken(),
