@@ -12,6 +12,8 @@ import (
 func AuthToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.AuthToken,
+		DocsURL:       sdk.URL("https://developer.hashicorp.com/nomad/docs/concepts/acl#token"),
+		ManagementURL: nil,
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
