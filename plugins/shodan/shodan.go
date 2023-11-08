@@ -9,9 +9,9 @@ import (
 
 func ShodanCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Shodan Command-Line Interface",
-		Runs:      []string{"shodan"},
-		DocsURL:   sdk.URL("https://cli.shodan.io"),
+		Name:    "Shodan Command-Line Interface",
+		Runs:    []string{"shodan"},
+		DocsURL: sdk.URL("https://cli.shodan.io"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
