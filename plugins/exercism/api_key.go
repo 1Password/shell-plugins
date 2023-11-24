@@ -19,9 +19,9 @@ func APIKey() schema.CredentialType {
 		ManagementURL: sdk.URL("https://exercism.org/settings/api_cli"),
 		Fields: []schema.CredentialField{
 			{
-				Name: fieldname.URL,
+				Name:                fieldname.URL,
 				MarkdownDescription: `The URL of the Exercism API.`,
-				Secret: false,
+				Secret:              false,
 			},
 			{
 				Name:                fieldname.APIKey,
@@ -36,9 +36,9 @@ func APIKey() schema.CredentialType {
 				},
 			},
 			{
-				Name: sdk.FieldName("Directory"),
+				Name:                sdk.FieldName("Directory"),
 				MarkdownDescription: `The path to the workspace directory where the exercises are stored.`,
-				Secret: false,
+				Secret:              false,
 			},
 		},
 		DefaultProvisioner: provision.TempFile(
@@ -64,8 +64,8 @@ func TryExercismConfigFile() sdk.Importer {
 
 		out.AddCandidate(sdk.ImportCandidate{
 			Fields: map[sdk.FieldName]string{
-				fieldname.APIKey: config.APIKey,
-				fieldname.URL: config.URL,
+				fieldname.APIKey:           config.APIKey,
+				fieldname.URL:              config.URL,
 				sdk.FieldName("Directory"): config.Workspace,
 			},
 		})
@@ -73,15 +73,15 @@ func TryExercismConfigFile() sdk.Importer {
 }
 
 type Config struct {
-	URL string `json:"apibaseurl"`
-	APIKey string `json:"token"`
+	URL       string `json:"apibaseurl"`
+	APIKey    string `json:"token"`
 	Workspace string `json:"workspace"`
 }
 
 func tempFileConfig(in sdk.ProvisionInput) ([]byte, error) {
 	config := Config{
-		URL: in.ItemFields[fieldname.URL],
-		APIKey: in.ItemFields[fieldname.APIKey],
+		URL:       in.ItemFields[fieldname.URL],
+		APIKey:    in.ItemFields[fieldname.APIKey],
 		Workspace: in.ItemFields[sdk.FieldName("Directory")],
 	}
 

@@ -9,9 +9,9 @@ import (
 
 func ExercismCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Exercism CLI", 
-		Runs:      []string{"exercism"},
-		DocsURL:   sdk.URL("https://exercism.org/docs/using/solving-exercises/working-locally"), 
+		Name:    "Exercism CLI",
+		Runs:    []string{"exercism"},
+		DocsURL: sdk.URL("https://exercism.org/docs/using/solving-exercises/working-locally"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
