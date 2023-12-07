@@ -4,25 +4,26 @@ import "github.com/1Password/shell-plugins/sdk"
 
 // Credential type names.
 const (
-	APIClientCredentials = sdk.CredentialName("API Client Credentials")
-	APIKey               = sdk.CredentialName("API Key")
-	APIToken             = sdk.CredentialName("API Token")
-	AccessKey            = sdk.CredentialName("Access Key")
-	AccessToken          = sdk.CredentialName("Access Token")
-	AppPassword          = sdk.CredentialName("App Password")
-	AppToken             = sdk.CredentialName("App Token")
-	AuthToken            = sdk.CredentialName("Auth Token")
-	CLIToken             = sdk.CredentialName("CLI Token")
-	Credential           = sdk.CredentialName("Credential")
-	Credentials          = sdk.CredentialName("Credentials")
-	DatabaseCredentials  = sdk.CredentialName("Database Credentials")
-	DeployKey            = sdk.CredentialName("Deploy Key")
-	LoginDetails         = sdk.CredentialName("Login Details")
-	PersonalAPIToken     = sdk.CredentialName("Personal API Token")
-	PersonalAccessToken  = sdk.CredentialName("Personal Access Token")
-	RegistryCredentials  = sdk.CredentialName("Registry Credentials")
-	SecretKey            = sdk.CredentialName("Secret Key")
-	UserLogin            = sdk.CredentialName("User Login")
+	APIClientCredentials           = sdk.CredentialName("API Client Credentials")
+	APIKey                         = sdk.CredentialName("API Key")
+	APIToken                       = sdk.CredentialName("API Token")
+	AccessKey                      = sdk.CredentialName("Access Key")
+	AccessToken                    = sdk.CredentialName("Access Token")
+	AppPassword                    = sdk.CredentialName("App Password")
+	AppToken                       = sdk.CredentialName("App Token")
+	AuthToken                      = sdk.CredentialName("Auth Token")
+	CLIToken                       = sdk.CredentialName("CLI Token")
+	Credential                     = sdk.CredentialName("Credential")
+	Credentials                    = sdk.CredentialName("Credentials")
+	DatabaseCredentials            = sdk.CredentialName("Database Credentials")
+	DeployKey                      = sdk.CredentialName("Deploy Key")
+	EnterprisePersonalAccessToken  = sdk.CredentialName("Enterprise Personal Access Token")
+	LoginDetails                   = sdk.CredentialName("Login Details")
+	PersonalAPIToken               = sdk.CredentialName("Personal API Token")
+	PersonalAccessToken            = sdk.CredentialName("Personal Access Token")
+	RegistryCredentials            = sdk.CredentialName("Registry Credentials")
+	SecretKey                      = sdk.CredentialName("Secret Key")
+	UserLogin                      = sdk.CredentialName("User Login")
 )
 
 func ListAll() []sdk.CredentialName {
@@ -40,6 +41,7 @@ func ListAll() []sdk.CredentialName {
 		Credentials,
 		DatabaseCredentials,
 		DeployKey,
+		EnterprisePersonalAccessToken,
 		LoginDetails,
 		PersonalAPIToken,
 		PersonalAccessToken,
