@@ -43,4 +43,5 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           # version of golangci-lint to use
+          # Version should stay in sync with version used for local linting (lint job in Makefile).
           version: v1.50.1

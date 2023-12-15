@@ -42,6 +42,10 @@ $(plugins_dir):
 test:
 	go test ./...
 
+lint:
+	# Version used should stay in sync with version in CI (.github/workflows/test.yaml).
+	docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.50.1 golangci-lint run
+
 %/remove-local: beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
 	rm -f ~/.op/plugins/local/$(plugin)
