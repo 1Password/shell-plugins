@@ -23,6 +23,7 @@ const (
 	RegistryCredentials  = sdk.CredentialName("Registry Credentials")
 	SecretKey            = sdk.CredentialName("Secret Key")
 	UserLogin            = sdk.CredentialName("User Login")
+	AccessConfig         = sdk.CredentialName("Access Config")
 )
 
 func ListAll() []sdk.CredentialName {
@@ -46,5 +47,6 @@ func ListAll() []sdk.CredentialName {
 		RegistryCredentials,
 		SecretKey,
 		UserLogin,
+		AccessConfig,
 	}
 }
