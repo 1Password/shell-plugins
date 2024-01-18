@@ -13,8 +13,15 @@ func Sqitch() schema.Executable {
 		Runs:      []string{"sqitch"},
 		DocsURL:   sdk.URL("https://sqitch.org/docs/"),
 		NeedsAuth: needsauth.IfAll(
-			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
+			needsauth.IfAny(
+				needsauth.ForCommand("deploy"),
+				needsauth.ForCommand("log"),
+				needsauth.ForCommand("revert"),
+				needsauth.ForCommand("status"),
+				needsauth.ForCommand("upgrade"),
+				needsauth.ForCommand("verify"),
+			),
+			needsauth.NotForHelp(),
 		),
 		Uses: []schema.CredentialUsage{
 			{

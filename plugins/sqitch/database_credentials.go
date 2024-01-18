@@ -19,6 +19,11 @@ func DatabaseCredentials() schema.CredentialType {
 				MarkdownDescription: "Password used to authenticate to the target database.",
 				Secret:              true,
 			},
+			{
+				Name:                fieldname.Username,
+				MarkdownDescription: "Username used to authenticate to the target database.",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
@@ -28,4 +33,5 @@ func DatabaseCredentials() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SQITCH_PASSWORD": fieldname.Password,
+	"SQITCH_USERNAME": fieldname.Username,
 }
