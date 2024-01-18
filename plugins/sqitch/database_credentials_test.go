@@ -13,7 +13,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Password: "nBI8u8aF10TvQFfBlMedCDuEXAMPLE",
-				fieldname.Username: "example_username",
+				fieldname.User: "example_username",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{

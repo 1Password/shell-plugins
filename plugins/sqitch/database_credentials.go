@@ -20,7 +20,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Secret:              true,
 			},
 			{
-				Name:                fieldname.Username,
+				Name:                fieldname.User,
 				MarkdownDescription: "Username used to authenticate to the target database.",
 				Optional:            true,
 			},
@@ -33,5 +33,5 @@ func DatabaseCredentials() schema.CredentialType {
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SQITCH_PASSWORD": fieldname.Password,
-	"SQITCH_USERNAME": fieldname.Username,
+	"SQITCH_USERNAME": fieldname.User,
 }
