@@ -2,6 +2,7 @@ package npm
 
 import (
 	"context"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -9,6 +10,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
+	"gopkg.in/ini.v1"
 )
 
 func AccessToken() schema.CredentialType {
@@ -33,6 +35,9 @@ func AccessToken() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
+		Importer: importer.TryAll(
+			TryNPMConfigFile(),
+		),
 	}
 }
 
@@ -40,29 +45,29 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NPM_CONFIG_//registry.npmjs.org/:_authToken": fieldname.Token,
 }
 
-// TODO: Check if the platform stores the Access Token in a local config file, and if so,
-// implement the function below to add support for importing it.
 func TryNPMConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-		// var config Config
-		// if err := contents.ToYAML(&config); err != nil {
-		// 	out.AddError(err)
-		// 	return
-		// }
+	return importer.TryFile("~/.npmrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		// don't use colon as a delimiter, since it is used in the .npmrc file as a delimiter
+		// between the scope, registry and configuration key
+		configs, err := ini.LoadSources(ini.LoadOptions{KeyValueDelimiters: "="}, []byte(contents))
+		if err != nil {
+			out.AddError(err)
+		}
 
-		// if config.Token == "" {
-		// 	return
-		// }
+		// sections are not supported in .npmrc
+		section, err := configs.GetSection(ini.DefaultSection)
+		if err != nil {
+			out.AddError(err)
+		}
+		for _, key := range section.Keys() {
+			if strings.Contains(key.Name(), "_authToken") {
 
-		// out.AddCandidate(sdk.ImportCandidate{
-		// 	Fields: map[sdk.FieldName]string{
-		// 		fieldname.Token: config.Token,
-		// 	},
-		// })
+				out.AddCandidate(sdk.ImportCandidate{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: key.Value(),
+					},
+				})
+			}
+		}
 	})
 }
-
-// TODO: Implement the config file schema
-// type Config struct {
-//	Token string
-// }
