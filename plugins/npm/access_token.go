@@ -2,6 +2,7 @@ package npm
 
 import (
 	"context"
+	"os"
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -11,6 +12,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 	"gopkg.in/ini.v1"
+	"path/filepath"
 )
 
 func AccessToken() schema.CredentialType {
@@ -36,7 +38,8 @@ func AccessToken() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
-			TryNPMConfigFile(),
+			TryNPMConfigFile(""),
+			TryGlobalNPMConfigFile("NPM_CONFIG_USERCONFIG", "~"),
 		),
 	}
 }
@@ -45,8 +48,17 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NPM_CONFIG_//registry.npmjs.org/:_authToken": fieldname.Token,
 }
 
-func TryNPMConfigFile() sdk.Importer {
-	return importer.TryFile("~/.npmrc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryGlobalNPMConfigFile(env string, defaultPath string) sdk.Importer {
+	path := os.Getenv(env)
+	if path == "" {
+		path = defaultPath
+	}
+	return TryNPMConfigFile(path)
+}
+
+func TryNPMConfigFile(path string) sdk.Importer {
+	return importer.TryFile(filepath.Join(path, ".npmrc"), func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+
 		// don't use colon as a delimiter, since it is used in the .npmrc file as a delimiter
 		// between the scope, registry and configuration key
 		configs, err := ini.LoadSources(ini.LoadOptions{KeyValueDelimiters: "="}, []byte(contents))
