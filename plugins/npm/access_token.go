@@ -68,6 +68,8 @@ func configFile(in sdk.ProvisionInput) ([]byte, error) {
 	}
 	if host, ok := in.ItemFields[fieldname.Host]; ok && host != "" {
 		contents += "//" + strings.Trim(host, "/") + "/:"
+	} else {
+		contents += "//registry.npmjs.org/:"
 	}
 
 	contents += "_authToken="
