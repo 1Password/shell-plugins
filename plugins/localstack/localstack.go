@@ -18,7 +18,7 @@ func LocalStackCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIKey,
+				Name: credname.AuthToken,
 			},
 		},
 	}
