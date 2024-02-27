@@ -13,10 +13,10 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://shopify.com"),
 		},
 		Credentials: []schema.CredentialType{
-			CLIToken(),
+			AccessKey(),
 		},
 		Executables: []schema.Executable{
-			ShopifyCLI(),
+			ShopifyThemeCLI(),
 		},
 	}
 }
