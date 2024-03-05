@@ -9,7 +9,6 @@
       in {
         devShells.default = pkgs.mkShell {
           name = "Shell with Go toolchain";
-
           packages = with pkgs; [ go gopls ];
         };
       })) // {
