@@ -1,9 +1,9 @@
 { pkgs, lib, config, is-home-manager, ... }:
 with lib;
-let cfg = config.programs.op-shell-plugins;
+let cfg = config.programs._1password-shell-plugins;
 in {
   options = {
-    programs.op-shell-plugins = {
+    programs._1password-shell-plugins = {
       enable = mkEnableOption "1Password Shell Plugins";
       plugins = mkOption {
         type = types.listOf types.package;
@@ -28,39 +28,22 @@ in {
     # of the form:
     # `alias {pkg}="op plugin run -- {pkg}"`
     # where `{pkg}` is the executable name of the package
-    aliases = ''
-      export OP_PLUGIN_ALIASES_SOURCED=1
-      ${concatMapStrings
-      (plugin: ''alias ${plugin}="op plugin run -- ${plugin}"'')
-      (map (package: builtins.baseNameOf (lib.getExe package)) cfg.plugins)}
-    '';
-    # install the 1Password CLI, as well as any of the CLIs for which
-    # shell plugins are enabled
+    aliases = listToAttrs (map (package: {
+      name = package;
+      value = "op plugin run -- ${package}";
+    }) (map (package:
+      builtins.unsafeDiscardStringContext (baseNameOf (getExe package)))
+      cfg.plugins));
     packages = [ pkgs._1password ] ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
     ({
-      # the option names are slightly different depending on whether you're using home-manager or not
-      programs = if is-home-manager then {
-        fish.interactiveShellInit = ''
-          ${aliases}
-        '';
-        bash.initExtra = ''
-          ${aliases}
-        '';
-        zsh.initExtra = ''
-          ${aliases}
-        '';
-      } else {
-        fish.interactiveShellInit = "";
-        bash.interactiveShellInit = ''
-          ${aliases}
-        '';
-        zsh.interactiveShellInit = ''
-          ${aliases}
-        '';
+      programs = {
+        bash.shellAliases = aliases;
+        zsh.shellAliases = aliases;
+        fish.shellAliases = aliases;
       };
     } // optionalAttrs is-home-manager { home.packages = packages; }
-      // optionalAttrs (not is-home-manager) {
+      // optionalAttrs (!is-home-manager) {
         environment.systemPackages = packages;
       })
   ]);
