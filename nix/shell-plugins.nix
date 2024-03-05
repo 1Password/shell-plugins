@@ -32,6 +32,11 @@ in {
       name = package;
       value = "op plugin run -- ${package}";
     }) (map (package:
+      # NOTE: SAFETY: This is okay because the `packages` list is also referred
+      # to below as `home.packages = packages;` or `environment.systemPackages = packages;`
+      # depending on if it's using `home-manager` or not; this means that Nix can still
+      # compute the dependency tree, even though we're discarding string context here,
+      # since the packages are still referred to below without discarding string context.
       builtins.unsafeDiscardStringContext (baseNameOf (getExe package)))
       cfg.plugins));
     packages = [ pkgs._1password ] ++ cfg.plugins;
