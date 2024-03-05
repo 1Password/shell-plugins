@@ -1,3 +1,4 @@
+# CI job to periodically (once a week) update flake.lock
 name: Update flake dependencies
 
 on:
