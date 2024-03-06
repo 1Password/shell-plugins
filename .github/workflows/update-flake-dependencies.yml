@@ -34,4 +34,4 @@ jobs:
             --field content=@<(base64 -i $FILE_TO_COMMIT) \
             --field branch="$COMMIT_BRANCH" \
             --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
-          gh pr create --title "[automation]: Update Flake dependencies" --reviewer mrjones2014 --base main --head $COMMIT_BRANCH
+          gh pr create --title "[automation]: Update Flake dependencies" --body "This is an automated PR to update \`flake.lock\`" --reviewer mrjones2014 --base main --head $COMMIT_BRANCH
