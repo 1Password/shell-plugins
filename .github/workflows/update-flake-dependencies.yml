@@ -2,9 +2,6 @@
 name: Update flake dependencies
 
 on:
-  # TODO this is just a test, remove the `push` trigger before merging
-  push:
-    branches: [ mrj/nix-flake-overlay ]
   schedule:
     - cron: '0 16 * * 5'
   workflow_dispatch: # for allowing manual triggers of the workflow
