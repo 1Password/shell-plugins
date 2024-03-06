@@ -25,6 +25,9 @@ jobs:
         COMMIT_BRANCH: automation/update-flake-dependencies
         COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
       run: |
+          # create the branch on the remote
+          git branch "$COMMIT_BRANCH"
+          git push -u origin "$COMMIT_BRANCH"
           # commit via the GitHub API so we get automatic commit signing
           gh api --method PUT /repos/1Password/shell-plugins/contents/$FILE_TO_COMMIT \
             --field message="$COMMIT_MESSAGE" \
