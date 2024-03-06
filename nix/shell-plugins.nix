@@ -49,9 +49,16 @@ in {
         zsh.shellAliases = aliases;
         fish.shellAliases = aliases;
       };
-    } // optionalAttrs is-home-manager { home.packages = packages; }
-      // optionalAttrs (!is-home-manager) {
-        environment.systemPackages = packages;
-      })
+    } // optionalAttrs is-home-manager {
+      home = {
+        inherit packages;
+        sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
+      };
+    } // optionalAttrs (!is-home-manager) {
+      environment = {
+        systemPackages = packages;
+        variables = { OP_PLUGINS_SOURCED = "1"; };
+      };
+    })
   ]);
 }
