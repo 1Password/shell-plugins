@@ -19,3 +19,7 @@ plugins/registry.json
 
 # 1Password
 .op
+
+# direnv
+.direnv
+.envrc

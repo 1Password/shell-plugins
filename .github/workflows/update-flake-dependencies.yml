@@ -1,0 +1,37 @@
+# CI job to periodically (once a week) update flake.lock
+name: Update flake dependencies
+
+on:
+  schedule:
+    - cron: '0 16 * * 5'
+  workflow_dispatch: # for allowing manual triggers of the workflow
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - name: update flake.lock
+      run: nix flake update
+    - name: Create signed commit with flake.lock changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FILE_TO_COMMIT: flake.lock
+        COMMIT_BRANCH: automation/update-flake-dependencies
+        COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
+      run: |
+          # make sure something actually changed first, if not, no updates required
+          if [[ `git status --porcelain` ]]; then
+            # create the branch on the remote
+            git branch "$COMMIT_BRANCH"
+            git push -u origin "$COMMIT_BRANCH"
+            # commit via the GitHub API so we get automatic commit signing
+            gh api --method PUT /repos/1Password/shell-plugins/contents/$FILE_TO_COMMIT \
+              --field message="$COMMIT_MESSAGE" \
+              --field content=@<(base64 -i $FILE_TO_COMMIT) \
+              --field branch="$COMMIT_BRANCH" \
+              --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
+            gh pr create --title "[automation]: Update Flake dependencies" --body "This is an automated PR to update \`flake.lock\`" --reviewer mrjones2014 --base main --head $COMMIT_BRANCH
+          fi
