@@ -17,7 +17,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require google.golang.org/protobuf v1.30.0 // indirect
+require google.golang.org/protobuf v1.33.0 // indirect
 
 require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
