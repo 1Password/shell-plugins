@@ -15,6 +15,7 @@ func ShodanCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("init"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
