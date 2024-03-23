@@ -33,15 +33,16 @@ func APIKey() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.TempFile(
 			provision.FieldAsFile(fieldname.APIKey),
-			provision.AtFixedPath("~/.config/shodan/api_key"),
+			provision.AtFixedPath("~/.shodan/api_key"),
 		),
 		Importer: importer.TryAll(
-			TryShodanConfigFile(),
+			TryShodanConfigFile("~/.shodan/api_key"),
+			TryShodanConfigFile("~/.config/shodan/api_key"),
 		)}
 }
 
-func TryShodanConfigFile() sdk.Importer {
-	return importer.TryFile("~/.config/shodan/api_key", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+func TryShodanConfigFile(configPath string) sdk.Importer {
+	return importer.TryFile(configPath, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		apiKey := contents.ToString()
 
 		if apiKey == "" {
