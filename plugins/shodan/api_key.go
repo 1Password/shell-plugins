@@ -14,7 +14,7 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://developer.shodan.io/api/requirements"),
+		DocsURL:       sdk.URL("https://cli.shodan.io"),
 		ManagementURL: sdk.URL("https://account.shodan.io"),
 		Fields: []schema.CredentialField{
 			{
