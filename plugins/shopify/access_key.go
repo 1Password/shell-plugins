@@ -12,8 +12,7 @@ import (
 func AccessKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:    credname.CLIToken,
-		DocsURL: sdk.URL("https://shopify.dev/docs/themes/tools/cli"),
-		//ManagementURL: sdk.URL("https://admin.shopify.com/store/{YOUR_STORE_ID}/apps/theme-kit-access"), // Can't support unless URL supports variable URLs
+		DocsURL: sdk.URL("https://admin.shopify.com/store/{YOUR_STORE_ID}/apps/theme-kit-access"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
@@ -29,10 +28,9 @@ func AccessKey() schema.CredentialType {
 				},
 			},
 		},
-		Importer: importer.NoOp(),
 		// Can't Implement Shopify environment parsing as the files are stored by project directory instead of a fixed location
 		// See: https://shopify.dev/docs/themes/tools/cli/environments
-
+		Importer: importer.NoOp(),
 		DefaultProvisioner: shopifyThemeProvisioner{},
 	}
 }
