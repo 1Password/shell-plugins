@@ -2,6 +2,7 @@ package shopify
 
 import (
 	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
@@ -30,7 +31,7 @@ func AccessKey() schema.CredentialType {
 		},
 		// Can't Implement Shopify environment parsing as the files are stored by project directory instead of a fixed location
 		// See: https://shopify.dev/docs/themes/tools/cli/environments
-		Importer: importer.NoOp(),
+		Importer:           importer.NoOp(),
 		DefaultProvisioner: shopifyThemeProvisioner{},
 	}
 }
