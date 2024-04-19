@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'github-actions[bot]' && github.event.pull_request.labels.*.name == 'flake.lock automation'
     steps:
+      - uses: actions/checkout@v4
       - name: Approve flake.lock PRs (still requires 1 human approval)
         run: |
           # only run if only exactly 1 file is changed;
