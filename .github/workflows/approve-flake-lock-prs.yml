@@ -1,0 +1,16 @@
+# This job applies one approval automatically to the automated `flake.lock` PRs
+# This helps us keep up with the weekly automated PRs, but still requires at least 1
+# human manual approval.
+name: Approve flake.lock PRs (still require 1 human approval)
+permissions:
+  pull-requests: write
+jobs:
+  approve-flake-lock-prs:
+    runs-on: ubuntu-latest
+    if: github.actor == 'github-actions[bot]' && github.event.pull_request.labels.*.name == 'flake.lock automation'
+    steps:
+      - name: Approve flake.lock PRs (still requires 1 human approval)
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
