@@ -5,9 +5,9 @@ name: Approve flake.lock PRs (still require 1 human approval)
 permissions:
   pull-requests: write
 on:
-  pull_request_target:
-    paths:
-      - 'flake.lock' # only run if flake.lock has changed
+  pull_request:
+    paths: # only run if flake.lock has changed
+      - flake.lock
 jobs:
   approve-flake-lock-prs:
     runs-on: ubuntu-latest
