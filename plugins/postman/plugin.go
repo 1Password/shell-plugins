@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "postman",
 		Platform: schema.PlatformInfo{
 			Name:     "postman",
-			Homepage: sdk.URL("https://identity.getpostman.com/"), 
+			Homepage: sdk.URL("https://www.postman.com/"), 
 		},
 		Credentials: []schema.CredentialType{
 			APIKey(),
