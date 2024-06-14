@@ -21,7 +21,7 @@ in {
   options = {
     programs._1password-shell-plugins = {
       enable = mkEnableOption "1Password Shell Plugins";
-      package = mkPackageOption pkgs "_1password" { };
+      package = mkPackageOption pkgs "_1password-cli" { nullable = true; };
       plugins = mkOption {
         type = types.listOf types.package;
         default = [ ];
@@ -63,7 +63,7 @@ in {
       name = package;
       value = "op plugin run -- ${package}";
     }) pkg-exe-names);
-    packages = [ cfg.package ] ++ cfg.plugins;
+    packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
     ({
       programs = {
