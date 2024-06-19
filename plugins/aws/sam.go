@@ -15,6 +15,11 @@ func AWSSAMCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			// skip 1Password authentication for "sam docs", "sam init", "sam local" and "sam validate" and their subcommands
+			needsauth.NotWhenContainsArgs("docs"),
+			needsauth.NotWhenContainsArgs("init"),
+			needsauth.NotWhenContainsArgs("local"),
+			needsauth.NotWhenContainsArgs("validate"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
