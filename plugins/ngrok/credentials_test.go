@@ -10,7 +10,7 @@ import (
 )
 
 func TestCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, ngrokProvisioner(), map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, fileProvisioner{}, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Authtoken: "cxG2Im21Yzkh8VnvFQaetlPHcQ9ZDUUk1IzzyHhcGcEXAMPLE",

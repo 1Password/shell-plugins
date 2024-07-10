@@ -28,12 +28,12 @@ const (
 type fileProvisioner struct {
 }
 
-func ngrokProvisioner() sdk.Provisioner {
+func IsNgrokAPIKeySupported() bool {
 	currentVersion, err := getNgrokVersion()
 	if err != nil {
 		// When ngrok version check fails for any reason,
 		// use config file to provision as a fallback
-		return fileProvisioner{}
+		return false
 	}
 
 	// If the current ngrok CLI version is 3.2.1 or higher,
@@ -42,14 +42,22 @@ func ngrokProvisioner() sdk.Provisioner {
 	// semver.Compare resulting in 0 means 3.2.1 is in use
 	// semver.Compare resulting in +1 means >3.2.1 is in use
 	if semver.Compare(currentVersion, envVarAuthVersion) >= 0 {
-		return ngrokEnvVarProvisioner{}
+		return true
 	}
 
 	// Otherwise use config file to provision credentials
-	return fileProvisioner{}
+	return false
 }
 
 func (f fileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	ngrokProvisioner := IsNgrokAPIKeySupported()
+
+	if ngrokProvisioner {
+		out.AddEnvVar("NGROK_AUTHTOKEN", in.ItemFields[fieldname.Authtoken])
+		out.AddEnvVar("NGROK_API_KEY", in.ItemFields[fieldname.APIKey])
+		return
+	}
+
 	provisionedConfigFilePath := filepath.Join(in.TempDir, "config.yml")
 	config := make(map[string]interface{})
 
@@ -138,9 +146,9 @@ func getNgrokVersion() (string, error) {
 }
 
 func (f fileProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
-	// nothing to do here: files get deleted automatically by 1Password CLI
+	// nothing to do here: files get deleted automatically by 1Password CLI and environment variables get wiped when process exits
 }
 
 func (f fileProvisioner) Description() string {
-	return "Config file aware provisioner. It will first check if an already existing config file is present."
+	return "If ngrok version is 3.2.1 or higher than provision ngrok credentials as environment variables NGROK_AUTH_TOKEN and NGROK_API_KEY otherwise config file aware provisioner. It will first check if an already existing config file is present."
 }
