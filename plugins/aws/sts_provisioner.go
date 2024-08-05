@@ -227,8 +227,6 @@ func resolveLocalAnd1PasswordConfigurations(itemFields map[sdk.FieldName]string,
 		region = defaultRegion
 	}
 
-	hasRegion := hasDefaultRegion || hasRegularRegion
-
 	// only 1Password OTPs are supported
 	if awsConfig.MfaToken != "" || awsConfig.MfaProcess != "" || awsConfig.MfaPromptMethod != "" {
 		return fmt.Errorf("only 1Password-backed OTP authentication is supported by the MFA worklfow of the AWS shell plugin")
