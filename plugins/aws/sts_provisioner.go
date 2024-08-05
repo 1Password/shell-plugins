@@ -250,8 +250,8 @@ Learn how to add an OTP field to your item:
 https://developer.1password.com/docs/cli/shell-plugins/aws/#optional-set-up-multi-factor-authentication`, awsConfig.MfaSerial)
 	}
 
-	if hasRegion && awsConfig.Region != "" && region != awsConfig.Region {
-		return fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password")
+	if hasRegularRegion && awsConfig.Region != "" && region != awsConfig.Region {
+		return fmt.Errorf("your local AWS configuration (config file or environment variable) has a different region than the one specified in 1Password")
 	} else if awsConfig.Region == "" {
 		awsConfig.Region = region
 	}
