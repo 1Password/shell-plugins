@@ -9,9 +9,9 @@ import (
 
 func RailwayCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Railway CLI", // TODO: Check if this is correct
-		Runs:      []string{"railway"},
-		DocsURL:   sdk.URL("https://railway.com/docs/cli"), // TODO: Replace with actual URL
+		Name:    "Railway CLI",
+		Runs:    []string{"railway"},
+		DocsURL: sdk.URL("https://docs.railway.app/guides/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
