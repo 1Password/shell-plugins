@@ -51,7 +51,7 @@ func HasEnvVarSupport() bool {
 
 func (p ngrokProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 
-	if ngrokProvisioner := HasEnvVarSupport(); ngrokProvisioner {
+	if HasEnvVarSupport() {
 		out.AddEnvVar("NGROK_AUTHTOKEN", in.ItemFields[fieldname.Authtoken])
 		out.AddEnvVar("NGROK_API_KEY", in.ItemFields[fieldname.APIKey])
 		return
