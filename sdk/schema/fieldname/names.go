@@ -48,6 +48,7 @@ const (
 	ProjectID       = sdk.FieldName("Project ID")
 	Project         = sdk.FieldName("Project")
 	Region          = sdk.FieldName("Region")
+	Scheme          = sdk.FieldName("Scheme")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
 	Subdomain       = sdk.FieldName("Subdomain")
@@ -103,8 +104,10 @@ func ListAll() []sdk.FieldName {
 		ProjectID,
 		Project,
 		Region,
+		Scheme,
 		Secret,
 		SecretAccessKey,
+		Subdomain,
 		Token,
 		URL,
 		User,
