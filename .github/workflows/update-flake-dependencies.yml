@@ -17,7 +17,7 @@ jobs:
       run: nix flake update
     - name: Create signed commit with flake.lock changes
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
         FILE_TO_COMMIT: flake.lock
         COMMIT_BRANCH: automation/update-flake-dependencies
         COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
