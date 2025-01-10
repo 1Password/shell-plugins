@@ -19,6 +19,7 @@ func New() schema.Plugin {
 			AWSCLI(),
 			AWSCDKToolkit(),
 			eksctlCLI(),
+			awslogsCli(),
 		},
 	}
 }
