@@ -22,7 +22,10 @@ type KeyPairProvisioner struct {
 // Provision sets up the necessary key file for the `age` command based on the operation mode (Encrypt or Decrypt).
 // It determines the mode from the command line arguments and prepares the corresponding key file.
 func (p KeyPairProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
-	operationHandlers := map[Operation]OperationHandler{}
+	operationHandlers := map[Operation]OperationHandler{
+		Encrypt: handleEncrypt,
+		Decrypt: handleDecrypt,
+	}
 
 	mode := detectOperation(out.CommandLine)
 	handler, ok := operationHandlers[mode]
@@ -46,6 +49,19 @@ func (p KeyPairProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionI
 
 func (p KeyPairProvisioner) Description() string {
 	return "Provision temporary file with public & private key pair & pass to age command"
+}
+
+func handleEncrypt(keys KeyFiles, _ *sdk.ProvisionOutput) (provision.ItemToFileContents, []string, string) {
+	return keys.public, []string{"-R", "{{.Path}}"}, "age.public.txt"
+}
+
+func handleDecrypt(keys KeyFiles, out *sdk.ProvisionOutput) (provision.ItemToFileContents, []string, string) {
+	for _, arg := range out.CommandLine {
+		if arg == "-i" || arg == "--identity" {
+			out.AddError(ErrConflictingIdentityFlag)
+		}
+	}
+	return keys.private, []string{"-i", "{{.Path}}"}, "age.private.txt"
 }
 
 // TempFile creates a new KeyPairProvisioner for handling temporary files for the age command.
