@@ -1,5 +1,10 @@
 package age
 
+import (
+	"github.com/1Password/shell-plugins/sdk"
+	"github.com/1Password/shell-plugins/sdk/provision"
+)
+
 const (
 	decryptShort = "-d"
 	decryptLong  = "--decrypt"
@@ -14,6 +19,9 @@ const (
 
 // Operation defines the type of action (encryption or decryption) to be performed.
 type Operation int
+
+// OperationHandler defines a function to handle specific operations.
+type OperationHandler func(KeyFiles, *sdk.ProvisionOutput) (provision.ItemToFileContents, []string, string)
 
 // String returns the string representation of an Operation.
 func (op Operation) String() string {
