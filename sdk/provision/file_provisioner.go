@@ -47,7 +47,7 @@ func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
 
 // TempFile returns a file provisioner and takes a function that maps a 1Password item to the contents of
 // a single file.
-func TempFile(fileContents ItemToFileContents, opts ...FileOption) FileProvisioner {
+func TempFile(fileContents ItemToFileContents, opts ...FileOption) sdk.Provisioner {
 	p := FileProvisioner{
 		fileContents: fileContents,
 	}
