@@ -3,6 +3,7 @@ package age
 import (
 	"fmt"
 
+	"github.com/1Password/shell-plugins/plugins/age/provisioner"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/schema"
@@ -41,10 +42,10 @@ func KeyPair() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: TempFile(KeyFiles{
-			private: materialisePrivateKeyFile,
-			public:  materialisePublicKeyFile,
-		}),
+		DefaultProvisioner: provisioner.KeyPairTempFile(provisioner.NewKeyFiles(
+			materialisePrivateKeyFile,
+			materialisePublicKeyFile,
+		)),
 		Importer: importer.NoOp(),
 	}
 }

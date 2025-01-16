@@ -3,6 +3,7 @@ package age
 import (
 	"testing"
 
+	"github.com/1Password/shell-plugins/plugins/age/provisioner"
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -93,7 +94,7 @@ func TestAsymmetricKeyPairProvisioner(t *testing.T) {
 			CommandLine: []string{"age", "-i", "/tmp/age.user_provided_identity_flag.txt", "--decrypt", "-o", "/tmp/encrypted.txt", "/tmp/unencrypted.txt"},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Diagnostics: sdk.Diagnostics{
-					Errors: []sdk.Error{{Message: ErrConflictingIdentityFlag.Error()}},
+					Errors: []sdk.Error{{Message: provisioner.ErrConflictingIdentityFlag.Error()}},
 				},
 				CommandLine: []string{"age", "-i", "/tmp/age.private.txt", "-i", "/tmp/age.user_provided_identity_flag.txt", "--decrypt", "-o", "/tmp/encrypted.txt", "/tmp/unencrypted.txt"},
 				Files: map[string]sdk.OutputFile{
