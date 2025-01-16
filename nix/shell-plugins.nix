@@ -62,7 +62,7 @@ in {
       name = package;
       value = "op plugin run -- ${package}";
     }) pkg-exe-names);
-    packages = [ pkgs._1password ] ++ cfg.plugins;
+    packages = [ pkgs._1password-cli ] ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
     ({
       programs = {
