@@ -57,6 +57,7 @@ const (
 	UserAccessToken = sdk.FieldName("User Access Token")
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
+	AllowedIPs      = sdk.FieldName("Allowed IPs")
 )
 
 func ListAll() []sdk.FieldName {
@@ -110,5 +111,6 @@ func ListAll() []sdk.FieldName {
 		User,
 		Username,
 		Website,
+		AllowedIPs,
 	}
 }
