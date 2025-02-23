@@ -29,7 +29,7 @@ type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
 type ArgPlacementMode int
 
 const (
-	Unset ArgPlacementMode = iota
+	NotSet ArgPlacementMode = iota
 	Prepend
 	Append
 )
@@ -158,7 +158,7 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	}
 
 	// Add args to specify the output path.
-	if p.argPlacementMode != Unset {
+	if p.argPlacementMode != NotSet {
 		tmplData := struct{ Path string }{
 			Path: outpath,
 		}
