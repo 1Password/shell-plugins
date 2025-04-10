@@ -9,9 +9,9 @@ import (
 
 func ScalewayCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Scaleway CLI", 
-		Runs:      []string{"scw"},
-		DocsURL:   sdk.URL("https://www.scaleway.com/en/cli/"),
+		Name:    "Scaleway CLI",
+		Runs:    []string{"scw"},
+		DocsURL: sdk.URL("https://www.scaleway.com/en/cli/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
