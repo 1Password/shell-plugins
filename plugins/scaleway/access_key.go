@@ -108,7 +108,7 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SCW_SECRET_KEY":              fieldname.SecretAccessKey,
 	"SCW_DEFAULT_REGION":          fieldname.DefaultRegion,
 	"SCW_DEFAULT_ZONE":            fieldname.DefaultZone,
-	"SCW_PROJECT_ID":              fieldname.ProjectID,
+	"SCW_DEFAULT_PROJECT_ID":              fieldname.ProjectID,
 	"SCW_DEFAULT_ORGANIZATION_ID": fieldname.OrgID,
 }
 

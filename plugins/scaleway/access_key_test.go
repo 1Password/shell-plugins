@@ -25,7 +25,7 @@ func TestAccessKeyProvisioner(t *testing.T) {
 					"SCW_SECRET_KEY":              "c3a22663-2770-4428-8166-c214643cd70b",
 					"SCW_DEFAULT_REGION":          "fr-par",
 					"SCW_DEFAULT_ZONE":            "fr-par-1",
-					"SCW_PROJECT_ID":              "d3a22663-2770-4428-8166-c214643cd70c",
+					"SCW_DEFAULT_PROJECT_ID":              "d3a22663-2770-4428-8166-c214643cd70c",
 					"SCW_DEFAULT_ORGANIZATION_ID": "e3a22663-2770-4428-8166-c214643cd70d",
 				},
 			},
@@ -41,7 +41,7 @@ func TestAccessKeyImporter(t *testing.T) {
 				"SCW_SECRET_KEY":              "c3a22663-2770-4428-8166-c214643cd70b",
 				"SCW_DEFAULT_REGION":          "fr-par",
 				"SCW_DEFAULT_ZONE":            "fr-par-1",
-				"SCW_PROJECT_ID":              "01696acf-7a78-4d94-a129-5e135d0377cc",
+				"SCW_DEFAULT_PROJECT_ID":      "01696acf-7a78-4d94-a129-5e135d0377cc",
 				"SCW_DEFAULT_ORGANIZATION_ID": "14800390-5df1-4a90-b38e-9b461bdcd108",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
