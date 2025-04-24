@@ -13,20 +13,28 @@ jobs:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@main
     - uses: DeterminateSystems/magic-nix-cache-action@main
-    - name: update flake.lock
-      run: nix flake update
-    - name: Create signed commit with flake.lock changes
+    - name: Update flake.lock and create signed commit with flake.lock changes
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         FILE_TO_COMMIT: flake.lock
         COMMIT_BRANCH: automation/update-flake-dependencies
         COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
       run: |
+          # fetch remote state
+          git fetch
+          # if branch exists on remote already
+          if git checkout "$COMMIT_BRANCH" > /dev/null 2>&1; then
+            # pull changes
+            git pull
+          else
+            # otherwise, create the branch and push it to remote
+            git checkout -b "$COMMIT_BRANCH"
+            git push -u origin "$COMMIT_BRANCH"
+          fi
+          # update flake.lock
+          nix flake update
           # make sure something actually changed first, if not, no updates required
           if [[ `git status --porcelain` ]]; then
-            # create the branch on the remote
-            git branch "$COMMIT_BRANCH"
-            git push -u origin "$COMMIT_BRANCH"
             # commit via the GitHub API so we get automatic commit signing
             gh api --method PUT /repos/1Password/shell-plugins/contents/$FILE_TO_COMMIT \
               --field message="$COMMIT_MESSAGE" \
