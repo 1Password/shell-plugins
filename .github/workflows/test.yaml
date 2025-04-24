@@ -1,6 +1,7 @@
 name: Test and Validate
 on:
   push:
+    branches: [main]
     paths-ignore:
       - '**.md'
       - '.github/ISSUE_TEMPLATE/**'
