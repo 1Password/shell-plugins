@@ -19,6 +19,7 @@ func New() schema.Plugin {
 			OpenAICLI(),
 			OpenAIEvalsCLI(),
 			OpenAIEvalSetCLI(),
+			OpenAICodex(),
 		},
 	}
 }
