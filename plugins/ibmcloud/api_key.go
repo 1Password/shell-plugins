@@ -1,8 +1,6 @@
 package ibmcloud
 
 import (
-	"context"
-
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -34,16 +32,9 @@ func APIKey() schema.CredentialType {
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-			TryIBMCloudConfigFile(),
 		)}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"IBMCLOUD_API_KEY": fieldname.APIKey,
-}
-
-// implement the function below to add support for importing it.
-func TryIBMCloudConfigFile() sdk.Importer {
-	return importer.TryFile("~/path/to/config/file.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
-	})
 }
