@@ -12,11 +12,11 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.APIKey: "2R6HTK2HeEpqPrQX4uGmJr736ng2MlBwA0tfiEXAMPLE",
+				fieldname.APIKey: "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"IBMCLOUD_API_KEY": "2R6HTK2HeEpqPrQX4uGmJr736ng2MlBwA0tfiEXAMPLE",
+					"IBMCLOUD_API_KEY": "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
 				},
 			},
 		},
@@ -27,12 +27,12 @@ func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"IBMCLOUD_API_KEY": "2R6HTK2HeEpqPrQX4uGmJr736ng2MlBwA0tfiEXAMPLE",
+				"IBMCLOUD_API_KEY": "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "2R6HTK2HeEpqPrQX4uGmJr736ng2MlBwA0tfiEXAMPLE",
+						fieldname.APIKey: "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
 					},
 				},
 			},
