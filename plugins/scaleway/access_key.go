@@ -19,7 +19,7 @@ func AccessKey() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.AccessKeyID,
-				MarkdownDescription: "Access key",
+				MarkdownDescription: "Access key ID",
 				Secret:              false,
 				Optional:            false,
 				Composition: &schema.ValueComposition{
