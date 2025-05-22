@@ -28,6 +28,7 @@ const (
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
 	DefaultRegion   = sdk.FieldName("Default Region")
+	DefaultZone     = sdk.FieldName("Default Zone")
 	Deployment      = sdk.FieldName("Deployment")
 	Email           = sdk.FieldName("Email")
 	Endpoint        = sdk.FieldName("Endpoint")
