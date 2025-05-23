@@ -8,7 +8,7 @@ let
       pkgs.runCommand "op-plugin-list" { }
       # 1Password CLI tries to create the config directory automatically, so set a temp XDG_CONFIG_HOME
       # since we don't actually need it for this
-      "mkdir $out && XDG_CONFIG_HOME=$out ${pkgs._1password}/bin/op plugin list | cut -d ' ' -f1 | tail -n +2 > $out/plugins.txt"
+      "mkdir $out && XDG_CONFIG_HOME=$out ${getExe cfg.cliPackage} plugin list | cut -d ' ' -f1 | tail -n +2 > $out/plugins.txt"
     }/plugins.txt");
   getExeName = package:
     # NOTE: SAFETY: This is okay because the `packages` list is also referred
@@ -21,6 +21,13 @@ in {
   options = {
     programs._1password-shell-plugins = {
       enable = mkEnableOption "1Password Shell Plugins";
+      cliPackage = mkOption {
+        type = types.package;
+        default = pkgs._1password-cli;
+        description = ''
+          The 1Password CLI package
+        '';
+      };
       plugins = mkOption {
         type = types.listOf types.package;
         default = [ ];
@@ -62,7 +69,7 @@ in {
       name = package;
       value = "op plugin run -- ${package}";
     }) pkg-exe-names);
-    packages = [ pkgs._1password ] ++ cfg.plugins;
+    packages = [ cfg.cliPackage ] ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
     ({
       programs = {
