@@ -22,6 +22,7 @@ const (
 	Authtoken       = sdk.FieldName("Authtoken")
 	Cert            = sdk.FieldName("Cert")
 	Certificate     = sdk.FieldName("Certificate")
+	ClientID        = sdk.FieldName("Client ID")
 	ClientSecret    = sdk.FieldName("Client Secret")
 	ClientToken     = sdk.FieldName("Client Token")
 	Credential      = sdk.FieldName("Credential")
@@ -52,6 +53,7 @@ const (
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
 	Subdomain       = sdk.FieldName("Subdomain")
+	TenantID        = sdk.FieldName("Tenant ID")
 	Token           = sdk.FieldName("Token")
 	URL             = sdk.FieldName("URL")
 	User            = sdk.FieldName("User")
@@ -79,6 +81,7 @@ func ListAll() []sdk.FieldName {
 		Authtoken,
 		Cert,
 		Certificate,
+		ClientID,
 		ClientSecret,
 		ClientToken,
 		Credential,
@@ -106,6 +109,7 @@ func ListAll() []sdk.FieldName {
 		Region,
 		Secret,
 		SecretAccessKey,
+		TenantID,
 		Token,
 		URL,
 		User,
