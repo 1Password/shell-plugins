@@ -28,6 +28,11 @@ func APIKey() schema.CredentialType {
 					},
 				},
 			},
+			{
+				Name:                sdk.FieldName("resource group"),
+				MarkdownDescription: "Resource group to target when logging in to IBM Cloud.",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(

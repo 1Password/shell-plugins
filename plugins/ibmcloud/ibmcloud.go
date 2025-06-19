@@ -18,7 +18,8 @@ func IBMCloudCLI() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIKey,
+				Name:        credname.APIKey,
+				Provisioner: CLIProvisioner{},
 			},
 		},
 	}
