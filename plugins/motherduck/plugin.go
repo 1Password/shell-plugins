@@ -10,7 +10,7 @@ func New() schema.Plugin {
 		Name: "motherduck",
 		Platform: schema.PlatformInfo{
 			Name:     "MotherDuck",
-			Homepage: sdk.URL("https://motherduck.com"), // TODO: Check if this is correct
+			Homepage: sdk.URL("https://motherduck.com"),
 		},
 		Credentials: []schema.CredentialType{
 			AccessToken(),
