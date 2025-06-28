@@ -9,9 +9,9 @@ import (
 
 func OpenSSFScorecardCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "OpenSSF Scorecard CLI",
-		Runs:      []string{"scorecard"},
-		DocsURL:   sdk.URL("https://github.com/ossf/scorecard"),
+		Name:    "OpenSSF Scorecard CLI",
+		Runs:    []string{"scorecard"},
+		DocsURL: sdk.URL("https://github.com/ossf/scorecard"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

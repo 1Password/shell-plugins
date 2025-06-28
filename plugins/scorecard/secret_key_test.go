@@ -6,12 +6,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"testing"
-	
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/plugintest"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
-	
+
 func generateTestPrivateKey(t *testing.T) string {
 	// Generate a test RSA private key
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -35,8 +35,8 @@ func TestSecretKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, SecretKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Key: testPrivateKey,
-				"App ID":         "123456",
+				fieldname.Key:     testPrivateKey,
+				"App ID":          "123456",
 				"Installation ID": "7890123",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -53,7 +53,7 @@ func TestSecretKeyProvisioner(t *testing.T) {
 		"partial fields": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Key: testPrivateKey,
-				"App ID": "123456",
+				"App ID":      "123456",
 				// Installation ID is missing to test handling of partial fields
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -74,9 +74,9 @@ func TestSecretKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, SecretKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"GITHUB_APP_KEY_PATH":         "/path/to/key.pem",
-				"GITHUB_APP_ID":               "123456", 
-				"GITHUB_APP_INSTALLATION_ID":  "7890123",
+				"GITHUB_APP_KEY_PATH":        "/path/to/key.pem",
+				"GITHUB_APP_ID":              "123456",
+				"GITHUB_APP_INSTALLATION_ID": "7890123",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{

@@ -50,8 +50,8 @@ func SecretKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"GITHUB_APP_KEY_PATH":         fieldname.Key,
-	"GITHUB_APP_ID":               "App ID",
+	"GITHUB_APP_KEY_PATH":        fieldname.Key,
+	"GITHUB_APP_ID":              "App ID",
 	"GITHUB_APP_INSTALLATION_ID": "Installation ID",
 }
 
