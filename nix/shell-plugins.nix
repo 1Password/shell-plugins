@@ -2,14 +2,7 @@
 with lib;
 let
   cfg = config.programs._1password-shell-plugins;
-
-  supported_plugins = splitString "\n" (lib.readFile "${
-    # get the list of supported plugin executable names
-      pkgs.runCommand "op-plugin-list" { }
-      # 1Password CLI tries to create the config directory automatically, so set a temp XDG_CONFIG_HOME
-      # since we don't actually need it for this
-      "mkdir $out && XDG_CONFIG_HOME=$out ${pkgs._1password}/bin/op plugin list | cut -d ' ' -f1 | tail -n +2 > $out/plugins.txt"
-    }/plugins.txt");
+  supported_plugins = import ./supported-plugins.nix;
   getExeName = package:
     # NOTE: SAFETY: This is okay because the `packages` list is also referred
     # to below as `home.packages = packages;` or `environment.systemPackages = packages;`

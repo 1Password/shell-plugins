@@ -3,10 +3,54 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
-  outputs = { nixpkgs, flake-utils, ... }:
+
+  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
     (flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in {
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          config = {
+            # Ensure that the op CLI command can be used in this flake without getting warnings about it being unfree
+            allowUnfreePredicate = pkg:
+              builtins.elem (nixpkgs.lib.getName pkg) [
+                "1password-cli"
+              ];
+          };
+        };
+      in
+      {
+        apps.make-supported-plugins = {
+          type = "app";
+          program = "${self.packages.${system}.make-supported-plugins}/bin/make-supported-plugins";
+          meta = {
+            description = "Generate a Nix expression containing an array of plugins that are currently supported by 1Password.";
+          };
+        };
+
+        packages.make-supported-plugins = pkgs.writeShellApplication {
+          name = "make-supported-plugins";
+          runtimeInputs = [
+            pkgs.git
+            pkgs._1password
+          ];
+          text = ''
+
+            # Get the flake's directory so the command can be run in subdirectories reproducibly
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
+
+            # Get the supported plugins separated by line breaks
+            SUPPORTED_PLUGINS=$(op plugin list | cut -d ' ' -f1 | tail -n +2)
+
+            if [ -z "$SUPPORTED_PLUGINS" ]; then
+              echo "Error: No plugins found when calling 'op plugin list' command." >&2
+              exit 1
+            fi
+
+            echo "# This file was automatically generated using 'nix run .#make-supported-plugins'" > "$PROJECT_ROOT/nix/supported-plugins.nix"
+            echo "$SUPPORTED_PLUGINS" | awk 'BEGIN { print "[" } {print "  \""$0"\""} END { print "]" }' >> "$PROJECT_ROOT/nix/supported-plugins.nix"
+          '';
+        };
+
         devShells.default = pkgs.mkShell {
           name = "Shell with Go toolchain";
           packages = with pkgs; [ go gopls ];
