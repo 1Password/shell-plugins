@@ -10,6 +10,7 @@
         pkgs = import nixpkgs {
           inherit system;
           config = {
+            # Ensure that the op CLI command can be used in this flake without getting warnings about it being unfree
             allowUnfreePredicate = pkg:
               builtins.elem (nixpkgs.lib.getName pkg) [
                 "1password-cli"
@@ -18,16 +19,16 @@
         };
       in
       {
-        apps.supported-plugins = {
+        apps.make-supported-plugins = {
           type = "app";
-          program = "${self.packages.${system}.supported-plugins}/bin/supported-plugins";
+          program = "${self.packages.${system}.make-supported-plugins}/bin/make-supported-plugins";
           meta = {
             description = "Generate a Nix expression containing an array of plugins that are currently supported by 1Password.";
           };
         };
 
-        packages.supported-plugins = pkgs.writeShellApplication {
-          name = "supported-plugins";
+        packages.make-supported-plugins = pkgs.writeShellApplication {
+          name = "make-supported-plugins";
           runtimeInputs = [
             pkgs.git
             pkgs._1password
@@ -45,7 +46,7 @@
               exit 1
             fi
 
-            echo "# This file was automatically generated using 'nix run .#supported-plugins'" > "$PROJECT_ROOT/nix/supported-plugins.nix"
+            echo "# This file was automatically generated using 'nix run .#make-supported-plugins'" > "$PROJECT_ROOT/nix/supported-plugins.nix"
             echo "$SUPPORTED_PLUGINS" | awk 'BEGIN { print "[" } {print "  \""$0"\""} END { print "]" }' >> "$PROJECT_ROOT/nix/supported-plugins.nix"
           '';
         };
