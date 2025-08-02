@@ -28,8 +28,14 @@
 
         packages.supported-plugins = pkgs.writeShellApplication {
           name = "supported-plugins";
-          runtimeInputs = [ pkgs._1password ];
+          runtimeInputs = [
+            pkgs.git
+            pkgs._1password
+          ];
           text = ''
+
+            # Get the flake's directory so the command can be run in subdirectories reproducibly
+            PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
             # Get the supported plugins separated by line breaks
             SUPPORTED_PLUGINS=$(op plugin list | cut -d ' ' -f1 | tail -n +2)
@@ -39,9 +45,8 @@
               exit 1
             fi
 
-            echo "# This file was automatically generated using 'nix run .#supported-plugins'"
-            echo "$SUPPORTED_PLUGINS" | awk 'BEGIN { print "[" } {print "  \""$0"\""} END { print "]" }'
-
+            echo "# This file was automatically generated using 'nix run .#supported-plugins'" > "$PROJECT_ROOT/nix/supported-plugins.nix"
+            echo "$SUPPORTED_PLUGINS" | awk 'BEGIN { print "[" } {print "  \""$0"\""} END { print "]" }' >> "$PROJECT_ROOT/nix/supported-plugins.nix"
           '';
         };
 
