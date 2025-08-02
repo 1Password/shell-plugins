@@ -16,7 +16,8 @@
               ];
           };
         };
-      in {
+      in
+      {
         apps.supported-plugins = {
           type = "app";
           program = "${self.packages.${system}.supported-plugins}/bin/supported-plugins";
