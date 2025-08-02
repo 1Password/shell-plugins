@@ -1,4 +1,4 @@
-#
+# This file was automatically generated using 'nix run .#supported-plugins'
 [
   "akamai"
   "argocd"
