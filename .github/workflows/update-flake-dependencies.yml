@@ -15,11 +15,14 @@ jobs:
     - uses: DeterminateSystems/magic-nix-cache-action@main
     - name: update flake.lock
       run: nix flake update
+    - name: Define Unique COMMIT_BRANCH by Timestamp
+      run: |
+        TIMESTAMP=$(date +'%Y-%m-%d-%H%M%S')
+        echo "COMMIT_BRANCH=automation/update-flake-dependencies-$TIMESTAMP" >> $GITHUB_ENV
     - name: Create signed commit with flake.lock changes
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         FILE_TO_COMMIT: flake.lock
-        COMMIT_BRANCH: automation/update-flake-dependencies
         COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
       run: |
           # make sure something actually changed first, if not, no updates required
