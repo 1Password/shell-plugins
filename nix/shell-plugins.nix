@@ -55,28 +55,55 @@ in {
     pkg-exe-names = map getExeName cfg.plugins;
     # Explanation:
     # Map over `cfg.plugins` (the value of the `plugins` option provided by the user)
-    # and for each package specified, get the executable name, then create a shell alias
+    # and for each package specified, get the executable name, then create a shell function
     # of the form:
-    # `alias {pkg}="op plugin run -- {pkg}"`
+    #
+    # For Bash and Zsh:
+    # ```
+    #   {pkg}() {
+    #     op plugin run -- {pkg};
+    #   }
+    # ```
+    #
+    # And for Fish:
+    # ```
+    #  function {pkg} --wraps {pkg}
+    #    op plugin run -- {pkg}
+    #  end
+    # ```
     # where `{pkg}` is the executable name of the package
-    aliases = listToAttrs (map (package: {
-      name = package;
-      value = "op plugin run -- ${package}";
-    }) pkg-exe-names);
+    posixFunctions = map (package: ''
+      ${package}() {
+        op plugin run -- ${package};
+      }
+    '') pkg-exe-names;
+    fishFunctions = map (package: ''
+      function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
+        op plugin run -- ${package}
+      end
+    '') pkg-exe-names;
     packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
     ({
-      programs = {
-        bash.shellAliases = aliases;
-        zsh.shellAliases = aliases;
-        fish.shellAliases = aliases;
-      };
+      # for Fish its the same option path between NixOS vs. home-manager
+      fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
     } // optionalAttrs is-home-manager {
+      programs = {
+        # for the Bash and Zsh home-manager modules,
+        # the initExtra option is equivalent to Fish's interactiveShellInit
+        bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
+        zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
+      };
       home = {
         inherit packages;
         sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
       };
     } // optionalAttrs (!is-home-manager) {
+      programs = {
+        bash.interactiveShellInit =
+          strings.concatStringsSep "\n" posixFunctions;
+        zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
+      };
       environment = {
         systemPackages = packages;
         variables = { OP_PLUGINS_SOURCED = "1"; };
