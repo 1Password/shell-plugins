@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  is-home-manager,
-  ...
-}:
+{ pkgs, lib, config, is-home-manager, ... }:
 with lib;
 let
   cfg = config.programs._1password-shell-plugins;
@@ -50,74 +44,85 @@ in
         # for which the executable has a supported 1Password Shell Plugin
         apply =
           package_list:
-          map (
-            package:
-            if (elem (getExeName package) supported_plugins) then
-              package
-            else
-              abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
-          ) package_list;
+          map
+            (
+              package:
+              if (elem (getExeName package) supported_plugins) then
+                package
+              else
+                abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
+            )
+            package_list;
       };
     };
   };
-  
-  config = let
-    # executable names as strings, e.g. `pkgs.gh` => `"gh"`, `pkgs.awscli2` => `"aws"`
-    pkg-exe-names = map getExeName cfg.plugins;
-    # Explanation:
-    # Map over `cfg.plugins` (the value of the `plugins` option provided by the user)
-    # and for each package specified, get the executable name, then create a shell function
-    # of the form:
-    #
-    # For Bash and Zsh:
-    # ```
-    #   {pkg}() {
-    #     op plugin run -- {pkg};
-    #   }
-    # ```
-    #
-    # And for Fish:
-    # ```
-    #  function {pkg} --wraps {pkg}
-    #    op plugin run -- {pkg}
-    #  end
-    # ```
-    # where `{pkg}` is the executable name of the package
-    posixFunctions = map (package: ''
-      ${package}() {
-        op plugin run -- ${package} "$@";
+
+  config =
+    let
+      # executable names as strings, e.g. `pkgs.gh` => `"gh"`, `pkgs.awscli2` => `"aws"`
+      pkg-exe-names = map getExeName cfg.plugins;
+      # Explanation:
+      # Map over `cfg.plugins` (the value of the `plugins` option provided by the user)
+      # and for each package specified, get the executable name, then create a shell function
+      # of the form:
+      #
+      # For Bash and Zsh:
+      # ```
+      #   {pkg}() {
+      #     op plugin run -- {pkg};
+      #   }
+      # ```
+      #
+      # And for Fish:
+      # ```
+      #  function {pkg} --wraps {pkg}
+      #    op plugin run -- {pkg}
+      #  end
+      # ```
+      # where `{pkg}` is the executable name of the package
+      posixFunctions = map
+        (package: ''
+          ${package}() {
+            op plugin run -- ${package} "$@";
+          }
+        '')
+        pkg-exe-names;
+      fishFunctions = map
+        (package: ''
+          function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
+            op plugin run -- ${package} $argv
+          end
+        '')
+        pkg-exe-names;
+      packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
+    in
+    mkIf cfg.enable (mkMerge [
+      {
+        programs.fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
       }
-    '') pkg-exe-names;
-    fishFunctions = map (package: ''
-      function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
-        op plugin run -- ${package} $argv
-      end
-    '') pkg-exe-names;
-    packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
-  in mkIf cfg.enable (mkMerge [
-    (
-      optionalAttrs is-home-manager {
-      programs = {
-        # for the Bash and Zsh home-manager modules,
-        # the initExtra option is equivalent to Fish's interactiveShellInit
-        fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
-        bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
-        zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
-      };
-      home = {
-        inherit packages;
-        sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
-      };
-    } // optionalAttrs (!is-home-manager) {
-      programs = {
-        bash.interactiveShellInit =
-          strings.concatStringsSep "\n" posixFunctions;
-        zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
-      };
-      environment = {
-        systemPackages = packages;
-        variables = { OP_PLUGINS_SOURCED = "1"; };
-      };
-    })
-  ]);
+      (optionalAttrs is-home-manager {
+        programs = {
+          # for the Bash and Zsh home-manager modules,
+          # the initExtra option is equivalent to Fish's interactiveShellInit
+          bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
+          zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
+        };
+        home = {
+          inherit packages;
+          sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
+        };
+      })
+      (optionalAttrs (!is-home-manager) {
+        programs = {
+          bash.interactiveShellInit =
+            strings.concatStringsSep "\n" posixFunctions;
+          zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
+        };
+        environment = {
+          systemPackages = packages;
+          variables = { OP_PLUGINS_SOURCED = "1"; };
+        };
+      })
+    ]);
 }
+
