@@ -74,23 +74,22 @@ in {
     # where `{pkg}` is the executable name of the package
     posixFunctions = map (package: ''
       ${package}() {
-        op plugin run -- ${package};
+        op plugin run -- ${package} "$@";
       }
     '') pkg-exe-names;
     fishFunctions = map (package: ''
       function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
-        op plugin run -- ${package}
+        op plugin run -- ${package} $argv
       end
     '') pkg-exe-names;
     packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
   in mkIf cfg.enable (mkMerge [
-    ({
-      # for Fish its the same option path between NixOS vs. home-manager
-      fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
-    } // optionalAttrs is-home-manager {
+    (
+      optionalAttrs is-home-manager {
       programs = {
         # for the Bash and Zsh home-manager modules,
         # the initExtra option is equivalent to Fish's interactiveShellInit
+        fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
         bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
         zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
       };
