@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  is-home-manager,
-  ...
-}:
+{ pkgs, lib, config, is-home-manager, ... }:
 with lib;
 let
   cfg = config.programs._1password-shell-plugins;
@@ -50,13 +44,15 @@ in
         # for which the executable has a supported 1Password Shell Plugin
         apply =
           package_list:
-          map (
-            package:
-            if (elem (getExeName package) supported_plugins) then
-              package
-            else
-              abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
-          ) package_list;
+          map
+            (
+              package:
+              if (elem (getExeName package) supported_plugins) then
+                package
+              else
+                abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
+            )
+            package_list;
       };
     };
   };
@@ -84,51 +80,49 @@ in
       #  end
       # ```
       # where `{pkg}` is the executable name of the package
-      posixFunctions = map (package: ''
-        ${package}() {
-          op plugin run -- ${package};
-        }
-      '') pkg-exe-names;
-      fishFunctions = map (package: ''
-        function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
-          op plugin run -- ${package}
-        end
-      '') pkg-exe-names;
+      posixFunctions = map
+        (package: ''
+          ${package}() {
+            op plugin run -- ${package} "$@";
+          }
+        '')
+        pkg-exe-names;
+      fishFunctions = map
+        (package: ''
+          function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
+            op plugin run -- ${package} $argv
+          end
+        '')
+        pkg-exe-names;
       packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
     in
     mkIf cfg.enable (mkMerge [
-      (
-        {
-          # for Fish its the same option path between NixOS vs. home-manager
-          fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
-        }
-        // optionalAttrs is-home-manager {
-          programs = {
-            # for the Bash and Zsh home-manager modules,
-            # the initExtra option is equivalent to Fish's interactiveShellInit
-            bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
-            zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
-          };
-          home = {
-            inherit packages;
-            sessionVariables = {
-              OP_PLUGINS_SOURCED = "1";
-            };
-          };
-        }
-        // optionalAttrs (!is-home-manager) {
-          programs = {
-            bash.interactiveShellInit =
-              strings.concatStringsSep "\n" posixFunctions;
-            zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
-          };
-          environment = {
-            systemPackages = packages;
-            variables = {
-              OP_PLUGINS_SOURCED = "1";
-            };
-          };
-        }
-      )
+      {
+        programs.fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
+      }
+      (optionalAttrs is-home-manager {
+        programs = {
+          # for the Bash and Zsh home-manager modules,
+          # the initExtra option is equivalent to Fish's interactiveShellInit
+          bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
+          zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
+        };
+        home = {
+          inherit packages;
+          sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
+        };
+      })
+      (optionalAttrs (!is-home-manager) {
+        programs = {
+          bash.interactiveShellInit =
+            strings.concatStringsSep "\n" posixFunctions;
+          zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
+        };
+        environment = {
+          systemPackages = packages;
+          variables = { OP_PLUGINS_SOURCED = "1"; };
+        };
+      })
     ]);
 }
+
