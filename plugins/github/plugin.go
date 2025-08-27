@@ -14,6 +14,7 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			PersonalAccessToken(),
+			EnterprisePersonalAccessToken(),
 		},
 		Executables: []schema.Executable{
 			GitHubCLI(),

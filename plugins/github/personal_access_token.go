@@ -32,24 +32,11 @@ func PersonalAccessToken() schema.CredentialType {
 					},
 				},
 			},
-			{
-				Name:                fieldname.Host,
-				MarkdownDescription: "The GitHub host to authenticate to. Defaults to 'github.com'.",
-				Optional:            true,
-			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.TryAllEnvVars(fieldname.Token, "GH_TOKEN", "GITHUB_PAT"),
-			importer.TryEnvVarPair(map[string]sdk.FieldName{
-				"GH_HOST":             fieldname.Host,
-				"GH_ENTERPRISE_TOKEN": fieldname.Token,
-			}),
-			importer.TryEnvVarPair(map[string]sdk.FieldName{
-				"GH_HOST":                 fieldname.Host,
-				"GITHUB_ENTERPRISE_TOKEN": fieldname.Token,
-			}),
 			importer.TryEnvVarPair(map[string]sdk.FieldName{
 				"GH_HOST":  fieldname.Host,
 				"GH_TOKEN": fieldname.Token,
@@ -64,7 +51,55 @@ func PersonalAccessToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"GITHUB_TOKEN": fieldname.Token,
+	"GH_TOKEN": fieldname.Token,
+}
+
+func EnterprisePersonalAccessToken() schema.CredentialType {
+	return schema.CredentialType{
+		Name:          credname.EnterprisePersonalAccessToken,
+		DocsURL:       sdk.URL("https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token"),
+                ManagementURL: nil, // TODO: Add management URL
+		Fields: []schema.CredentialField{
+			{
+				Name:                fieldname.Token,
+				MarkdownDescription: "Token used to authenticate to Enterprise GitHub.",
+				Secret:              true,
+				Composition: &schema.ValueComposition{
+					Length: 40,
+					Prefix: "ghp_",
+					Charset: schema.Charset{
+						Uppercase: true,
+						Lowercase: true,
+						Digits:    true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.Host,
+				MarkdownDescription: "The GitHub Enterprise host to authenticate to.",
+				Optional:            false,
+			},
+		},
+		DefaultProvisioner: provision.EnvVars(defaultEnterpriseEnvVarMapping),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnterpriseEnvVarMapping),
+			importer.TryAllEnvVars(fieldname.Token),
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":             fieldname.Host,
+				"GH_ENTERPRISE_TOKEN": fieldname.Token,
+			}),
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"GH_HOST":                 fieldname.Host,
+				"GITHUB_ENTERPRISE_TOKEN": fieldname.Token,
+			}),
+			TryEnterpriseGitHubConfigFile(),
+		),
+	}
+}
+
+var defaultEnterpriseEnvVarMapping = map[string]sdk.FieldName{
+	"GH_ENTERPRISE_TOKEN": fieldname.Token,
+	"GH_HOST": fieldname.Host,
 }
 
 type Config struct {
@@ -88,9 +123,37 @@ func TryGitHubConfigFile() sdk.Importer {
 				}
 
 				if host != "github.com" {
+                                        continue
+				}
+
+				out.AddCandidate(candidate)
+			}
+		}
+	})
+}
+
+func TryEnterpriseGitHubConfigFile() sdk.Importer {
+	return importer.TryFile("~/.config/gh/hosts.yml", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config map[string]Config
+		if err := contents.ToYAML(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		for host, values := range config {
+			if strings.HasPrefix(values.Token, "ghp_") {
+				candidate := sdk.ImportCandidate{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: values.Token,
+					},
+				}
+
+				if host != "github.com" {
 					candidate.NameHint = host
 					candidate.Fields[fieldname.Host] = host
-				}
+				} else {
+                                        continue
+                                }
 
 				out.AddCandidate(candidate)
 			}
