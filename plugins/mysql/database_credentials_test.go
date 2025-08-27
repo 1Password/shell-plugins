@@ -37,7 +37,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 }
 
 func TestDatabaseCredentialsProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, DatabaseCredentials().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+	plugintest.TestProvisioner(t, Mysql().Uses[0].Provisioner, map[string]plugintest.ProvisionCase{
 		"temp file": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.User:     "root",
