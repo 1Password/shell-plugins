@@ -64,7 +64,9 @@ func PersonalAccessToken() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"GITHUB_TOKEN": fieldname.Token,
+	"GH_TOKEN": fieldname.Token,
+	"GH_ENTERPRISE_TOKEN": fieldname.Token,
+        "GH_HOST": fieldname.Host,
 }
 
 type Config struct {
