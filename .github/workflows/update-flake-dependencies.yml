@@ -38,7 +38,7 @@ jobs:
             # commit via the GitHub API so we get automatic commit signing
             gh api --method PUT /repos/1Password/shell-plugins/contents/$FILE_TO_COMMIT \
               --field message="$COMMIT_MESSAGE" \
-              --field content=@<(base64 -i $FILE_TO_COMMIT) \
+              --field content="$(base64 -w 0 $FILE_TO_COMMIT)" \
               --field branch="$COMMIT_BRANCH" \
               --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
             if [ "$BRANCH_EXISTS" = "false" ]; then
