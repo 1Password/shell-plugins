@@ -47,7 +47,7 @@ in
           map
             (
               package:
-              if (elem (getExeNameasdasdas package) supported_plugins) then
+              if (elem (getExeName package) supported_plugins) then
                 package
               else
                 abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
