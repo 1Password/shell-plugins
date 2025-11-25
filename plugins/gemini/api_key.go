@@ -36,5 +36,5 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"GEMINI_API_KEY": fieldname.APIKey, // TODO: Check if this is correct
+	"GEMINI_API_KEY": fieldname.APIKey,
 }
