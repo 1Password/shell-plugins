@@ -5,6 +5,6 @@ rest_endpoint: api/v2
 tls_cert: ""
 tls_insecure: false
 orb_publishing:
-    default_namespace: ""
-    default_vcs_provider: ""
-    default_owner: ""
+  default_namespace: ""
+  default_vcs_provider: ""
+  default_owner: ""

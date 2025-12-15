@@ -17,7 +17,7 @@ jobs:
           FILE_TO_COMMIT: flake.lock
           COMMIT_BRANCH: automation/update-flake-dependencies
           COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
-        run: |
+        run: |-
           # fetch remote state
           git fetch
           # if branch exists on remote already
