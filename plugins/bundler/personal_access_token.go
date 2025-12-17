@@ -17,7 +17,7 @@ func PersonalAccessToken() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Token,
-				MarkdownDescription: "GitHub Personal Access Token used to authenticate to GitHub Package Registry for Bundler.",
+				MarkdownDescription: "GitHub Personal Access Token (classic) used to authenticate to GitHub Package Registry for Bundler. Note: GitHub Packages only supports authentication using a personal access token (classic). For more information, see [Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
 					Length: 40,
