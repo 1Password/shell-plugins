@@ -5,7 +5,6 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
 
-// github action bug
 func New() schema.Plugin {
 	return schema.Plugin{
 		Name: "bundler",
