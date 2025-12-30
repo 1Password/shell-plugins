@@ -9,7 +9,7 @@ import (
 
 func DescopeCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "Descope CLI", 
+		Name:    "Descope CLI",
 		Runs:    []string{"descope"},
 		DocsURL: sdk.URL("https://docs.descope.com/cli/descope"),
 		NeedsAuth: needsauth.IfAll(

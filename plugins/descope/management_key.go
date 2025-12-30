@@ -18,7 +18,19 @@ func ManagementKey() schema.CredentialType {
 		ManagementURL: sdk.URL("https://app.descope.com/settings/company/managementkeys"), 
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Key,
+				Name:                fieldname.ProjectID,
+				MarkdownDescription: "Key used to authenticate to Descope.",
+				Composition: &schema.ValueComposition{
+					Length: 71,
+					Charset: schema.Charset{
+						Uppercase: true,
+						Lowercase: true,
+						Digits:    true,
+					},
+				},
+			},
+			{
+				Name:                fieldname.ManagementKey,
 				MarkdownDescription: "Key used to authenticate to Descope.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
@@ -35,11 +47,13 @@ func ManagementKey() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 			TryDescopeConfigFile(),
-		)}
+		),
+	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"DESCOPE_KEY": fieldname.Key, // TODO: Check if this is correct
+    "DESCOPE_PROJECT_ID":     fieldname.ProjectID,
+    "DESCOPE_MANAGEMENT_KEY": fieldname.ManagementKey,
 }
 
 // TODO: Check if the platform stores the Management Key in a local config file, and if so,
