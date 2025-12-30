@@ -9,14 +9,14 @@ func New() schema.Plugin {
 	return schema.Plugin{
 		Name: "descope",
 		Platform: schema.PlatformInfo{
-			Name:     "Desope",
-			Homepage: sdk.URL("https://descope.com"), // TODO: Check if this is correct
+			Name:     "Decsope",
+			Homepage: sdk.URL("https://descope.com"),
 		},
 		Credentials: []schema.CredentialType{
-			&#34;ManagementKey&#34;(),
+			ManagementKey(),
 		},
 		Executables: []schema.Executable{
-			DesopeCLI(),
+			DescopeCLI(),
 		},
 	}
 }
