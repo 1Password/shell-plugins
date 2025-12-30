@@ -9,7 +9,7 @@ func New() schema.Plugin {
 	return schema.Plugin{
 		Name: "descope",
 		Platform: schema.PlatformInfo{
-			Name:     "Decsope",
+			Name:     "Descope",
 			Homepage: sdk.URL("https://descope.com"),
 		},
 		Credentials: []schema.CredentialType{

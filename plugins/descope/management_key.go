@@ -19,9 +19,8 @@ func ManagementKey() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.ProjectID,
-				MarkdownDescription: "Key used to authenticate to Descope.",
+				MarkdownDescription: "Project ID for the current Descope Project.",
 				Composition: &schema.ValueComposition{
-					Length: 71,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
@@ -31,10 +30,9 @@ func ManagementKey() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.ManagementKey,
-				MarkdownDescription: "Key used to authenticate to Descope.",
+				MarkdownDescription: "Management Key used to authenticate to Descope.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 71,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
