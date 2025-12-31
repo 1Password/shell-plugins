@@ -11,13 +11,13 @@ import (
 func TestManagementKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, ManagementKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ 
-				fieldname.ProjectID: "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.ProjectID:     "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
 				fieldname.ManagementKey: "K37aAMWGYC8trD7MXBp2P9y22kBsi0qnNMRQQVLSK7YxbT9taEHnTpfrJTb2Qozm9Yd4sAeEXAMPLE",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"DESCOPE_PROJECT_ID": "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
+					"DESCOPE_PROJECT_ID":     "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
 					"DESCOPE_MANAGEMENT_KEY": "K37aAMWGYC8trD7MXBp2P9y22kBsi0qnNMRQQVLSK7YxbT9taEHnTpfrJTb2Qozm9Yd4sAeEXAMPLE",
 				},
 			},
@@ -28,15 +28,15 @@ func TestManagementKeyProvisioner(t *testing.T) {
 func TestManagementKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, ManagementKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
-			Environment: map[string]string{ 
-				"DESCOPE_PROJECT_ID": "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
+			Environment: map[string]string{
+				"DESCOPE_PROJECT_ID":     "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
 				"DESCOPE_MANAGEMENT_KEY": "K37aAMWGYC8trD7MXBp2P9y22kBsi0qnNMRQQVLSK7YxbT9taEHnTpfrJTb2Qozm9Yd4sAeEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.ProjectID: "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
-				fieldname.ManagementKey: "K37aAMWGYC8trD7MXBp2P9y22kBsi0qnNMRQQVLSK7YxbT9taEHnTpfrJTb2Qozm9Yd4sAeEXAMPLE",
+						fieldname.ProjectID:     "P37a8ZDXSo0XPrH3maK9PvF5IKrNEXAMPLE",
+						fieldname.ManagementKey: "K37aAMWGYC8trD7MXBp2P9y22kBsi0qnNMRQQVLSK7YxbT9taEHnTpfrJTb2Qozm9Yd4sAeEXAMPLE",
 					},
 				},
 			},
