@@ -21,6 +21,7 @@ type FileProvisioner struct {
 	outpathEnvVar       string
 	outdirEnvVar        string
 	setOutpathAsArg     bool
+	prependArgs         bool
 	outpathArgTemplates []string
 }
 
@@ -95,6 +96,19 @@ func AddArgs(argTemplates ...string) FileOption {
 	}
 }
 
+// PrependArgs can be used to prepend args to the command line, placing them before any user-provided arguments.
+// This is useful for CLIs like mysql that require certain arguments (e.g., --defaults-file) to be the very first argument.
+// The output path is available as "{{ .Path }}" in each arg.
+// For example:
+// * `PrependArgs("--defaults-file={{ .Path }}")` will result in `--defaults-file=/path/to/tempfile` being placed first.
+func PrependArgs(argTemplates ...string) FileOption {
+	return func(p *FileProvisioner) {
+		p.setOutpathAsArg = true
+		p.prependArgs = true
+		p.outpathArgTemplates = argTemplates
+	}
+}
+
 func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	contents, err := p.fileContents(in)
 	if err != nil {
@@ -159,7 +173,11 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 			argsResolved[i] = result.String()
 		}
 
-		out.PrependArgs(argsResolved...)
+		if p.prependArgs {
+			out.PrependArgs(argsResolved...)
+		} else {
+			out.AddArgs(argsResolved...)
+		}
 	}
 }
 
