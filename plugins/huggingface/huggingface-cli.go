@@ -10,13 +10,13 @@ import (
 func HuggingFaceCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "HuggingFace CLI",
-		Runs:    []string{"huggingface-cli"},
+		Runs:    []string{"hf"},
 		DocsURL: sdk.URL("https://huggingface.co/docs/huggingface_hub/quick-start"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.NotWhenContainsArgs("login"),
-			needsauth.NotWhenContainsArgs("logout"),
+			needsauth.NotWhenContainsArgs("auth", "login"),
+			needsauth.NotWhenContainsArgs("auth", "logout"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
