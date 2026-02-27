@@ -29,6 +29,11 @@ func ServiceAccountKey() schema.CredentialType {
 				MarkdownDescription: "The default GCP project to use.",
 				Optional:            true,
 			},
+			{
+				Name:                fieldname.Account,
+				MarkdownDescription: "The account email associated with the credential.",
+				Optional:            true,
+			},
 		},
 		DefaultProvisioner: GCPProvisioner{},
 		Importer: importer.TryAll(
@@ -49,7 +54,8 @@ func (p GCPProvisioner) Description() string {
 
 func (p GCPProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
 	credJSON := in.ItemFields[fieldname.Credential]
-	if !json.Valid([]byte(credJSON)) {
+	var cred gcpCredentialFile
+	if err := json.Unmarshal([]byte(credJSON), &cred); err != nil {
 		out.AddError(errInvalidJSON)
 		return
 	}
@@ -60,6 +66,14 @@ func (p GCPProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 
 	if projectID, ok := in.ItemFields[fieldname.ProjectID]; ok && projectID != "" {
 		out.AddEnvVar("CLOUDSDK_CORE_PROJECT", projectID)
+	} else if cred.ProjectID != "" {
+		out.AddEnvVar("CLOUDSDK_CORE_PROJECT", cred.ProjectID)
+	}
+
+	if account, ok := in.ItemFields[fieldname.Account]; ok && account != "" {
+		out.AddEnvVar("CLOUDSDK_CORE_ACCOUNT", account)
+	} else if cred.ClientEmail != "" {
+		out.AddEnvVar("CLOUDSDK_CORE_ACCOUNT", cred.ClientEmail)
 	}
 }
 
@@ -97,6 +111,10 @@ func TryGCloudApplicationDefaultCredentialsFile() sdk.Importer {
 
 		if cred.ProjectID != "" {
 			candidate.Fields[fieldname.ProjectID] = cred.ProjectID
+		}
+
+		if cred.ClientEmail != "" {
+			candidate.NameHint = importer.SanitizeNameHint(cred.ClientEmail)
 		}
 
 		out.AddCandidate(candidate)
@@ -140,6 +158,10 @@ func TryGoogleApplicationCredentialsEnvVar() sdk.Importer {
 			candidate.Fields[fieldname.ProjectID] = cred.ProjectID
 		}
 
+		if cred.ClientEmail != "" {
+			candidate.NameHint = importer.SanitizeNameHint(cred.ClientEmail)
+		}
+
 		attempt.AddCandidate(candidate)
 	}
 }
@@ -147,6 +169,7 @@ func TryGoogleApplicationCredentialsEnvVar() sdk.Importer {
 // gcpCredentialFile represents the minimal structure of a GCP credential JSON file,
 // supporting both service_account and authorized_user types.
 type gcpCredentialFile struct {
-	Type      string `json:"type"`
-	ProjectID string `json:"project_id,omitempty"`
+	Type        string `json:"type"`
+	ProjectID   string `json:"project_id,omitempty"`
+	ClientEmail string `json:"client_email,omitempty"`
 }

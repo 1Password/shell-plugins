@@ -20,6 +20,8 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_CORE_PROJECT":          "my-gcp-project",
+					"CLOUDSDK_CORE_ACCOUNT":          "test@my-gcp-project.iam.gserviceaccount.com",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
@@ -29,12 +31,29 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 		"service account key with project": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Credential: saKeyJSON,
-				fieldname.ProjectID:  "my-gcp-project",
+				fieldname.ProjectID:  "explicit-project",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_CORE_PROJECT":          "explicit-project",
+					"CLOUDSDK_CORE_ACCOUNT":          "test@my-gcp-project.iam.gserviceaccount.com",
+				},
+				Files: map[string]sdk.OutputFile{
+					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
+				},
+			},
+		},
+		"service account key with explicit account": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Credential: saKeyJSON,
+				fieldname.Account:    "explicit-account@example.com",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
 					"CLOUDSDK_CORE_PROJECT":          "my-gcp-project",
+					"CLOUDSDK_CORE_ACCOUNT":          "explicit-account@example.com",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
@@ -72,6 +91,7 @@ func TestServiceAccountKeyImporter(t *testing.T) {
 						fieldname.Credential: saKeyJSON,
 						fieldname.ProjectID:  "my-gcp-project",
 					},
+					NameHint: "test@my-gcp-project.iam.gserviceaccount.com",
 				},
 			},
 		},
