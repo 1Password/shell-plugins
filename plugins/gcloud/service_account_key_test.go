@@ -91,7 +91,7 @@ func TestServiceAccountKeyImporter(t *testing.T) {
 						fieldname.Credential: saKeyJSON,
 						fieldname.ProjectID:  "my-gcp-project",
 					},
-					NameHint: "test@my-gcp-project.iam.gserviceaccount.com",
+					NameHint: "test@my-gcp-project.iam…",
 				},
 			},
 		},
