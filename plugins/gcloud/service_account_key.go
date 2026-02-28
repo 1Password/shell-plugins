@@ -63,6 +63,11 @@ func (p GCPProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	outPath := filepath.Join(in.TempDir, "gcloud-credentials.json")
 	out.AddSecretFile(outPath, []byte(credJSON))
 	out.AddEnvVar("GOOGLE_APPLICATION_CREDENTIALS", outPath)
+	// CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE tells the gcloud CLI to use
+	// this credential file directly, bypassing its own auth store.
+	// GOOGLE_APPLICATION_CREDENTIALS alone is only respected by client
+	// libraries, not by gcloud CLI commands.
+	out.AddEnvVar("CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE", outPath)
 
 	if projectID, ok := in.ItemFields[fieldname.ProjectID]; ok && projectID != "" {
 		out.AddEnvVar("CLOUDSDK_CORE_PROJECT", projectID)

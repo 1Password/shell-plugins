@@ -19,9 +19,10 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
-					"CLOUDSDK_CORE_PROJECT":          "my-gcp-project",
-					"CLOUDSDK_CORE_ACCOUNT":          "test@my-gcp-project.iam.gserviceaccount.com",
+					"GOOGLE_APPLICATION_CREDENTIALS":          "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE":  "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_CORE_PROJECT":                   "my-gcp-project",
+					"CLOUDSDK_CORE_ACCOUNT":                   "test@my-gcp-project.iam.gserviceaccount.com",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
@@ -35,9 +36,10 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
-					"CLOUDSDK_CORE_PROJECT":          "explicit-project",
-					"CLOUDSDK_CORE_ACCOUNT":          "test@my-gcp-project.iam.gserviceaccount.com",
+					"GOOGLE_APPLICATION_CREDENTIALS":          "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE":  "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_CORE_PROJECT":                   "explicit-project",
+					"CLOUDSDK_CORE_ACCOUNT":                   "test@my-gcp-project.iam.gserviceaccount.com",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
@@ -51,9 +53,10 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
-					"CLOUDSDK_CORE_PROJECT":          "my-gcp-project",
-					"CLOUDSDK_CORE_ACCOUNT":          "explicit-account@example.com",
+					"GOOGLE_APPLICATION_CREDENTIALS":          "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE":  "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_CORE_PROJECT":                   "my-gcp-project",
+					"CLOUDSDK_CORE_ACCOUNT":                   "explicit-account@example.com",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(saKeyJSON)},
@@ -66,7 +69,8 @@ func TestServiceAccountKeyProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcloud-credentials.json",
+					"GOOGLE_APPLICATION_CREDENTIALS":          "/tmp/gcloud-credentials.json",
+					"CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE":  "/tmp/gcloud-credentials.json",
 				},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/gcloud-credentials.json": {Contents: []byte(adcJSON)},
