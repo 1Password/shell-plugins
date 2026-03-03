@@ -14,6 +14,7 @@ func New() schema.Plugin {
 		},
 		Executables: []schema.Executable{
 			TerraformCLI(),
+			OpenTofuCLI(),
 		},
 	}
 }
