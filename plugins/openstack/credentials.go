@@ -118,6 +118,8 @@ func Credentials() schema.CredentialType {
 		}),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
+			TryOpenStackCloudRCFromCWD(),
+			TryOpenStackCloudsYAMLFromCWD(),
 			TryOpenStackCloudRC("~/openrc.sh"),
 			TryOpenStackCloudRC("~/.config/openstack/openrc.sh"),
 			TryOpenStackCloudsYAMLFromEnvVar(),

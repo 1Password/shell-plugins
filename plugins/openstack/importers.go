@@ -68,6 +68,33 @@ func TryOpenStackCloudsYAMLFromEnvVar() sdk.Importer {
 	}
 }
 
+// TryOpenStackCloudRCFromCWD imports credentials from an openrc.sh file in the current
+// working directory, useful when credentials are stored alongside a project.
+func TryOpenStackCloudRCFromCWD() sdk.Importer {
+	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return
+		}
+		TryOpenStackCloudRC(filepath.Join(cwd, "openrc.sh"))(ctx, in, out)
+	}
+}
+
+// TryOpenStackCloudsYAMLFromCWD imports credentials from a clouds.yaml file in the current
+// working directory, merging with a companion secure.yaml if present.
+func TryOpenStackCloudsYAMLFromCWD() sdk.Importer {
+	return func(ctx context.Context, in sdk.ImportInput, out *sdk.ImportOutput) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return
+		}
+		TryOpenStackCloudsAndSecureYAML(
+			filepath.Join(cwd, "clouds.yaml"),
+			filepath.Join(cwd, "secure.yaml"),
+		)(ctx, in, out)
+	}
+}
+
 // TryOpenStackCloudsAndSecureYAML imports credentials by merging an OpenStack clouds.yaml
 // file with the companion secure.yaml file at the same path. secure.yaml provides the base
 // values (typically sensitive fields such as passwords) and clouds.yaml takes priority,
