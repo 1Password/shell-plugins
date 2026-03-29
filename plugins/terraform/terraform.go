@@ -33,6 +33,8 @@ func TerraformCLI() schema.Executable {
 					needsauth.ForCommand("destroy"),
 					needsauth.ForCommand("import"),
 					needsauth.ForCommand("test"),
+					needsauth.ForCommand("output"),
+					needsauth.ForCommand("taint"),	
 				),
 			},
 		},
