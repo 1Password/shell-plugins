@@ -105,7 +105,7 @@ in
           # for the Bash and Zsh home-manager modules,
           # the initExtra option is equivalent to Fish's interactiveShellInit
           bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
-          zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
+          zsh.initContent = mkOrder 1000 (strings.concatStringsSep "\n" posixFunctions);
         };
         home = {
           inherit packages;
