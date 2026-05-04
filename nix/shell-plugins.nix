@@ -95,6 +95,7 @@ in
         '')
         pkg-exe-names;
       packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
+      initExtraPosix = strings.concatStringsSep "\n" posixFunctions;
     in
     mkIf cfg.enable (mkMerge [
       {
@@ -103,9 +104,9 @@ in
       (optionalAttrs is-home-manager {
         programs = {
           # for the Bash and Zsh home-manager modules,
-          # the initExtra option is equivalent to Fish's interactiveShellInit
-          bash.initExtra = strings.concatStringsSep "\n" posixFunctions;
-          zsh.initExtra = strings.concatStringsSep "\n" posixFunctions;
+          # the initExtra/initContent option is equivalent to Fish's interactiveShellInit
+          bash.initExtra = initExtraPosix;
+          zsh.initContent = initExtraPosix;
         };
         home = {
           inherit packages;
