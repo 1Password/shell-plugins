@@ -12,6 +12,7 @@ func TryPyPIRCFile() sdk.Importer {
 	return importer.TryFile("~/.pypirc", func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		cfg, err := contents.ToINI()
 		if err != nil {
+			out.AddError(err)
 			return
 		}
 
