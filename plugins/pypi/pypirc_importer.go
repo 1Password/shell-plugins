@@ -18,10 +18,10 @@ func TryPyPIRCFile() sdk.Importer {
 
 		// Try [pypi] section first, then [server-login]
 		for _, section := range []string{"pypi", "server-login"} {
-			s := cfg.Section(section)
-			if s == nil {
+			if !cfg.HasSection(section) {
 				continue
 			}
+			s := cfg.Section(section)
 
 			password := s.Key("password").String()
 			if password != "" {
