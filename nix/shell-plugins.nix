@@ -1,19 +1,16 @@
-{ pkgs, lib, config, is-home-manager, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  is-home-manager,
+  ...
+}:
 with lib;
 let
   cfg = config.programs._1password-shell-plugins;
 
-  supported_plugins = splitString "\n" (
-    lib.readFile "${
-      # get the list of supported plugin executable names
-      pkgs.runCommand "op-plugin-list" { }
-        # 1Password CLI tries to create the config directory automatically, so set a temp XDG_CONFIG_HOME
-        # since we don't actually need it for this
-        "mkdir $out && XDG_CONFIG_HOME=$out ${
-          if cfg.package != null then cfg.package else pkgs._1password-cli
-        }/bin/op plugin list | cut -d ' ' -f1 | tail -n +2 > $out/plugins.txt"
-    }/plugins.txt"
-  );
+  opPkg = if cfg.package != null then cfg.package else pkgs._1password-cli;
+
   getExeName =
     package:
     # NOTE: SAFETY: This is okay because the `packages` list is also referred
@@ -22,6 +19,62 @@ let
     # compute the dependency tree, even though we're discarding string context here,
     # since the packages are still referred to below without discarding string context.
     strings.unsafeDiscardStringContext (baseNameOf (getExe package));
+
+  mkPluginSupportCheck =
+    pluginExeNames:
+    let
+      configuredFile = pkgs.writeText "op-configured-plugins.txt" (
+        # ensure trailing newline
+        lib.concatStringsSep "\n" pluginExeNames + "\n"
+      );
+    in
+    pkgs.runCommand "op-shell-plugins-support-check"
+      {
+        nativeBuildInputs = [
+          pkgs.coreutils
+          pkgs.gnugrep
+          pkgs.gawk
+          pkgs.gnused
+        ];
+      }
+      ''
+        		set -euo pipefail
+
+        		export XDG_CONFIG_HOME="$TMPDIR/xdg-config"
+        		mkdir -p "$XDG_CONFIG_HOME"
+
+        		"${opPkg}/bin/op" plugin list \
+        		  | awk 'NR>1 { print $1 }' \
+        		  | sed '/^$/d' \
+        		  | sort -u > supported.txt
+
+        		if [ ! -s supported.txt ]; then
+        		  echo "ERROR: \`op plugin list\` produced no supported plugins (unexpected output or CLI failure)." >&2
+        		  echo "Raw output was:" >&2
+        		  "${opPkg}/bin/op" plugin list >&2 || true
+        		  exit 1
+        		fi
+
+        		missing=0
+        		while IFS= read -r plugin; do
+        		  [ -z "$plugin" ] && continue
+        		  if ! grep -Fxq "$plugin" supported.txt; then
+        		    echo "ERROR: Configured plugin '$plugin' is not supported by this op binary (\`${opPkg.name or "op"}\`)." >&2
+        		    missing=1
+        		  fi
+        		done < "${configuredFile}"
+
+        		if [ "$missing" -ne 0 ]; then
+        		  echo "" >&2
+        		  echo "Supported plugins according to \`op plugin list\`:" >&2
+        		  cat supported.txt >&2
+        		  exit 1
+        		fi
+        		mkdir -p "$out"
+        		echo "Plugin support check passed." > "$out/check.txt"
+
+        				  '';
+
 in
 {
   options = {
@@ -39,28 +92,17 @@ in
           ]
         '';
         description = "CLI Packages to enable 1Password Shell Plugins for; ensure that a Shell Plugin exists by checking the docs: https://developer.1password.com/docs/cli/shell-plugins/";
-        # this is a bit of a hack to do option validation;
-        # ensure that the list of packages include only packages
-        # for which the executable has a supported 1Password Shell Plugin
-        apply =
-          package_list:
-          map
-            (
-              package:
-              if (elem (getExeName package) supported_plugins) then
-                package
-              else
-                abort "${getExeName package} is not a valid 1Password Shell Plugin. A list of supported plugins can be found by running `op plugin list` or at: https://developer.1password.com/docs/cli/shell-plugins/"
-            )
-            package_list;
+
       };
     };
   };
 
   config =
     let
+
       # executable names as strings, e.g. `pkgs.gh` => `"gh"`, `pkgs.awscli2` => `"aws"`
       pkg-exe-names = map getExeName cfg.plugins;
+      plugin-support-check = mkPluginSupportCheck pkg-exe-names;
       # Explanation:
       # Map over `cfg.plugins` (the value of the `plugins` option provided by the user)
       # and for each package specified, get the executable name, then create a shell function
@@ -80,20 +122,16 @@ in
       #  end
       # ```
       # where `{pkg}` is the executable name of the package
-      posixFunctions = map
-        (package: ''
-          ${package}() {
-            op plugin run -- ${package} "$@";
-          }
-        '')
-        pkg-exe-names;
-      fishFunctions = map
-        (package: ''
-          function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
-            op plugin run -- ${package} $argv
-          end
-        '')
-        pkg-exe-names;
+      posixFunctions = map (package: ''
+        ${package}() {
+          op plugin run -- ${package} "$@";
+        }
+      '') pkg-exe-names;
+      fishFunctions = map (package: ''
+        function ${package} --wraps "${package}" --description "1Password Shell Plugin for ${package}"
+          op plugin run -- ${package} $argv
+        end
+      '') pkg-exe-names;
       packages = lib.optional (cfg.package != null) cfg.package ++ cfg.plugins;
       initExtraPosix = strings.concatStringsSep "\n" posixFunctions;
     in
@@ -102,6 +140,7 @@ in
         programs.fish.interactiveShellInit = strings.concatStringsSep "\n" fishFunctions;
       }
       (optionalAttrs is-home-manager {
+        home.checks = [ plugin-support-check ];
         programs = {
           # for the Bash and Zsh home-manager modules,
           # the initExtra/initContent option is equivalent to Fish's interactiveShellInit
@@ -110,20 +149,23 @@ in
         };
         home = {
           inherit packages;
-          sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
+          sessionVariables = {
+            OP_PLUGINS_SOURCED = "1";
+          };
         };
       })
       (optionalAttrs (!is-home-manager) {
+        system.checks = [ plugin-support-check ];
         programs = {
-          bash.interactiveShellInit =
-            strings.concatStringsSep "\n" posixFunctions;
+          bash.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
           zsh.interactiveShellInit = strings.concatStringsSep "\n" posixFunctions;
         };
         environment = {
           systemPackages = packages;
-          variables = { OP_PLUGINS_SOURCED = "1"; };
+          variables = {
+            OP_PLUGINS_SOURCED = "1";
+          };
         };
       })
     ]);
 }
-
