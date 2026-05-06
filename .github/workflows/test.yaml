@@ -1,13 +1,14 @@
 name: Test and Validate
 on:
+  workflow_dispatch:
   push:
     paths-ignore:
-      - '**.md'
-      - '.github/ISSUE_TEMPLATE/**'
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
   pull_request:
     paths-ignore:
-      - '**.md'
-      - '.github/ISSUE_TEMPLATE/**'
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
 
 jobs:
   build:
