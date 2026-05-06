@@ -2,13 +2,13 @@
 name: Update flake dependencies
 on:
   schedule:
-    - cron: '0 16 * * 5'
+    - cron: "0 16 * * 5"
   workflow_dispatch: # for allowing manual triggers of the workflow
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Update flake.lock and create signed commit with flake.lock changes

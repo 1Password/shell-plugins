@@ -2,7 +2,7 @@ name: Check Nix flake
 on:
   pull_request:
     paths:
-      - '**.nix'
+      - "**.nix"
       - flake.lock
   push:
     branches:
@@ -11,7 +11,7 @@ jobs:
   check-flake:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - name: Check Nix flake inputs
