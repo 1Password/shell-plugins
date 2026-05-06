@@ -7,7 +7,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 jobs:
   check-flake:
     runs-on: ubuntu-latest

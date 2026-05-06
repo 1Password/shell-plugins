@@ -1,6 +1,5 @@
 name: Test and Validate
 on:
-  workflow_dispatch:
   push:
     paths-ignore:
       - "**.md"
