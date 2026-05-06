@@ -1,5 +1,6 @@
 name: Check Nix flake
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "**.nix"
