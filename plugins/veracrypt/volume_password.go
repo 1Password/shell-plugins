@@ -54,7 +54,23 @@ func (p volumePasswordProv) Provision(ctx context.Context, in sdk.ProvisionInput
 		out.CommandLine = []string{}
 		return
 	}
-	out.AddArgs("-p", password, "--non-interactive")
+	args := []string{"-p", password, "--non-interactive"}
+	if len(out.CommandLine) == 0 {
+		out.CommandLine = args
+		return
+	}
+	insertAt := len(out.CommandLine)
+	for i, arg := range out.CommandLine {
+		if len(arg) > 0 && arg[0] != '-' {
+			insertAt = i
+			break
+		}
+	}
+	newCmd := make([]string, 0, len(out.CommandLine)+len(args))
+	newCmd = append(newCmd, out.CommandLine[:insertAt]...)
+	newCmd = append(newCmd, args...)
+	newCmd = append(newCmd, out.CommandLine[insertAt:]...)
+	out.CommandLine = newCmd
 }
 
 func (p volumePasswordProv) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {

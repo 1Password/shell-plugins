@@ -10,20 +10,22 @@ import (
 
 func TestVolumePasswordProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, VolumePassword().DefaultProvisioner, map[string]plugintest.ProvisionCase{
-		"password flag injection": {
+		"password flag inserted before positional args": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Password: "TestPassword123!",
 			},
+			CommandLine: []string{"-t", "--mount", "/tmp/vol", "/mnt/point"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"-p", "TestPassword123!", "--non-interactive"},
+				CommandLine: []string{"-t", "--mount", "-p", "TestPassword123!", "--non-interactive", "/tmp/vol", "/mnt/point"},
 			},
 		},
-		"includes non-interactive flag": {
+		"flags inserted before mount point": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Password: "Secret456!",
 			},
+			CommandLine: []string{"--dismount", "/mnt/point"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"-p", "Secret456!", "--non-interactive"},
+				CommandLine: []string{"--dismount", "-p", "Secret456!", "--non-interactive", "/mnt/point"},
 			},
 		},
 		"empty password returns error": {
@@ -44,8 +46,17 @@ func TestVolumePasswordProvisioner(t *testing.T) {
 				fieldname.Password: "VolumePass789!",
 				"Volume":           "/path/to/volume.tc",
 			},
+			CommandLine: []string{"-t", "--mount"},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"-p", "VolumePass789!", "--non-interactive"},
+				CommandLine: []string{"-t", "--mount", "-p", "VolumePass789!", "--non-interactive"},
+			},
+		},
+		"no command line uses flags as provided": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Password: "MySecret123!",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{
+				CommandLine: []string{"-p", "MySecret123!", "--non-interactive"},
 			},
 		},
 	})
