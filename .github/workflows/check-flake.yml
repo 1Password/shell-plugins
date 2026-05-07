@@ -1,12 +1,13 @@
 name: Check Nix flake
 on:
-  pull_request:
-    paths:
-      - "**.nix"
-      - flake.lock
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    # pull_request:
+    #   paths:
+    #     - "**.nix"
+    #     - flake.lock
+    # push:
+    #   branches:
+    #     - main
 jobs:
   check-flake:
     runs-on: ubuntu-latest
