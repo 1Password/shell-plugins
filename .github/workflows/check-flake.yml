@@ -5,9 +5,10 @@ on:
     #   paths:
     #     - "**.nix"
     #     - flake.lock
-    # push:
-    #   branches:
-    #     - main
+  push:
+    # branches:
+    #   - main
+    #   -
 jobs:
   check-flake:
     runs-on: ubuntu-latest
