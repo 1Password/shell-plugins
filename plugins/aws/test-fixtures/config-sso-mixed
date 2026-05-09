@@ -1,0 +1,19 @@
+[profile sso-legacy]
+sso_start_url = https://example.awsapps.com/start
+sso_region = us-east-1
+sso_account_id = 123456789012
+sso_role_name = ReadOnly
+region = us-west-2
+
+[sso-session corp]
+sso_start_url = https://corp.awsapps.com/start
+sso_region = eu-west-1
+
+[profile sso-new]
+sso_session = corp
+sso_account_id = 210987654321
+sso_role_name = Admin
+region = eu-west-1
+
+[profile iam-only]
+region = us-east-1

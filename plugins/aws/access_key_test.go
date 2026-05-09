@@ -545,6 +545,77 @@ func TestSourceProfileLoop(t *testing.T) {
 	})
 }
 
+func TestSTSProvisionerYieldsOnSSOProfile(t *testing.T) {
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	configPath := filepath.Join(t.TempDir(), "awsConfig")
+	t.Setenv("AWS_CONFIG_FILE", configPath)
+
+	file := ini.Empty()
+
+	profileLegacy, err := file.NewSection("profile sso-legacy")
+	require.NoError(t, err)
+	_, err = profileLegacy.NewKey("sso_start_url", "https://example.awsapps.com/start")
+	require.NoError(t, err)
+	_, err = profileLegacy.NewKey("sso_region", "us-east-1")
+	require.NoError(t, err)
+	_, err = profileLegacy.NewKey("sso_account_id", "111111111111")
+	require.NoError(t, err)
+	_, err = profileLegacy.NewKey("sso_role_name", "ReadOnly")
+	require.NoError(t, err)
+
+	ssoSession, err := file.NewSection("sso-session corp")
+	require.NoError(t, err)
+	_, err = ssoSession.NewKey("sso_start_url", "https://corp.awsapps.com/start")
+	require.NoError(t, err)
+	_, err = ssoSession.NewKey("sso_region", "eu-west-1")
+	require.NoError(t, err)
+
+	profileSession, err := file.NewSection("profile sso-new")
+	require.NoError(t, err)
+	_, err = profileSession.NewKey("sso_session", "corp")
+	require.NoError(t, err)
+	_, err = profileSession.NewKey("sso_account_id", "222222222222")
+	require.NoError(t, err)
+	_, err = profileSession.NewKey("sso_role_name", "PowerUser")
+	require.NoError(t, err)
+
+	err = file.SaveTo(configPath)
+	require.NoError(t, err)
+
+	// When the active profile is SSO-configured, the STS provisioner must yield
+	// silently — no env vars, no error — so the SSO Profile provisioner can run.
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "sso-legacy",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"legacy SSO profile yields silently": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{},
+		},
+	})
+
+	plugintest.TestProvisioner(t, STSProvisioner{
+		profileName: "sso-new",
+		newProviderFactory: func(cacheState sdk.CacheState, cacheOps sdk.CacheOperations, fields map[sdk.FieldName]string) STSProviderFactory {
+			return &mockProviderManager{}
+		},
+	}, map[string]plugintest.ProvisionCase{
+		"sso_session profile yields silently": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.AccessKeyID:     "AKIAHPIZFMD5EEXAMPLE",
+				fieldname.SecretAccessKey: "lBfKB7P5ScmpxDeRoFLZvhJbqNGPoV0vIEXAMPLE",
+			},
+			ExpectedOutput: sdk.ProvisionOutput{},
+		},
+	})
+}
+
 func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 	for _, scenario := range []struct {
 		description             string

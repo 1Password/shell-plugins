@@ -168,10 +168,14 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	// Most credentials carry a long-lived secret, but some (e.g. AWS IAM
+	// Identity Center) keep their token in an external cache and only store
+	// configuration in 1Password. A warning still surfaces the absence so plugin
+	// authors notice it during review.
 	report.AddCheck(ValidationCheck{
 		Description: "Has at least 1 field that is secret",
 		Assertion:   hasSecretField,
-		Severity:    ValidationSeverityError,
+		Severity:    ValidationSeverityWarning,
 	})
 
 	report.AddCheck(ValidationCheck{
