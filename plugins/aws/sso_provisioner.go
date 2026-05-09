@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -13,7 +16,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/ssocreds"
 	"github.com/aws/aws-sdk-go-v2/service/sso"
+	smithy "github.com/aws/smithy-go"
 )
+
+// ssoRetrieveTimeout caps a single sso:GetRoleCredentials round-trip. The SSO endpoint can be
+// reached via an attacker-influenceable region if the local AWS config is compromised; a per-call
+// deadline ensures one bad config cannot wedge the plugin indefinitely.
+const ssoRetrieveTimeout = 30 * time.Second
 
 // SSOProvisioner provisions short-lived AWS credentials by exchanging an SSO access token
 // (cached by `aws sso login`) for role credentials via sso:GetRoleCredentials.
@@ -81,7 +90,10 @@ func (p SSOProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	factory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
 	credsProvider := factory.NewSSORoleCredentialsProvider(awsConfig)
 
-	creds, err := ExecuteSilently(credsProvider.Retrieve)(ctx)
+	retrieveCtx, cancel := context.WithTimeout(ctx, ssoRetrieveTimeout)
+	defer cancel()
+
+	creds, err := ExecuteSilently(credsProvider.Retrieve)(retrieveCtx)
 	if err != nil {
 		out.AddError(translateSSORetrieveError(err, profile))
 		return
@@ -128,6 +140,10 @@ func (f SSOCacheProviderFactory) NewSSORoleCredentialsProvider(awsConfig *config
 
 	cachedTokenFilepath, err := ssocreds.StandardCachedTokenFilepath(ssoSessionKey(awsConfig))
 	if err != nil {
+		return errProvider{err: err}
+	}
+
+	if err := assertSSOTokenCacheSafe(cachedTokenFilepath); err != nil {
 		return errProvider{err: err}
 	}
 
@@ -180,8 +196,12 @@ func (p errProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	return aws.Credentials{}, p.err
 }
 
-// translateSSORetrieveError rewrites token-not-found / token-expired errors from ssocreds
-// into a friendly message that points the user at `aws sso login`.
+// translateSSORetrieveError rewrites token-not-found / token-expired errors from ssocreds into
+// a friendly message that points the user at `aws sso login`. For other smithy.APIError variants
+// returned by the SSO endpoint, it maps known codes to plugin-controlled strings; unknown codes
+// get a generic message so attacker-controlled error text from a hostile endpoint never reaches
+// the user-visible UI. Non-smithy errors (e.g. our own filesystem fail-closed errors from
+// assertSSOTokenCacheSafe) are passed through unchanged because they are locally produced.
 func translateSSORetrieveError(err error, profile string) error {
 	var invalid *ssocreds.InvalidTokenError
 	if errors.As(err, &invalid) {
@@ -191,7 +211,58 @@ func translateSSORetrieveError(err error, profile string) error {
 		}
 		return fmt.Errorf("AWS SSO token is missing or expired; run `%s` and try again", cmd)
 	}
+
+	var apiErr smithy.APIError
+	if errors.As(err, &apiErr) {
+		switch apiErr.ErrorCode() {
+		case "UnauthorizedException":
+			return fmt.Errorf("AWS SSO rejected the cached access token as unauthorized; run `aws sso login` and try again")
+		case "ForbiddenException":
+			return fmt.Errorf("AWS SSO denied access for the configured account/role; verify the assigned permissions in IAM Identity Center")
+		case "ResourceNotFoundException":
+			return fmt.Errorf("AWS SSO could not find the configured account or role; verify sso_account_id and sso_role_name")
+		case "TooManyRequestsException":
+			return fmt.Errorf("AWS SSO is throttling requests; wait a moment and try again")
+		default:
+			// Internally log the original error so an operator can still diagnose; do not surface
+			// the server-controlled message text in the user-facing error.
+			log.Printf("aws sso plugin: unexpected SSO API error code %q from sso:GetRoleCredentials", apiErr.ErrorCode())
+			return fmt.Errorf("failed to retrieve SSO role credentials; check AWS configuration and try again")
+		}
+	}
+
 	return err
+}
+
+// assertSSOTokenCacheSafe enforces fail-closed properties on `~/.aws/sso/cache/<sha1>.json`
+// before the AWS SDK reads it: refuses symlinks (which would let a co-resident attacker
+// substitute a forged token), refuses files with group/world-readable bits set (since SSO
+// access tokens are bearer credentials), and on Unix refuses files not owned by the current
+// user. A non-existent file is allowed: the SDK will surface InvalidTokenError, which our
+// caller translates into the friendly "run `aws sso login`" message.
+func assertSSOTokenCacheSafe(path string) error {
+	fi, err := os.Lstat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("inspecting AWS SSO token cache %q: %w", path, err)
+	}
+	if fi.Mode()&os.ModeSymlink != 0 {
+		return fmt.Errorf("AWS SSO token cache %q is a symlink; refusing to follow", path)
+	}
+	if !fi.Mode().IsRegular() {
+		return fmt.Errorf("AWS SSO token cache %q is not a regular file", path)
+	}
+	if fi.Mode().Perm()&0o077 != 0 {
+		return fmt.Errorf("AWS SSO token cache %q is group/world readable (mode %o); chmod 600 it and re-run", path, fi.Mode().Perm())
+	}
+	if st, ok := fi.Sys().(*syscall.Stat_t); ok {
+		if st.Uid != uint32(os.Geteuid()) {
+			return fmt.Errorf("AWS SSO token cache %q is not owned by the current user", path)
+		}
+	}
+	return nil
 }
 
 // missingRequiredSSOFields reports which SSO fields are still empty after merging the 1Password

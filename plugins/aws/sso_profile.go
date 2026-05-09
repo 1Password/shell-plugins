@@ -51,5 +51,9 @@ func SSOProfile() schema.CredentialType {
 		Importer: importer.TryAll(
 			TrySSOConfigFile(),
 		),
+		// The SSO bearer token lives in `~/.aws/sso/cache/<sha1>.json` (written by `aws sso login`),
+		// so the vault item only stores configuration. Opt out of the "must have at least one secret
+		// field" validator instead of relaxing it globally.
+		AllowsExternalSecretCache: true,
 	}
 }

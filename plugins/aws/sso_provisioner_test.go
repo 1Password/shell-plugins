@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
+	"regexp"
 	"testing"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	confighelpers "github.com/99designs/aws-vault/v7/vault"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/ssocreds"
+	smithy "github.com/aws/smithy-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/ini.v1"
@@ -493,4 +496,137 @@ type mockSSOInvalidTokenProvider struct{}
 
 func (mockSSOInvalidTokenProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	return aws.Credentials{}, &ssocreds.InvalidTokenError{Err: fmt.Errorf("token cache file does not exist")}
+}
+
+// TestAssertSSOTokenCacheSafe exercises the fail-closed properties enforced on
+// `~/.aws/sso/cache/<sha1>.json` before the AWS SDK reads it.
+func TestAssertSSOTokenCacheSafe(t *testing.T) {
+	dir := t.TempDir()
+
+	t.Run("regular 0600 file owned by current user is accepted", func(t *testing.T) {
+		path := filepath.Join(dir, "ok-token.json")
+		require.NoError(t, os.WriteFile(path, []byte(`{"accessToken":"x"}`), 0o600))
+		assert.NoError(t, assertSSOTokenCacheSafe(path))
+	})
+
+	t.Run("non-existent path is allowed (SDK will surface InvalidTokenError)", func(t *testing.T) {
+		assert.NoError(t, assertSSOTokenCacheSafe(filepath.Join(dir, "missing.json")))
+	})
+
+	t.Run("symlink is rejected without following", func(t *testing.T) {
+		target := filepath.Join(dir, "real-token.json")
+		require.NoError(t, os.WriteFile(target, []byte(`{"accessToken":"forged"}`), 0o600))
+		link := filepath.Join(dir, "linked-token.json")
+		if err := os.Symlink(target, link); err != nil {
+			t.Skipf("cannot create symlink: %v", err)
+		}
+		err := assertSSOTokenCacheSafe(link)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "symlink")
+	})
+
+	t.Run("world-readable file is rejected", func(t *testing.T) {
+		path := filepath.Join(dir, "world-readable.json")
+		require.NoError(t, os.WriteFile(path, []byte(`{"accessToken":"x"}`), 0o644))
+		err := assertSSOTokenCacheSafe(path)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "group/world readable")
+	})
+
+	t.Run("directory is rejected as not a regular file", func(t *testing.T) {
+		err := assertSSOTokenCacheSafe(dir)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "regular file")
+	})
+}
+
+type stubAPIError struct {
+	code    string
+	message string
+}
+
+func (e stubAPIError) Error() string               { return fmt.Sprintf("api error %s: %s", e.code, e.message) }
+func (e stubAPIError) ErrorCode() string           { return e.code }
+func (e stubAPIError) ErrorMessage() string        { return e.message }
+func (stubAPIError) ErrorFault() smithy.ErrorFault { return smithy.FaultServer }
+
+// TestTranslateSSORetrieveError verifies that smithy.APIError instances from the SSO endpoint
+// are translated into plugin-controlled strings. The token-leak guard at the end asserts that
+// no translated message ever contains substrings that would indicate access-token leakage —
+// even when the server-controlled message text contains them.
+func TestTranslateSSORetrieveError(t *testing.T) {
+	hostileMessage := "request body: {\"accessToken\":\"eyJabc.def.ghi\",\"bearer\":\"AKIA\"}"
+
+	cases := []struct {
+		name       string
+		err        error
+		profile    string
+		wantSubstr string
+	}{
+		{
+			name:       "InvalidTokenError → friendly login instruction (default profile)",
+			err:        &ssocreds.InvalidTokenError{Err: fmt.Errorf("expired")},
+			profile:    defaultProfileName,
+			wantSubstr: "AWS SSO token is missing or expired",
+		},
+		{
+			name:       "InvalidTokenError → friendly login instruction (named profile)",
+			err:        &ssocreds.InvalidTokenError{Err: fmt.Errorf("expired")},
+			profile:    "corp",
+			wantSubstr: "aws sso login --profile corp",
+		},
+		{
+			name:       "UnauthorizedException → static plugin message",
+			err:        stubAPIError{code: "UnauthorizedException", message: hostileMessage},
+			profile:    "corp",
+			wantSubstr: "rejected the cached access token",
+		},
+		{
+			name:       "ForbiddenException → static plugin message",
+			err:        stubAPIError{code: "ForbiddenException", message: hostileMessage},
+			profile:    "corp",
+			wantSubstr: "denied access for the configured account/role",
+		},
+		{
+			name:       "ResourceNotFoundException → static plugin message",
+			err:        stubAPIError{code: "ResourceNotFoundException", message: hostileMessage},
+			profile:    "corp",
+			wantSubstr: "could not find the configured account or role",
+		},
+		{
+			name:       "TooManyRequestsException → static plugin message",
+			err:        stubAPIError{code: "TooManyRequestsException", message: hostileMessage},
+			profile:    "corp",
+			wantSubstr: "throttling",
+		},
+		{
+			name:       "unknown smithy code → generic message, server text suppressed",
+			err:        stubAPIError{code: "MysteryException", message: hostileMessage},
+			profile:    "corp",
+			wantSubstr: "check AWS configuration and try again",
+		},
+	}
+
+	// Markers that would only appear if the server-controlled hostileMessage above were echoed
+	// into the translated user-visible error. Phrased so they do not match the static plugin
+	// strings we intentionally use (e.g. "access token" in `AWS SSO rejected the cached access
+	// token...` is a static phrase, not a leak).
+	tokenLeakRE := regexp.MustCompile(`(eyJ|"accessToken"|"bearer")`)
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := translateSSORetrieveError(tc.err, tc.profile)
+			require.Error(t, out)
+			assert.Contains(t, out.Error(), tc.wantSubstr)
+
+			// Token-leak guard: under no smithy variant should the translated user-visible
+			// message expose JWT-shaped or JSON-key-shaped fragments from the hostile message.
+			if _, isSmithy := tc.err.(stubAPIError); isSmithy {
+				assert.False(t, tokenLeakRE.MatchString(out.Error()),
+					"translated message %q must not echo server-controlled token-shaped text", out.Error())
+				assert.NotContains(t, out.Error(), hostileMessage,
+					"translated message must not echo the verbatim server-controlled message text")
+			}
+		})
+	}
 }
