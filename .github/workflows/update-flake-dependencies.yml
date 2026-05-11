@@ -13,6 +13,16 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v13
         with:
           use-flakehub: false
+      - name: Diagnose OP_BOT_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
+        run: |
+          echo "=== whoami ==="
+          gh api /user -q '.login' || echo "auth failed"
+          echo "=== repo permissions ==="
+          gh api /repos/1Password/shell-plugins -q '.permissions'
+          echo "=== rate limit (shows token type) ==="
+          gh api /rate_limit -q '.resources.core'
       - name: Update flake.lock and create signed commit with flake.lock changes
         env:
           GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
