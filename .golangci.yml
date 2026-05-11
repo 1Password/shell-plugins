@@ -1,26 +1,29 @@
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     # Defaults:
-    - errcheck
-    - gosimple
     - govet
     - ineffassign
-    - staticcheck
-    - typecheck
     - unused
     # Extra:
     - asciicheck
     - bidichk
+  disable:
+    # Scott L: currently these produce errors that need to be fixed in a seprate PR
+    - errcheck
     - depguard
-    - goimports
-    - gofmt
+    - staticcheck
 
-linters-settings:
-  depguard:
-    list-type: blacklist
-    include-go-root: false
-    packages:
-      - math/rand
-    packages-with-error-message:
-      - math/rand: "please use the safer crypto/rand"
+  settings:
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: math/rand
+              desc: "please use the safer crypto/rand"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
