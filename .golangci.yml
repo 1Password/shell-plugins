@@ -6,6 +6,7 @@ linters:
     - govet
     - ineffassign
     - unused
+    - errcheck
     # Extra:
     - asciicheck
     - bidichk
