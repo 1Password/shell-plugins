@@ -134,7 +134,8 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 	importer, ok := t.importers[req.CredentialID]
 	if !ok || importer == nil {
 		return &errFunctionFieldNotSet{
-			objName:  req.CredentialID.String(), //lint:ignore QF1008 explicit reads more clearly here
+			//lint:ignore QF1008 explicit reads more clearly here
+			objName:  req.CredentialID.String(),
 			funcName: "Importer",
 		}
 	}
