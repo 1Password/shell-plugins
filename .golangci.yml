@@ -9,10 +9,10 @@ linters:
     # Extra:
     - asciicheck
     - bidichk
+    - depguard
   disable:
     # Scott L: currently these produce errors that need to be fixed in a seprate PR
     - errcheck
-    - depguard
     - staticcheck
 
   settings:
