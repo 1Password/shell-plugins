@@ -59,7 +59,7 @@ type ValidationReportPrinter struct {
 }
 
 func (p *ValidationReportPrinter) Print() {
-	if p.Reports == nil || len(p.Reports) == 0 {
+	if len(p.Reports) == 0 {
 		color.Cyan("No reports to print")
 		return
 	}
