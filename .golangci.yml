@@ -3,17 +3,14 @@ linters:
   default: none
   enable:
     # Defaults:
+    - errcheck
     - govet
     - ineffassign
     - unused
-    - errcheck
     # Extra:
     - asciicheck
     - bidichk
     - depguard
-  disable:
-    # Scott L: currently these produce errors that need to be fixed in a seprate PR
-    - errcheck
     - staticcheck
 
   settings:
