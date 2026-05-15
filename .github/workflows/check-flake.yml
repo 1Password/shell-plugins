@@ -1,0 +1,23 @@
+name: Check Nix flake
+on:
+  pull_request:
+    paths:
+      - "**.nix"
+      - flake.lock
+  push:
+    branches:
+      - main
+jobs:
+  check-flake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@v22
+      - uses: DeterminateSystems/magic-nix-cache-action@v13
+      - name: Check Nix flake inputs
+        uses: DeterminateSystems/flake-checker-action@v5
+        with:
+          fail-mode: true
+          send-statistics: false
+      - name: Run nix flake check
+        run: nix flake check

@@ -1,6 +1,9 @@
 # Auto-generated with `make registry`
 plugins/plugins.go
 
+# Auto-generated with `make registry.json`
+plugins/registry.json
+
 # GoLand
 .idea
 
@@ -16,3 +19,7 @@ plugins/plugins.go
 
 # 1Password
 .op
+
+# direnv
+.direnv
+.envrc

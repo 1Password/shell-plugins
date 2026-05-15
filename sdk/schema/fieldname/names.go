@@ -5,6 +5,7 @@ import "github.com/1Password/shell-plugins/sdk"
 // Credential field names.
 const (
 	APIHost         = sdk.FieldName("API Host")
+	APIUrl          = sdk.FieldName("API URL")
 	APIKey          = sdk.FieldName("API Key")
 	APIKeyID        = sdk.FieldName("API Key ID")
 	APISecret       = sdk.FieldName("API Secret")
@@ -27,6 +28,8 @@ const (
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
 	DefaultRegion   = sdk.FieldName("Default Region")
+	DefaultZone     = sdk.FieldName("Default Zone")
+	Deployment      = sdk.FieldName("Deployment")
 	Email           = sdk.FieldName("Email")
 	Endpoint        = sdk.FieldName("Endpoint")
 	Host            = sdk.FieldName("Host")
@@ -36,12 +39,15 @@ const (
 	Mode            = sdk.FieldName("Mode")
 	Namespace       = sdk.FieldName("Namespace")
 	OneTimePassword = sdk.FieldName("One-Time Password")
+	OrgID           = sdk.FieldName("Org ID")
 	OrgURL          = sdk.FieldName("Org URL")
 	Organization    = sdk.FieldName("Organization")
 	Password        = sdk.FieldName("Password")
 	Port            = sdk.FieldName("Port")
 	PublicKey       = sdk.FieldName("Public Key")
 	PrivateKey      = sdk.FieldName("Private Key")
+	ProjectID       = sdk.FieldName("Project ID")
+	Project         = sdk.FieldName("Project")
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
@@ -49,6 +55,7 @@ const (
 	Token           = sdk.FieldName("Token")
 	URL             = sdk.FieldName("URL")
 	User            = sdk.FieldName("User")
+	UserAccessToken = sdk.FieldName("User Access Token")
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
 )
@@ -78,6 +85,7 @@ func ListAll() []sdk.FieldName {
 		Credentials,
 		Database,
 		DefaultRegion,
+		Deployment,
 		Endpoint,
 		Host,
 		HostAddress,
@@ -86,12 +94,15 @@ func ListAll() []sdk.FieldName {
 		Mode,
 		Namespace,
 		OneTimePassword,
+		OrgID,
 		OrgURL,
 		Organization,
 		Password,
 		Port,
 		PublicKey,
 		PrivateKey,
+		ProjectID,
+		Project,
 		Region,
 		Secret,
 		SecretAccessKey,

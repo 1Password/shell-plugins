@@ -25,6 +25,9 @@ registry:
 validate: registry
 	go run cmd/contrib/main.go $@
 
+registry.json: registry
+	go run cmd/contrib/main.go $@
+
 $(plugins_dir):
 	mkdir -p $(plugins_dir)
 	chmod 700 $(plugins_dir)
@@ -38,6 +41,10 @@ $(plugins_dir):
 
 test:
 	go test ./...
+
+lint:
+	# Version used should stay in sync with version in CI (.github/workflows/test.yaml).
+	docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v2.12.2 golangci-lint run
 
 %/remove-local: beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))

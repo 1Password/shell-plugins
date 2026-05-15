@@ -17,6 +17,9 @@ func New() schema.Plugin {
 		},
 		Executables: []schema.Executable{
 			Psql(),
+			Pg_dump(),
+			Pg_restore(),
+			Pgcli(),
 		},
 	}
 }

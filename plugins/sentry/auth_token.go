@@ -31,7 +31,17 @@ func AuthToken() schema.CredentialType {
 			},
 			{
 				Name:                fieldname.Organization,
-				MarkdownDescription: "The default organization used for this auth token.",
+				MarkdownDescription: "The slug of the organization to use for commands.",
+				Optional:            true,
+			},
+			{
+				Name:                fieldname.Project,
+				MarkdownDescription: "The slug of the project to use for commands.",
+				Optional:            true,
+			},
+			{
+				Name:                fieldname.URL,
+				MarkdownDescription: "The URL to use to connect to Sentry. This defaults to 'https://sentry.io/' but can be overridden for self-hosted instances.",
 				Optional:            true,
 			},
 		},
@@ -46,6 +56,8 @@ func AuthToken() schema.CredentialType {
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"SENTRY_AUTH_TOKEN": fieldname.Token,
 	"SENTRY_ORG":        fieldname.Organization,
+	"SENTRY_PROJECT":    fieldname.Project,
+	"SENTRY_URL":        fieldname.URL,
 }
 
 func TrySentryclircFile() sdk.Importer {
@@ -64,6 +76,14 @@ func TrySentryclircFile() sdk.Importer {
 
 			if section.HasKey("org") && section.Key("org").Value() != "" {
 				fields[fieldname.Organization] = section.Key("org").Value()
+			}
+
+			if section.HasKey("project") && section.Key("project").Value() != "" {
+				fields[fieldname.Project] = section.Key("project").Value()
+			}
+
+			if section.HasKey("url") && section.Key("url").Value() != "" {
+				fields[fieldname.URL] = section.Key("url").Value()
 			}
 		}
 

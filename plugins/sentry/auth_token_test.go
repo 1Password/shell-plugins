@@ -14,12 +14,16 @@ func TestAuthTokenImporter(t *testing.T) {
 			Environment: map[string]string{
 				"SENTRY_AUTH_TOKEN": "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 				"SENTRY_ORG":        "acme",
+				"SENTRY_PROJECT":    "my-project",
+				"SENTRY_URL":        "https://sentry.acme.com/",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token:        "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 						fieldname.Organization: "acme",
+						fieldname.Project:      "my-project",
+						fieldname.URL:          "https://sentry.acme.com/",
 					},
 				},
 			},
@@ -33,6 +37,8 @@ func TestAuthTokenImporter(t *testing.T) {
 					Fields: map[sdk.FieldName]string{
 						fieldname.Token:        "mw4ms9tx4dci52bfr19sbj40lb0pu9w4camnf8w3hfzl8hckvkdocd28nexample",
 						fieldname.Organization: "acme",
+						fieldname.Project:      "my-project",
+						fieldname.URL:          "https://sentry.acme.com/",
 					},
 				},
 			},
@@ -46,11 +52,15 @@ func TestAuthTokenProvisioner(t *testing.T) {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:        "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 				fieldname.Organization: "acme",
+				fieldname.Project:      "my-project",
+				fieldname.URL:          "https://sentry.acme.com/",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"SENTRY_AUTH_TOKEN": "hmcxn4gjv9etm096p4v9ttxkvhj4tdm6ft6qmaj4szbb62bwu6mrl0gopexample",
 					"SENTRY_ORG":        "acme",
+					"SENTRY_PROJECT":    "my-project",
+					"SENTRY_URL":        "https://sentry.acme.com/",
 				},
 			},
 		},

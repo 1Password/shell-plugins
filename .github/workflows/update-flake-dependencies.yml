@@ -1,0 +1,53 @@
+# CI job to periodically (once a week) update flake.lock
+name: Update flake dependencies
+on:
+  schedule:
+    - cron: "0 16 * * 5"
+  workflow_dispatch: # for allowing manual triggers of the workflow
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@v22
+      - uses: DeterminateSystems/magic-nix-cache-action@v13
+        with:
+          use-flakehub: false
+      - name: Update flake.lock and create signed commit with flake.lock changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
+          FILE_TO_COMMIT: flake.lock
+          COMMIT_BRANCH: automation/update-flake-dependencies
+          COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
+        run: |
+          # fetch remote state
+          git fetch
+          # if branch exists on remote already
+          BRANCH_EXISTS=false
+          if git checkout "$COMMIT_BRANCH" > /dev/null 2>&1; then
+            # pull changeshttps://github.com/1Password/shell-plugins/pull/595
+            git pull
+            BRANCH_EXISTS=true
+          else
+            # otherwise, create the branch and push it to remote
+            git checkout -b "$COMMIT_BRANCH"
+            git push -u origin "$COMMIT_BRANCH"
+          fi
+          # update flake.lock
+          nix flake update
+          # make sure something actually changed first, if not, no updates required
+          if [[ `git status --porcelain` ]]; then
+            # commit via the GitHub API so we get automatic commit signing
+            gh api --method PUT /repos/1Password/shell-plugins/contents/$FILE_TO_COMMIT \
+              --field message="$COMMIT_MESSAGE" \
+              --field content="$(base64 -w 0 $FILE_TO_COMMIT)" \
+              --field branch="$COMMIT_BRANCH" \
+              --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
+            if [ "$BRANCH_EXISTS" = "false" ]; then
+              gh pr create --title "[automation]: Update Flake dependencies" \
+                --body "This is an automated PR to update \`flake.lock\`" \
+                --label "flake.lock automation" \
+                --reviewer mrjones2014 \
+                --base main --head $COMMIT_BRANCH
+            fi
+          fi

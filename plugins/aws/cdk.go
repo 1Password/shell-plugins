@@ -18,7 +18,8 @@ func AWSCDKToolkit() schema.Executable {
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.AccessKey,
+				Name:        credname.AccessKey,
+				Provisioner: CLIProvisioner{},
 			},
 		},
 	}

@@ -61,10 +61,10 @@ make new-plugin
 
 Still not sure where or how to begin? We're happy to help! You can:
 - Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our developers
-- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA), and ask us any questions there
+- Join the [Developer Slack workspace](https://developer.1password.com/joinslack), and ask us any questions there
 
 ## 💙 Community & Support
 
 - File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
-- Join the [Developer Slack workspace](https://join.slack.com/t/1password-devs/shared_invite/zt-1halo11ps-6o9pEv96xZ3LtX_VE0fJQA)
+- Join the [Developer Slack workspace](https://developer.1password.com/joinslack)
 - Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/)
