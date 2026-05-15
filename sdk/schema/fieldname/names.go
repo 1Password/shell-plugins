@@ -35,6 +35,7 @@ const (
 	Host            = sdk.FieldName("Host")
 	HostAddress     = sdk.FieldName("Host Address")
 	Key             = sdk.FieldName("Key")
+	ManagementKey   = sdk.FieldName("Management Key")
 	MFASerial       = sdk.FieldName("MFA Serial")
 	Mode            = sdk.FieldName("Mode")
 	Namespace       = sdk.FieldName("Namespace")
