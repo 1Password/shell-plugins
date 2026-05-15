@@ -18,7 +18,7 @@ func (p CrateArgsProvisioner) Provision(ctx context.Context, in sdk.ProvisionInp
 	user, userFound := in.ItemFields[fieldname.Username]
 	host, hostFound := in.ItemFields[fieldname.Host]
 	if userFound && hostFound {
-		commandLine := []string{out.CommandLine[0], "--user", user, "--host", host}
+		commandLine := []string{out.CommandLine[0], "--username", user, "--hosts", host}
 		commandLine = append(commandLine, out.CommandLine[1:]...)
 		out.CommandLine = commandLine
 	}
