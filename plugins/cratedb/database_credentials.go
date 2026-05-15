@@ -16,7 +16,7 @@ func DatabaseCredentials() schema.CredentialType {
 		ManagementURL: sdk.URL("https://console.cratedb.cloud/account/settings"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.Host, 
+				Name:                fieldname.Host,
 				MarkdownDescription: "CrateDB host to connect to.",
 				Optional:            false,
 			},
