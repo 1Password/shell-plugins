@@ -26,7 +26,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 					"crash",
 					"--username",
 					"admin",
-					"--host",
+					"--hosts",
 					"https://love.aks1.eastus2.azure.cratedb.net:4200",
 				},
 			},
