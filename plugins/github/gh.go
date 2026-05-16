@@ -21,6 +21,9 @@ func GitHubCLI() schema.Executable {
 			{
 				Name: credname.PersonalAccessToken,
 			},
+			{
+				Name: credname.EnterprisePersonalAccessToken,
+			},
 		},
 	}
 }
