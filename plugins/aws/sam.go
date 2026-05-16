@@ -26,6 +26,10 @@ func AWSSAMCLI() schema.Executable {
 				Name:        credname.AccessKey,
 				Provisioner: CLIProvisioner{},
 			},
+			{
+				Name:        credname.SSOProfile,
+				Provisioner: SSOCLIProvisioner{},
+			},
 		},
 	}
 }

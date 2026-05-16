@@ -21,6 +21,7 @@ const (
 	PersonalAPIToken     = sdk.CredentialName("Personal API Token")
 	PersonalAccessToken  = sdk.CredentialName("Personal Access Token")
 	RegistryCredentials  = sdk.CredentialName("Registry Credentials")
+	SSOProfile           = sdk.CredentialName("SSO Profile")
 	SecretKey            = sdk.CredentialName("Secret Key")
 	UserLogin            = sdk.CredentialName("User Login")
 )
@@ -44,6 +45,7 @@ func ListAll() []sdk.CredentialName {
 		PersonalAPIToken,
 		PersonalAccessToken,
 		RegistryCredentials,
+		SSOProfile,
 		SecretKey,
 		UserLogin,
 	}

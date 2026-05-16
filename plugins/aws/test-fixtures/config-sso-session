@@ -1,0 +1,9 @@
+[sso-session corp]
+sso_start_url = https://corp.awsapps.com/start
+sso_region = eu-west-1
+
+[profile sso-session]
+sso_session = corp
+sso_account_id = 210987654321
+sso_role_name = Admin
+region = eu-west-1
