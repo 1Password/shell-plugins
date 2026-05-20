@@ -15,20 +15,6 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v13
         with:
           use-flakehub: false
-      # --- START DEBUG ---
-      - name: Debug bot token access
-        env:
-          GH_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
-        run: |
-          echo "=== whoami ==="
-          gh api /user --jq '.login'
-          echo "=== org membership (1Password) ==="
-          gh api /user/memberships/orgs/1Password --jq '{state, role}' || echo "NOT A MEMBER OR 404"
-          echo "=== can see repo? ==="
-          gh api /repos/1Password/shell-plugins --jq '{full_name, permissions}' || echo "REPO 404"
-          echo "=== SSO check (look for X-GitHub-SSO header) ==="
-          gh api -i /repos/1Password/shell-plugins 2>&1 | grep -i 'x-github-sso\|HTTP/' || true
-      # --- END DEBUG ---
       - name: Update flake.lock and create signed commit with flake.lock changes
         env:
           GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
