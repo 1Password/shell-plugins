@@ -13,7 +13,7 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.URL:              "https://api.exercism.io/v1",
+				fieldname.URL:              "https://api.exercism.org/v1",
 				fieldname.APIKey:           "1ge7a536-9d1c-4a26-9ww3-3d423example",
 				sdk.FieldName("Directory"): "/Users/username/exercism",
 			},
@@ -37,7 +37,7 @@ func TestAPIKeyImporter(t *testing.T) {
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.URL:              "https://api.exercism.io/v1",
+						fieldname.URL:              "https://api.exercism.org/v1",
 						fieldname.APIKey:           "v1o2p80wuf2qhnurrvf8rigro6sp38example",
 						sdk.FieldName("Directory"): "/Users/username/exercism",
 					},
