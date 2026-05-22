@@ -15,6 +15,7 @@ func ExercismCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotForExactArgs("completion", "upgrade", "workspace", "troubleshoot"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
