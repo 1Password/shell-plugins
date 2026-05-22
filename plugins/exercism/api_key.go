@@ -28,10 +28,11 @@ func APIKey() schema.CredentialType {
 				MarkdownDescription: "API Key used to authenticate to Exercism.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 37,
+					Length: 36,
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
+						Specific: []rune{'-'},
 					},
 				},
 			},
