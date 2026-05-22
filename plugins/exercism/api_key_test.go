@@ -38,7 +38,7 @@ func TestAPIKeyImporter(t *testing.T) {
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.URL:              "https://api.exercism.org/v1",
-						fieldname.APIKey:           "v1o2p80wuf2qhnurrvf8rigro6sp38example",
+						fieldname.APIKey:           "1ge7a536-9d1c-4a26-9ww3-3d423example",
 						sdk.FieldName("Directory"): "/Users/username/exercism",
 					},
 				},

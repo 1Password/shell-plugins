@@ -32,7 +32,7 @@ func APIKey() schema.CredentialType {
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
-						Specific: []rune{'-'},
+						Specific:  []rune{'-'},
 					},
 				},
 			},
