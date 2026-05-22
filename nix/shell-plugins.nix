@@ -110,7 +110,7 @@ in
         };
         home = {
           inherit packages;
-          sessionVariables = { OP_PLUGINS_SOURCED = "1"; };
+          sessionVariables = { OP_PLUGIN_ALIASES_SOURCED = "1"; };
         };
       })
       (optionalAttrs (!is-home-manager) {
@@ -121,7 +121,7 @@ in
         };
         environment = {
           systemPackages = packages;
-          variables = { OP_PLUGINS_SOURCED = "1"; };
+          variables = { OP_PLUGIN_ALIASES_SOURCED = "1"; };
         };
       })
     ]);
