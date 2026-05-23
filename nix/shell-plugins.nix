@@ -96,10 +96,8 @@ in
       };
     };
   };
-
   config =
     let
-
       # executable names as strings, e.g. `pkgs.gh` => `"gh"`, `pkgs.awscli2` => `"aws"`
       pkg-exe-names = map getExeName cfg.plugins;
       plugin-support-check = mkPluginSupportCheck pkg-exe-names;
@@ -149,7 +147,7 @@ in
         };
         home = {
           inherit packages;
-          sessionVariables = { OP_PLUGIN_ALIASES_SOURCED = "1"; };
+           sessionVariables = { OP_PLUGIN_ALIASES_SOURCED = "1"; };
         };
       })
       (optionalAttrs (!is-home-manager) {
