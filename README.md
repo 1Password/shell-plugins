@@ -22,6 +22,8 @@
 
 No more plaintext credentials in your home directory. Automatically authenticate every CLI you use with [1Password CLI](https://developer.1password.com/docs/cli/) + [Shell Plugins](https://developer.1password.com/docs/cli/shell-plugins/). Approve temporary credential usage in your terminal with biometrics.
 
+*By accessing or using 1Password Developer Tools, you agree to the [API and SDK Terms of Service](https://1password.com/legal/api-sdk-terms-of-service).*
+
 ## 🪄 See it in action!
 <p align="center">
   <picture>
@@ -68,5 +70,3 @@ Still not sure where or how to begin? We're happy to help! You can:
 - File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
 - Join the [Developer Slack workspace](https://developer.1password.com/joinslack)
 - Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/)
-
-*By accessing or using 1Password Developer Tools, you agree to the [API and SDK Terms of Service](https://1password.com/legal/api-sdk-terms-of-service).*
