@@ -63,6 +63,52 @@ Still not sure where or how to begin? We're happy to help! You can:
 - Book a free [pairing session](https://calendly.com/d/grs-x2h-pmb/1password-shell-plugins-pairing-session) with one of our developers
 - Join the [Developer Slack workspace](https://developer.1password.com/joinslack), and ask us any questions there
 
+## Advanced Configuration
+### Managing shell plugins in your own dotfiles
+
+By default, `op plugin init` writes its configuration to `~/.config/op/plugins.sh`
+and manages that file for you. If you'd rather keep your plugin configuration in
+your own dotfiles (for example, tracked in version control), you can define the
+shell functions yourself instead.
+
+### 1. Define the plugin functions
+Shell functions for each shell should follow this pattern. In this case, 
+
+### bash / zsh
+
+```bash
+gh() {
+  op plugin run -- gh "$@"
+}
+```
+
+### fish
+
+```fish
+function gh --wraps gh --description "1Password shell plugin for GitHub CLI"
+  op plugin run -- gh $argv
+end
+```
+
+### 2. Tell `op` your plugins are already configured
+
+Set `OP_PLUGINS_SOURCED=1` so the 1Password CLI knows the shell plugins have
+already been set up:
+
+### bash / zsh
+
+```bash
+export OP_PLUGINS_SOURCED="1"
+```
+
+### fish
+```fish
+set -x OP_PLUGINS_SOURCED 1
+```
+
+> **Note:** `op plugin init <plugin>` edits `~/.config/op/plugins.sh` directly and won't update your own dotfiles, so configure plugins manually as shown above.
+
+
 ## 💙 Community & Support
 
 - File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
