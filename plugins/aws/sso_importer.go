@@ -21,11 +21,11 @@ const (
 	ssoSessionSectionPrefix = "sso-session "
 )
 
-// AWS account IDs are exactly 12 decimal digits; AWS regions are lowercase letters with one or two
-// dashes separating segments and a trailing digit (e.g. `us-east-1`, `ap-southeast-2`).
+// AWS account IDs are exactly 12 decimal digits. Regions are lowercase with one or more hyphenated
+// segments before a trailing partition number (e.g. `us-east-1`, `ap-southeast-2`, `us-gov-west-1`).
 var (
 	ssoAccountIDRE = regexp.MustCompile(`^[0-9]{12}$`)
-	ssoRegionRE    = regexp.MustCompile(`^[a-z]{2}-[a-z]+-[0-9]+$`)
+	ssoRegionRE    = regexp.MustCompile(`^[a-z]{2}(-[a-z0-9]+)+-[0-9]+$`)
 )
 
 // TrySSOConfigFile looks for AWS IAM Identity Center profiles in ~/.aws/config.

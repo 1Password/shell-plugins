@@ -576,10 +576,16 @@ func TestTranslateSSORetrieveError(t *testing.T) {
 			wantSubstr: "aws sso login --profile corp",
 		},
 		{
-			name:       "UnauthorizedException → static plugin message",
+			name:       "UnauthorizedException → static plugin message (default profile)",
+			err:        stubAPIError{code: "UnauthorizedException", message: hostileMessage},
+			profile:    defaultProfileName,
+			wantSubstr: "rejected the cached access token",
+		},
+		{
+			name:       "UnauthorizedException → profile-aware login instruction",
 			err:        stubAPIError{code: "UnauthorizedException", message: hostileMessage},
 			profile:    "corp",
-			wantSubstr: "rejected the cached access token",
+			wantSubstr: "aws sso login --profile corp",
 		},
 		{
 			name:       "ForbiddenException → static plugin message",

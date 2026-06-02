@@ -202,21 +202,24 @@ func (p errProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 // get a generic message so attacker-controlled error text from a hostile endpoint never reaches
 // the user-visible UI. Non-smithy errors (e.g. our own filesystem fail-closed errors from
 // assertSSOTokenCacheSafe) are passed through unchanged because they are locally produced.
+func ssoLoginCommand(profile string) string {
+	if profile != defaultProfileName {
+		return fmt.Sprintf("aws sso login --profile %s", profile)
+	}
+	return "aws sso login"
+}
+
 func translateSSORetrieveError(err error, profile string) error {
 	var invalid *ssocreds.InvalidTokenError
 	if errors.As(err, &invalid) {
-		cmd := "aws sso login"
-		if profile != defaultProfileName {
-			cmd = fmt.Sprintf("aws sso login --profile %s", profile)
-		}
-		return fmt.Errorf("AWS SSO token is missing or expired; run `%s` and try again", cmd)
+		return fmt.Errorf("AWS SSO token is missing or expired; run `%s` and try again", ssoLoginCommand(profile))
 	}
 
 	var apiErr smithy.APIError
 	if errors.As(err, &apiErr) {
 		switch apiErr.ErrorCode() {
 		case "UnauthorizedException":
-			return fmt.Errorf("AWS SSO rejected the cached access token as unauthorized; run `aws sso login` and try again")
+			return fmt.Errorf("AWS SSO rejected the cached access token as unauthorized; run `%s` and try again", ssoLoginCommand(profile))
 		case "ForbiddenException":
 			return fmt.Errorf("AWS SSO denied access for the configured account/role; verify the assigned permissions in IAM Identity Center")
 		case "ResourceNotFoundException":
