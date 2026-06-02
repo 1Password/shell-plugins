@@ -19,7 +19,6 @@ func UserCredentials() schema.CredentialType {
 				MarkdownDescription: "Password used to authenticate to Redis server.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 32,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,

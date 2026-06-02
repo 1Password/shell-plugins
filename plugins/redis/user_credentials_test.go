@@ -22,7 +22,49 @@ func TestUserCredentialsProvisioner(t *testing.T) {
 				Environment: map[string]string{
 					"REDISCLI_AUTH": "pjtxpc2gaddifapjvalggspojexample",
 				},
-				CommandLine: []string{"redis-cli", "-p", "6379", "-h", "127.0.0.1", "--user", "example"}, // Each argument is provisioned at index 1, pushing the existing arguments forward to the next index
+				CommandLine: []string{"redis-cli", "-h", "127.0.0.1", "-p", "6379", "--user", "example"},
+			},
+		},
+		// User supplies some flags themselves: we must not duplicate them, but
+		// should still provision the fields they left out (and keep their args).
+		"user-supplied flags are respected": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Password: "pjtxpc2gaddifapjvalggspojexample",
+				fieldname.Username: "example",
+				fieldname.Host:     "127.0.0.1",
+				fieldname.Port:     "6379",
+			},
+			CommandLine: []string{"redis-cli", "-h", "myhost", "PING"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"REDISCLI_AUTH": "pjtxpc2gaddifapjvalggspojexample",
+				},
+				CommandLine: []string{"redis-cli", "-p", "6379", "--user", "example", "-h", "myhost", "PING"},
+			},
+		},
+		// A recognized flag as the final token used to cause an index-out-of-range
+		// panic; ensure it is handled gracefully.
+		"recognized flag as last token": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Password: "pjtxpc2gaddifapjvalggspojexample",
+				fieldname.Host:     "127.0.0.1",
+			},
+			CommandLine: []string{"redis-cli", "-h"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				Environment: map[string]string{
+					"REDISCLI_AUTH": "pjtxpc2gaddifapjvalggspojexample",
+				},
+				CommandLine: []string{"redis-cli", "-h"},
+			},
+		},
+		// User authenticates on the command line: don't also set the env var.
+		"password flag skips env var": {
+			ItemFields: map[sdk.FieldName]string{
+				fieldname.Password: "pjtxpc2gaddifapjvalggspojexample",
+			},
+			CommandLine: []string{"redis-cli", "-a", "mypassword"},
+			ExpectedOutput: sdk.ProvisionOutput{
+				CommandLine: []string{"redis-cli", "-a", "mypassword"},
 			},
 		},
 	})

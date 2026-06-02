@@ -72,6 +72,7 @@ func ListAll() []sdk.FieldName {
 		AccessToken,
 		Account,
 		AccountID,
+		AccountKey,
 		AccountSID,
 		Address,
 		AppKey,
@@ -111,6 +112,7 @@ func ListAll() []sdk.FieldName {
 		Token,
 		URL,
 		User,
+		UserKey,
 		Username,
 		Website,
 	}
