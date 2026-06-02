@@ -180,7 +180,7 @@ func (p *ssoRoleCacheWritingProvider) Retrieve(ctx context.Context) (aws.Credent
 	if err != nil {
 		return aws.Credentials{}, err
 	}
-	if err := p.stsCacheWriter.Put(creds); err != nil {
+	if err := p.Put(creds); err != nil {
 		return aws.Credentials{}, err
 	}
 	return creds, nil
