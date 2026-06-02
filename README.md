@@ -69,7 +69,7 @@ Still not sure where or how to begin? We're happy to help! You can:
 By default, `op plugin init` writes its configuration to `~/.config/op/plugins.sh`
 and manages that file for you. If you'd rather keep your plugin configuration in
 your own dotfiles (for example, tracked in version control), you can define the
-shell functions yourself instead.
+shell functions yourself and source them in your shell's configuration file. 
 
 ### Step 1: Define the plugin functions
 Shell functions for each shell should follow this pattern. In this case, 
@@ -92,18 +92,18 @@ end
 
 ### Step 2: Tell `op` your plugins are already configured
 
-Set `OP_PLUGINS_SOURCED=1` so 1Password CLI knows the shell plugins have
+Set `OP_PLUGIN_ALIASES_SOURCED=1` so 1Password CLI knows the shell plugins have
 already been set up:
 
 ### bash / zsh
 
 ```bash
-export OP_PLUGINS_SOURCED="1"
+export OP_PLUGIN_ALIASES_SOURCED="1"
 ```
 
 ### fish
 ```fish
-set -x OP_PLUGINS_SOURCED 1
+set -x OP_PLUGIN_ALIASES_SOURCED 1
 ```
 
 > **Note:** `op plugin init <plugin>` edits `~/.config/op/plugins.sh` directly and won't update your own dotfiles, so configure plugins manually as shown above.
