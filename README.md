@@ -71,7 +71,7 @@ and manages that file for you. If you'd rather keep your plugin configuration in
 your own dotfiles (for example, tracked in version control), you can define the
 shell functions yourself instead.
 
-### 1. Define the plugin functions
+### Step 1: Define the plugin functions
 Shell functions for each shell should follow this pattern. In this case, 
 
 ### bash / zsh
@@ -90,9 +90,9 @@ function gh --wraps gh --description "1Password shell plugin for GitHub CLI"
 end
 ```
 
-### 2. Tell `op` your plugins are already configured
+### Step 2: Tell `op` your plugins are already configured
 
-Set `OP_PLUGINS_SOURCED=1` so the 1Password CLI knows the shell plugins have
+Set `OP_PLUGINS_SOURCED=1` so 1Password CLI knows the shell plugins have
 already been set up:
 
 ### bash / zsh
