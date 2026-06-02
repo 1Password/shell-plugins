@@ -68,3 +68,5 @@ Still not sure where or how to begin? We're happy to help! You can:
 - File an [issue](https://github.com/1Password/shell-plugins/issues/new/choose) for bugs and feature requests
 - Join the [Developer Slack workspace](https://developer.1password.com/joinslack)
 - Subscribe to the [Developer Newsletter](https://1password.com/dev-subscribe/)
+
+*By accessing or using 1Password Developer Tools, you agree to the [API and SDK Terms of Service](https://1password.com/legal/api-sdk-terms-of-service).*
