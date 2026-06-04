@@ -62,6 +62,14 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		return
 	}
 
+	// If the selected profile is configured for AWS IAM Identity Center (SSO),
+	// this provisioner is not the right one to handle the request. Yield
+	// silently so the SSO Profile provisioner — which the user has linked in
+	// the same `Uses` block — can supply credentials.
+	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
+		return
+	}
+
 	cacheProviderFactory := p.newProviderFactory(in.Cache, out.Cache, in.ItemFields)
 	tempCredentialsProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig, cacheProviderFactory, in.ItemFields)
 	if err != nil {
@@ -101,10 +109,6 @@ func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, 
 	}
 
 	unsupportedMessage := "%s is not yet supported by the AWS Shell Plugin. If you would like for this feature to be supported, upvote or take on its issue: %s"
-	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
-		return nil, fmt.Errorf(unsupportedMessage, "SSO Authentication", "https://github.com/1Password/shell-plugins/issues/210")
-	}
-
 	if awsConfig.HasWebIdentity() {
 		return nil, fmt.Errorf(unsupportedMessage, "Web Identity Authentication", "https://github.com/1Password/shell-plugins/issues/209")
 	}

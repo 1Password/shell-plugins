@@ -59,3 +59,29 @@ func (p CLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput
 func (p CLIProvisioner) Description() string {
 	return "Provision environment variables with master credentials or temporary STS credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
 }
+
+// SSOCLIProvisioner provisions SSO role credentials when the AWS CLI is invoked,
+// after stripping any --profile flag from the command line so the AWS CLI does
+// not try to assume a role on its own.
+type SSOCLIProvisioner struct {
+}
+
+func (p SSOCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, out *sdk.ProvisionOutput) {
+	profile, editedCommandLine, err := stripAndReturnProfileFlag(out.CommandLine)
+	if err != nil {
+		out.AddError(err)
+		return
+	}
+	if editedCommandLine != nil {
+		out.CommandLine = editedCommandLine
+	}
+	NewSSOProvisioner(profile).Provision(ctx, in, out)
+}
+
+func (p SSOCLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
+	// Nothing to do here: environment variables get wiped automatically when the process exits.
+}
+
+func (p SSOCLIProvisioner) Description() string {
+	return "Provision environment variables with temporary AWS IAM Identity Center role credentials AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN"
+}
