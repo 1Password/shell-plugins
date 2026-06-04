@@ -55,7 +55,7 @@ func TestGitHubCLIProvisioner(t *testing.T) {
 				Environment: map[string]string{
 					"GH_TOKEN":     "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
 					"GITHUB_TOKEN": "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
-					"GH_HOST":        "company.ghe.com",
+					"GH_HOST":      "company.ghe.com",
 				},
 			},
 		},
@@ -68,7 +68,7 @@ func TestGitHubCLIProvisioner(t *testing.T) {
 				Environment: map[string]string{
 					"GH_TOKEN":     "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
 					"GITHUB_TOKEN": "github_pat_OYXGsaLFxgNy9msXs44LFNzg3wh0VsXRGycViVc0iKPOqczc1QKlB3ZVVrm5ESukqKR8nE3jzPBEXAMPLE",
-					"GH_HOST":        "github.localhost",
+					"GH_HOST":      "github.localhost",
 				},
 			},
 		},
