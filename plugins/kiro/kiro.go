@@ -9,9 +9,9 @@ import (
 
 func KiroCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Kiro CLI",
-		Runs:      []string{"kiro-cli"},
-		DocsURL:   sdk.URL("https://kiro.dev/docs/cli/"),
+		Name:    "Kiro CLI",
+		Runs:    []string{"kiro-cli"},
+		DocsURL: sdk.URL("https://kiro.dev/docs/cli/"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
