@@ -12,7 +12,10 @@ func JunieCLI() schema.Executable {
 		Name:      "JetBrains Junie CLI",
 		Runs:      []string{"junie"},
 		DocsURL:   sdk.URL("https://junie.jetbrains.com/docs/junie-cli-usage.html"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
