@@ -9,9 +9,9 @@ import (
 
 func JunieCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "JetBrains Junie CLI",
-		Runs:      []string{"junie"},
-		DocsURL:   sdk.URL("https://junie.jetbrains.com/docs/junie-cli-usage.html"),
+		Name:    "JetBrains Junie CLI",
+		Runs:    []string{"junie"},
+		DocsURL: sdk.URL("https://junie.jetbrains.com/docs/junie-cli-usage.html"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
