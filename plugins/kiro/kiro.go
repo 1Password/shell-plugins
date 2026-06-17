@@ -12,7 +12,12 @@ func KiroCLI() schema.Executable {
 		Name:      "Kiro CLI",
 		Runs:      []string{"kiro-cli"},
 		DocsURL:   sdk.URL("https://kiro.dev/docs/cli/"),
-		NeedsAuth: needsauth.NotForHelpOrVersion(),
+		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("login"),
+			needsauth.NotWhenContainsArgs("logout"),
+		),
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIKey,
