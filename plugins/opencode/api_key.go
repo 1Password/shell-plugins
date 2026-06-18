@@ -17,7 +17,7 @@ func APIKey() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
-				MarkdownDescription: "API Key used to authenticate to opencode.",
+				MarkdownDescription: "API Key used to authenticate to OpenCode.",
 				Secret:              true,
 			},
 		},

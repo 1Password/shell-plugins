@@ -9,7 +9,7 @@ func New() schema.Plugin {
 	return schema.Plugin{
 		Name: "opencode",
 		Platform: schema.PlatformInfo{
-			Name:     "opencode",
+			Name:     "OpenCode",
 			Homepage: sdk.URL("https://opencode.ai"),
 		},
 		Credentials: []schema.CredentialType{

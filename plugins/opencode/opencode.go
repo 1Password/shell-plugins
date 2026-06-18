@@ -9,7 +9,7 @@ import (
 
 func OpencodeCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "opencode CLI",
+		Name:    "OpenCode CLI",
 		Runs:    []string{"opencode"},
 		DocsURL: sdk.URL("https://opencode.ai/docs/"),
 		NeedsAuth: needsauth.IfAll(
