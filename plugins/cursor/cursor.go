@@ -15,8 +15,8 @@ func CursorCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
-			needsauth.NotWhenContainsArgs("login"),
-			needsauth.NotWhenContainsArgs("logout"),
+			needsauth.NotForExactArgs("login"),
+			needsauth.NotForExactArgs("logout"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
