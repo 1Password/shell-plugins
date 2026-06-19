@@ -18,6 +18,7 @@ const (
 	DatabaseCredentials  = sdk.CredentialName("Database Credentials")
 	DeployKey            = sdk.CredentialName("Deploy Key")
 	LoginDetails         = sdk.CredentialName("Login Details")
+	ManagementKey        = sdk.CredentialName("Management Key")
 	Password             = sdk.CredentialName("Password")
 	PersonalAPIToken     = sdk.CredentialName("Personal API Token")
 	PersonalAccessToken  = sdk.CredentialName("Personal Access Token")
