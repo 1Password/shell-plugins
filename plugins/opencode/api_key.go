@@ -12,12 +12,12 @@ import (
 func APIKey() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://opencode.ai/docs/"),
+		DocsURL:       sdk.URL("https://opencode.ai/docs/providers/"),
 		ManagementURL: sdk.URL("https://opencode.ai/auth"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.APIKey,
-				MarkdownDescription: "API Key used to authenticate to OpenCode.",
+				MarkdownDescription: "OpenCode Zen API key from https://opencode.ai/auth used to authenticate to OpenCode. `OPENCODE_API_KEY` covers only the OpenCode Zen gateway, not BYOK keys such as `ANTHROPIC_API_KEY`.",
 				Secret:              true,
 			},
 		},

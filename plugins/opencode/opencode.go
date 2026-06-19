@@ -15,6 +15,7 @@ func OpencodeCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("auth"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
