@@ -17,6 +17,8 @@ func CursorCLI() schema.Executable {
 			needsauth.NotWithoutArgs(),
 			needsauth.NotForExactArgs("login"),
 			needsauth.NotForExactArgs("logout"),
+			needsauth.NotForExactArgs("status"),
+			needsauth.NotWhenContainsArgs("--api-key"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
