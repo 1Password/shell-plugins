@@ -271,7 +271,7 @@ func (p assumeRoleProvider) Retrieve(ctx context.Context) (aws.Credentials, erro
 		return aws.Credentials{}, err
 	}
 
-	err = p.stsCacheWriter.Put(credentials)
+	err = p.Put(credentials)
 	if err != nil {
 		return aws.Credentials{}, err
 	}
@@ -308,7 +308,7 @@ func (p mfaSessionTokenProvider) Retrieve(ctx context.Context) (aws.Credentials,
 		return aws.Credentials{}, err
 	}
 
-	err = p.stsCacheWriter.Put(credentials)
+	err = p.Put(credentials)
 	if err != nil {
 		return aws.Credentials{}, err
 	}

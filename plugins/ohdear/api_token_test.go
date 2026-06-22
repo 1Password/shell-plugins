@@ -16,7 +16,12 @@ func TestAPITokenProvisioner(t *testing.T) {
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"OHDEAR_API_TOKEN": "SZ5rluwzbtMyyQFQNoeqEFbpVbTL0ItsXEXAMPLE",
+					"OHDEAR_CONFIG_FILE_PATH": "/tmp/config.json",
+				},
+				Files: map[string]sdk.OutputFile{
+					"/tmp/config.json": {
+						Contents: []byte(plugintest.LoadFixture(t, "import_or_provision")),
+					},
 				},
 			},
 		},
@@ -24,6 +29,20 @@ func TestAPITokenProvisioner(t *testing.T) {
 }
 
 func TestAPITokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
+		"config file": {
+			Files: map[string]string{
+				"~/.ohdear/config.json": plugintest.LoadFixture(t, "import_or_provision"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "SZ5rluwzbtMyyQFQNoeqEFbpVbTL0ItsXEXAMPLE",
+					},
+				},
+			},
+		},
+	})
 	plugintest.TestImporter(t, APIToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
