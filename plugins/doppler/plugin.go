@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://doppler.com"),
 		},
 		Credentials: []schema.CredentialType{
-			ServiceToken(),
+			PersonalAccessToken(),
 		},
 		Executables: []schema.Executable{
 			DopplerCLI(),

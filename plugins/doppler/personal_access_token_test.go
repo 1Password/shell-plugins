@@ -8,8 +8,8 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestServiceTokenImporter(t *testing.T) {
-	plugintest.TestImporter(t, ServiceToken().Importer, map[string]plugintest.ImportCase{
+func TestPersonalAccessTokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, PersonalAccessToken().Importer, map[string]plugintest.ImportCase{
 		"DOPPLER_TOKEN environment variable": {
 			Environment: map[string]string{
 				"DOPPLER_TOKEN": "dp.pt.SQgRDoLc2lBYVu5Vr2T4XHPvBcp0HlhMZq8F11whbvQEXAMPLE",
@@ -20,18 +20,26 @@ func TestServiceTokenImporter(t *testing.T) {
 						fieldname.Token: "dp.pt.SQgRDoLc2lBYVu5Vr2T4XHPvBcp0HlhMZq8F11whbvQEXAMPLE",
 					},
 				},
+			},
+		},
+		"config file": {
+			Files: map[string]string{
+				"~/.doppler/.doppler.yaml": plugintest.LoadFixture(t, "doppler.yaml"),
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.Token: "dp.pt.SQgRDoLc2lBYVu5Vr2T4XHPvBcp0HlhMZq8F11whbvQEXAMPLE",
+						fieldname.Token: "dp.ct.0nFkB2tJ8wQxZ5pYcR7vLmA3sD6gH9jKqW1eU4iO0EXAMPLE",
 					},
+					NameHint: "example-project",
 				},
 			},
 		},
 	})
 }
 
-func TestServiceTokenProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, ServiceToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestPersonalAccessTokenProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token: "dp.pt.SQgRDoLc2lBYVu5Vr2T4XHPvBcp0HlhMZq8F11whbvQEXAMPLE",

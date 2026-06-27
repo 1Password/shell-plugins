@@ -15,6 +15,8 @@ func DopplerCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("__complete"),
+			needsauth.NotWhenContainsArgs("--token"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
