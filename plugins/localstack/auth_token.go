@@ -27,6 +27,7 @@ func AuthToken() schema.CredentialType {
 						Digits:    true,
 						Specific:  []rune{'-'},
 					},
+					Prefix: "ls-",
 				},
 			},
 		},
@@ -34,4 +35,8 @@ func AuthToken() schema.CredentialType {
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
 		)}
+}
+
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"LOCALSTACK_AUTH_TOKEN": fieldname.AuthToken,
 }

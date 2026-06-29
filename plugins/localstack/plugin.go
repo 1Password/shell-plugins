@@ -12,9 +12,6 @@ func New() schema.Plugin {
 			Name:     "LocalStack",
 			Homepage: sdk.URL("https://localstack.cloud"),
 		},
-		// TODO: LocalStack accepts both auth token and api key. When multiple
-		// credentials types are supported, update this list to include both
-		// options.
 		Credentials: []schema.CredentialType{
 			AuthToken(),
 		},
