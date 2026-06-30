@@ -13,7 +13,7 @@ func New() schema.Plugin {
 			Homepage: sdk.URL("https://localstack.cloud"),
 		},
 		Credentials: []schema.CredentialType{
-			APIKey(),
+			AuthToken(),
 		},
 		Executables: []schema.Executable{
 			LocalStackCLI(),

@@ -9,23 +9,25 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func APIKey() schema.CredentialType {
+func AuthToken() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://docs.localstack.cloud/getting-started/api-key/"),
-		ManagementURL: sdk.URL("https://app.localstack.cloud/account/apikeys"),
+		Name:          credname.AuthToken,
+		DocsURL:       sdk.URL("https://docs.localstack.cloud/getting-started/auth-token/"),
+		ManagementURL: sdk.URL("https://app.localstack.cloud/workspace/auth-token"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.APIKey,
-				MarkdownDescription: "API Key used to authenticate to LocalStack.",
+				Name:                fieldname.AuthToken,
+				MarkdownDescription: "Auth token used to authenticate to LocalStack.",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length: 10,
+					Length: 39,
 					Charset: schema.Charset{
 						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
+						Specific:  []rune{'-'},
 					},
+					Prefix: "ls-",
 				},
 			},
 		},
@@ -36,5 +38,5 @@ func APIKey() schema.CredentialType {
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"LOCALSTACK_API_KEY": fieldname.APIKey,
+	"LOCALSTACK_AUTH_TOKEN": fieldname.AuthToken,
 }
