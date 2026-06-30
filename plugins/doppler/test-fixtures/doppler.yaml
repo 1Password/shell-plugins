@@ -1,0 +1,11 @@
+scoped:
+  /:
+    token: dp.ct.0nFkB2tJ8wQxZ5pYcR7vLmA3sD6gH9jKqW1eU4iO0EXAMPLE
+    enclave.project: example-project
+    enclave.config: dev
+  /home/user/app:
+    token: dp.st.dev.aB3cD6gH9jKqW1eU4iO0nFkB2tJ8wQxZ5pYcR7vLmEXAMPLE
+    enclave.project: app
+    enclave.config: dev
+version-check:
+  lastversioncheck: 0
