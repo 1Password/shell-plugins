@@ -20,11 +20,19 @@ type FileProvisioner struct {
 	outpathFixed        string
 	outpathEnvVar       string
 	outdirEnvVar        string
-	setOutpathAsArg     bool
+	argPlacementMode    ArgPlacementMode
 	outpathArgTemplates []string
 }
 
 type ItemToFileContents func(in sdk.ProvisionInput) ([]byte, error)
+
+type ArgPlacementMode int
+
+const (
+	Unset ArgPlacementMode = iota
+	Prepend
+	Append
+)
 
 // FieldAsFile can be used to store the value of a single field as a file.
 func FieldAsFile(fieldName sdk.FieldName) ItemToFileContents {
@@ -83,14 +91,30 @@ func SetOutputDirAsEnvVar(envVarName string) FileOption {
 	}
 }
 
-// AddArgs can be used to add args to the command line. This is useful when the output file path
-// should be passed as an arg. The output path is available as "{{ .Path }}" in each arg.
+// AppendArgs appends arguments to the command line for a FileProvisioner.
+// This is particularly useful when you need to add arguments that reference the output file path.
+// The output path is available as "{{ .Path }}" within the provided argument templates.
 // For example:
-// * `AddArgs("--config-file", "{{ .Path }}")` will result in `--config-file /path/to/tempfile`.
-// * `AddArgs("--config-file={{ .Path }}")` will result in `--config-file=/path/to/tempfile`.
-func AddArgs(argTemplates ...string) FileOption {
+// * `AppendArgs("--log", "{{ .Path }}")` results in `--log /path/to/tempfile`.
+// * `AppendArgs("--log={{ .Path }}")` results in `--log=/path/to/tempfile`.
+func AppendArgs(argTemplates ...string) FileOption {
 	return func(p *FileProvisioner) {
-		p.setOutpathAsArg = true
+		p.argPlacementMode = Append
+		p.outpathArgTemplates = argTemplates
+	}
+}
+
+// PrependArgs prepends arguments to the command line for a FileProvisioner.
+// This is particularly useful when you need to add arguments that reference the output file path.
+// The output path is available as "{{ .Path }}" within the provided argument templates.
+// For example:
+// * `PrependArgs("--input", "{{ .Path }}")` results in `--input /path/to/tempfile`.
+// * `PrependArgs("--input={{ .Path }}")` results in `--input=/path/to/tempfile`.
+//
+// The arguments provided are added before any pre-existing arguments in the command line, but after the command itself.
+func PrependArgs(argTemplates ...string) FileOption {
+	return func(p *FileProvisioner) {
+		p.argPlacementMode = Prepend
 		p.outpathArgTemplates = argTemplates
 	}
 }
@@ -134,7 +158,7 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	}
 
 	// Add args to specify the output path.
-	if p.setOutpathAsArg {
+	if p.argPlacementMode != Unset {
 		tmplData := struct{ Path string }{
 			Path: outpath,
 		}
@@ -159,7 +183,14 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 			argsResolved[i] = result.String()
 		}
 
-		out.AddArgs(argsResolved...)
+		switch p.argPlacementMode {
+		case Append:
+			out.AppendArgs(argsResolved...)
+		case Prepend:
+			out.PrependArgs(argsResolved...)
+		default:
+			out.AddError(fmt.Errorf("invalid argument placement mode"))
+		}
 	}
 }
 
