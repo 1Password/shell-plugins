@@ -1,0 +1,11 @@
+clouds:
+  mycloud:
+    auth:
+      auth_url: https://keystone.example.com:5000/v3
+      application_credential_id: "xxxxxxxxxxxxxxx"
+      application_credential_secret: "yyyyy342lhkwdh"
+    region_name: "RegionOne"
+    interface: "public"
+    project_domain_name: "Default"
+    identity_api_version: "3"
+    auth_type: "v3applicationcredential"
