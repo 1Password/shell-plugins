@@ -190,6 +190,22 @@ func TestSSOImporter(t *testing.T) {
 				},
 			},
 		},
+		"European Sovereign Cloud sso_region is accepted": {
+			Files: map[string]string{
+				"~/.aws/config": "[profile eusc]\nsso_start_url = https://example.awsapps.com/start\nsso_region = eusc-de-east-1\nsso_account_id = 123456789012\nsso_role_name = ReadOnly\n",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					NameHint: "eusc",
+					Fields: map[sdk.FieldName]string{
+						fieldname.SSOStartURL:  "https://example.awsapps.com/start",
+						fieldname.SSORegion:    "eusc-de-east-1",
+						fieldname.SSOAccountID: "123456789012",
+						fieldname.SSORoleName:  "ReadOnly",
+					},
+				},
+			},
+		},
 		"sso_region with bad characters is rejected": {
 			Files: map[string]string{
 				"~/.aws/config": "[profile bad-region]\nsso_start_url = https://example.awsapps.com/start\nsso_region = us@east-1\nsso_account_id = 123456789012\nsso_role_name = ReadOnly\n",
