@@ -117,6 +117,15 @@ func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, 
 		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
 	}
 
+	// An SSO-configured profile can only reach this point as the source profile of a role
+	// chain: when it is the active profile, STSProvisioner.Provision has already yielded to
+	// the SSO Profile provisioner before this function is called. The SSO provisioner does
+	// not resolve role chains, so fail with a clear message instead of falling through to
+	// an access-key lookup that cannot succeed.
+	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
+		return nil, fmt.Errorf("profile %q is configured for AWS IAM Identity Center (SSO) and is not yet supported as the source profile of a role chain by the AWS Shell Plugin", awsConfig.ProfileName)
+	}
+
 	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
 		sourceProfileProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig.SourceProfile, providerFactory, itemFields)
