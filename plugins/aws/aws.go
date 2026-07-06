@@ -38,13 +38,20 @@ func AWSCLI() schema.Executable {
 			needsauth.NotWhenContainsArgs("configure", "set"),
 		),
 		Uses: []schema.CredentialUsage{
+			// Both credential types are optional so that users can link only the one
+			// they use: SSO-only users (no IAM access key) can set up the plugin without
+			// being forced to provide an Access Key, and vice versa. At runtime, each
+			// provisioner yields silently when the active profile is configured for the
+			// other credential type.
 			{
 				Name:        credname.AccessKey,
 				Provisioner: CLIProvisioner{},
+				Optional:    true,
 			},
 			{
 				Name:        credname.SSOProfile,
 				Provisioner: SSOCLIProvisioner{},
+				Optional:    true,
 			},
 		},
 	}
