@@ -16,7 +16,7 @@ func New() schema.Plugin {
 			CLIToken(),
 		},
 		Executables: []schema.Executable{
-			SonarScannerCLI(),
+			SonarQubeCLI(),
 		},
 	}
 }

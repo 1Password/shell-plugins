@@ -7,7 +7,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func SonarScannerCLI() schema.Executable {
+func SonarQubeCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "SonarQube CLI",
 		Runs:    []string{"sonar"},
