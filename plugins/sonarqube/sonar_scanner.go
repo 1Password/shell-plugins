@@ -18,7 +18,7 @@ func SonarScannerCLI() schema.Executable {
 			needsauth.NotForExactArgs("auth", "login"),
 			needsauth.NotForExactArgs("auth", "logout"),
 			needsauth.NotWhenContainsArgs("config", "telemetry"),
-			needsauth.NotWhenContainsArgs("system",),
+			needsauth.NotWhenContainsArgs("system"),
 			needsauth.NotWhenContainsArgs("self-update"),
 		),
 		Uses: []schema.CredentialUsage{
