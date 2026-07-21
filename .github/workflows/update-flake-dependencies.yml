@@ -30,7 +30,7 @@ jobs:
           # if branch exists on remote already
           BRANCH_EXISTS=false
           if git checkout "$COMMIT_BRANCH" > /dev/null 2>&1; then
-            # pull changeshttps://github.com/1Password/shell-plugins/pull/595
+            # pull changes
             git pull
             BRANCH_EXISTS=true
           else
@@ -48,7 +48,8 @@ jobs:
               --field content="$(base64 -w 0 $FILE_TO_COMMIT)" \
               --field branch="$COMMIT_BRANCH" \
               --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
-            if [ "$BRANCH_EXISTS" = "false" ]; then
+            OPEN_PR_COUNT=$(gh pr list --head "$COMMIT_BRANCH" --state open --json number --jq 'length')
+            if [ "$OPEN_PR_COUNT" -eq 0]; then
               gh pr create --title "[automation]: Update Flake dependencies" \
                 --body "This is an automated PR to update \`flake.lock\`" \
                 --label "flake.lock automation" \
