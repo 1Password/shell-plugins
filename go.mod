@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.18.5
 	github.com/fatih/color v1.13.0
 	github.com/hashicorp/go-plugin v1.4.6
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.11.1
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
