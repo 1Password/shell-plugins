@@ -28,11 +28,9 @@ jobs:
           # fetch remote state
           git fetch
           # if branch exists on remote already
-          BRANCH_EXISTS=false
           if git checkout "$COMMIT_BRANCH" > /dev/null 2>&1; then
             # pull changes
             git pull
-            BRANCH_EXISTS=true
           else
             # otherwise, create the branch and push it to remote
             git checkout -b "$COMMIT_BRANCH"
@@ -49,7 +47,7 @@ jobs:
               --field branch="$COMMIT_BRANCH" \
               --field sha="$(git rev-parse $COMMIT_BRANCH:$FILE_TO_COMMIT)"
             OPEN_PR_COUNT=$(gh pr list --head "$COMMIT_BRANCH" --state open --json number --jq 'length')
-            if [ "$OPEN_PR_COUNT" -eq 0]; then
+            if [ "$OPEN_PR_COUNT" -eq 0 ]; then
               gh pr create --title "[automation]: Update Flake dependencies" \
                 --body "This is an automated PR to update \`flake.lock\`" \
                 --label "flake.lock automation" \
