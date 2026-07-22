@@ -2,6 +2,7 @@ package sdk
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 	"time"
 
@@ -121,4 +122,61 @@ func TestCacheOperationsPutStruct(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, structData, structResult)
+}
+
+func TestProvisionOutputAddArgsAtIndex(t *testing.T) {
+	tc := []struct {
+		name     string
+		initial  []string
+		position int
+		args     []string
+		expected []string
+	}{
+		{
+			name:     "Insert at the beginning",
+			initial:  []string{"arg2", "arg3"},
+			position: 0,
+			args:     []string{"arg1"},
+			expected: []string{"arg1", "arg2", "arg3"},
+		},
+		{
+			name:     "Insert in the middle",
+			initial:  []string{"arg1", "arg3"},
+			position: 1,
+			args:     []string{"arg2"},
+			expected: []string{"arg1", "arg2", "arg3"},
+		},
+		{
+			name:     "Insert at the end",
+			initial:  []string{"arg1", "arg2"},
+			position: -1,
+			args:     []string{"arg3"},
+			expected: []string{"arg1", "arg2", "arg3"},
+		},
+		{
+			name:     "Append at out-of-range index",
+			initial:  []string{"arg1", "arg2"},
+			position: 5,
+			args:     []string{"arg3"},
+			expected: []string{"arg1", "arg2", "arg3"},
+		},
+		{
+			name:     "Insert at negative index (should prepend)",
+			initial:  []string{"arg2", "arg3"},
+			position: -5,
+			args:     []string{"arg1"},
+			expected: []string{"arg1", "arg2", "arg3"},
+		},
+	}
+
+	for _, tc := range tc {
+		t.Run(tc.name, func(t *testing.T) {
+			out := ProvisionOutput{CommandLine: append([]string{}, tc.initial...)}
+			out.AddArgsAtIndex(tc.position, tc.args...)
+
+			if !reflect.DeepEqual(out.CommandLine, tc.expected) {
+				t.Errorf("expected %v, got %v", tc.expected, out.CommandLine)
+			}
+		})
+	}
 }
