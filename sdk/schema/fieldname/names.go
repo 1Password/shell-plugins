@@ -53,6 +53,7 @@ const (
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
+	Space           = sdk.FieldName("Space")
 	Subdomain       = sdk.FieldName("Subdomain")
 	Token           = sdk.FieldName("Token")
 	URL             = sdk.FieldName("URL")
@@ -110,6 +111,7 @@ func ListAll() []sdk.FieldName {
 		Region,
 		Secret,
 		SecretAccessKey,
+		Space,
 		Token,
 		URL,
 		User,
