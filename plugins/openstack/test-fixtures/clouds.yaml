@@ -1,0 +1,14 @@
+clouds:
+  mycloud:
+    auth:
+      auth_url: https://keystone.example.com:5000/v3
+      username: myuser
+      password: s3cr3tpassword
+      project_id: abc123def456abc123def456abc123de
+      project_name: myproject
+      user_domain_name: Default
+      project_domain_name: Default
+      project_domain_id: default
+    region_name: RegionOne
+    interface: public
+    identity_api_version: "3"

@@ -1,0 +1,4 @@
+clouds:
+  mycloud:
+    auth:
+      password: s3cr3tpassword
