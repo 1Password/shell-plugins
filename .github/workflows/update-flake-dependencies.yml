@@ -13,14 +13,23 @@ jobs:
         with:
           egress-policy: audit
 
+      - name: Generate GitHub App installation token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.FLAKE_BOT_APP_ID }}
+          private-key: ${{ secrets.FLAKE_BOT_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
       - uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
       - uses: DeterminateSystems/magic-nix-cache-action@908b263ff629f4cc17666315b7fd3ec127c6244d # v14
         with:
           use-flakehub: false
       - name: Update flake.lock and create signed commit with flake.lock changes
         env:
-          GITHUB_TOKEN: ${{ secrets.OP_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           FILE_TO_COMMIT: flake.lock
           COMMIT_BRANCH: automation/update-flake-dependencies
           COMMIT_MESSAGE: "chore(nix): Update Flake dependencies"
@@ -51,7 +60,7 @@ jobs:
               gh pr create --title "[automation]: Update Flake dependencies" \
                 --body "This is an automated PR to update \`flake.lock\`" \
                 --label "flake.lock automation" \
-                --reviewer 1password/open-source \
+                --reviewer 1Password/open-source \
                 --base main --head $COMMIT_BRANCH
             fi
           fi
