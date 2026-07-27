@@ -1,6 +1,6 @@
 module github.com/1Password/shell-plugins
 
-go 1.24
+go 1.25.0
 
 require (
 	github.com/99designs/aws-vault/v7 v7.0.0-rc2
@@ -57,7 +57,7 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966 // indirect
-	golang.org/x/mod v0.17.0
+	golang.org/x/mod v0.38.0
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
