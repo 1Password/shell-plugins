@@ -60,7 +60,6 @@ jobs:
               gh pr create --title "[automation]: Update Flake dependencies" \
                 --body "This is an automated PR to update \`flake.lock\`" \
                 --label "flake.lock automation" \
-                --reviewer 1Password/open-source \
                 --base main --head $COMMIT_BRANCH
             fi
           fi
