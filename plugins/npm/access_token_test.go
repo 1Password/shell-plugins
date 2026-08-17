@@ -119,7 +119,7 @@ func TestAccessTokenImporter(t *testing.T) {
 			}},
 		},
 		"pnpm scoped auth key": {
-			OS: "linux",
+			OS:          "linux",
 			Environment: map[string]string{"XDG_CONFIG_HOME": ""},
 			Files: map[string]string{
 				"~/.config/pnpm/auth.ini": "//registry.example.com/:@acme:_authToken=custom_from_pnpm\n",
@@ -134,7 +134,7 @@ func TestAccessTokenImporter(t *testing.T) {
 			}},
 		},
 		"pnpm macOS auth file": {
-			OS: "darwin",
+			OS:          "darwin",
 			Environment: map[string]string{"XDG_CONFIG_HOME": ""},
 			Files: map[string]string{
 				"~/Library/Preferences/pnpm/auth.ini": "//registry.npmjs.org/:_authToken=npm_from_pnpm\n",
