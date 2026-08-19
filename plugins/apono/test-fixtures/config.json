@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "active_profile": "work",
+    "profiles": {
+      "work": {
+        "client_id": "3afae9ff-48e6-45f3-b0e8-37658b7271b7",
+        "api_url": "https://api.apono.io",
+        "app_url": "https://app.apono.io",
+        "account_id": "example-account-id",
+        "user_email": "user@example.com",
+        "personal_token": "apono_example_personal_token_ynAvsvBcxSGzMkPr"
+      },
+      "sso": {
+        "client_id": "3afae9ff-48e6-45f3-b0e8-37658b7271b7",
+        "api_url": "https://api.apono.io",
+        "app_url": "https://app.apono.io",
+        "account_id": "example-account-id",
+        "user_email": "user@example.com",
+        "personal_token": "",
+        "token": {
+          "access_token": "example-oauth-access-token",
+          "refresh_token": "example-oauth-refresh-token",
+          "expiry": "2026-01-01T00:00:00Z"
+        }
+      }
+    }
+  }
+}
