@@ -643,14 +643,14 @@ func TestResolveLocalAnd1PasswordConfigurations(t *testing.T) {
 			description: "has region both in 1Password and local config, but values differ",
 			itemFields: map[sdk.FieldName]string{
 				fieldname.OneTimePassword: "515467",
-				fieldname.DefaultRegion:   "us-east-2",
+				fieldname.Region:          "us-east-2",
 			},
 			awsConfig: &confighelpers.Config{
 				ProfileName: "dev",
 				MfaSerial:   "arn:aws:iam::123456789012:mfa/user",
 				Region:      "us-east-1",
 			},
-			err: fmt.Errorf("your local AWS configuration (config file or environment variable) has a different default region than the one specified in 1Password"),
+			err: fmt.Errorf("your local AWS configuration (config file or environment variable) has a different region than the one specified in 1Password"),
 		},
 	} {
 		t.Run(scenario.description, func(t *testing.T) {
