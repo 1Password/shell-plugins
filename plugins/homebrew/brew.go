@@ -15,14 +15,15 @@ func HomebrewCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.IfAny(
-				needsauth.ForCommand("search"),
+				needsauth.ForCommand("audit"),
 				needsauth.ForCommand("bump"),
 				needsauth.ForCommand("bump-cask-pr"),
 				needsauth.ForCommand("bump-formula-pr"),
-				needsauth.ForCommand("update"),
-				needsauth.ForCommand("upgrade"),
 				needsauth.ForCommand("install"),
 				needsauth.ForCommand("reinstall"),
+				needsauth.ForCommand("search"),
+				needsauth.ForCommand("update"),
+				needsauth.ForCommand("upgrade"),
 			),
 		),
 		Uses: []schema.CredentialUsage{
