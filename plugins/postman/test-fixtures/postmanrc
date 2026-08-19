@@ -1,0 +1,14 @@
+{
+  "login": {
+    "_profiles": [
+      {
+        "alias": "default",
+        "postmanApiKey": "jNMdtxuUHqiSMNmwYu3OXyhOgYKse6H82uhghe0Zw3K92ZEfXhL8wvLzX",
+        "username": "example@example.com"
+      }
+    ]
+  },
+  "updates": {
+    "updateCheckedTimestamp": 1623456789
+  }
+}
