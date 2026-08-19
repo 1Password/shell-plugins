@@ -91,6 +91,12 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	report.AddCheck(ValidationCheck{
+		Description: "Do not specify plugin name in credential usage because credential is from the same plugin",
+		Assertion:   !UnnecessaryPluginNameDefined(p),
+		Severity:    ValidationSeverityWarning,
+	})
+
 	return report.IsValid(), report
 }
 
