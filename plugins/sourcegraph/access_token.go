@@ -17,10 +17,10 @@ func AccessToken() schema.CredentialType {
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Endpoint,
-				AlternativeNames:    []string{"Website","URL"},
+				AlternativeNames:    []string{"Website", "URL"},
 				MarkdownDescription: "Base URL for your Sourcegraph instance. Should start with https://",
 				Composition: &schema.ValueComposition{
-					Prefix:  "https://",
+					Prefix: "https://",
 					Charset: schema.Charset{
 						Lowercase: true,
 						Digits:    true,
@@ -34,9 +34,9 @@ func AccessToken() schema.CredentialType {
 				MarkdownDescription: "Access token used to authenticate to Sourcegraph. Should start with sgp_",
 				Secret:              true,
 				Composition: &schema.ValueComposition{
-					Length:  60,
-					Prefix:  "sgp_",
+					Prefix: "sgp_",
 					Charset: schema.Charset{
+						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
 						Specific:  []rune{'_'},

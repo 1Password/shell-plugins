@@ -13,12 +13,12 @@ func TestAccessTokenProvisioner(t *testing.T) {
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.Endpoint: "https://sourcegraph.com",
-				fieldname.Token:    "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+				fieldname.Token:    "sgp_fake0123456789ab_fake0123456789abcdef0123456789abcdef0123",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
 					"SRC_ENDPOINT":     "https://sourcegraph.com",
-					"SRC_ACCESS_TOKEN": "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+					"SRC_ACCESS_TOKEN": "sgp_fake0123456789ab_fake0123456789abcdef0123456789abcdef0123",
 				},
 			},
 		},
@@ -30,13 +30,13 @@ func TestAccessTokenImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{
 				"SRC_ENDPOINT":     "https://sourcegraph.com",
-				"SRC_ACCESS_TOKEN": "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+				"SRC_ACCESS_TOKEN": "sgp_fake0123456789ab_fake0123456789abcdef0123456789abcdef0123",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
 						fieldname.Endpoint: "https://sourcegraph.com",
-						fieldname.Token:    "bqrv8bpqtplf7xv5lkk6oxfldtttmhzx4example",
+						fieldname.Token:    "sgp_fake0123456789ab_fake0123456789abcdef0123456789abcdef0123",
 					},
 				},
 			},
