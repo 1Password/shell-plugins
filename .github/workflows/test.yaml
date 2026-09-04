@@ -57,7 +57,7 @@ jobs:
           go-version: 1.24
 
       - name: Lint with golangci-lint
-        uses: step-security/golangci-lint-action@ce3368d2f0a15c79206a120861e3f847c8beb466 # v9.2.1
+        uses: step-security/golangci-lint-action@2697867e9c204558ca23d0decdd0039dc21f2b93 # v9.3.0
         with:
           # version of golangci-lint to use
           # Version should stay in sync with version used for local linting (lint job in Makefile).
