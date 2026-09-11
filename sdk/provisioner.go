@@ -107,6 +107,11 @@ func (out *ProvisionOutput) AddArgs(args ...string) {
 	out.CommandLine = append(out.CommandLine, args...)
 }
 
+// PrependArgs can be used to insert additional arguments at the beginning of the command line of the provision output.
+func (out *ProvisionOutput) PrependArgs(args ...string) {
+	out.CommandLine = append(out.CommandLine[:1], append(args, out.CommandLine[1:]...)...)
+}
+
 // AddSecretFile can be used to add a file containing secrets to the provision output.
 func (out *ProvisionOutput) AddSecretFile(path string, contents []byte) {
 	out.AddFile(path, OutputFile{

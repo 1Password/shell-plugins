@@ -43,7 +43,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.AddArgs("--defaults-file={{ .Path }}")),
+		DefaultProvisioner: provision.TempFile(mysqlConfig, provision.Filename("my.cnf"), provision.PrependArgs("--defaults-file={{ .Path }}")),
 		Importer: importer.TryAll(
 			TryMySQLConfigFile("/etc/my.cnf"),
 			TryMySQLConfigFile("/etc/mysql/my.cnf"),
