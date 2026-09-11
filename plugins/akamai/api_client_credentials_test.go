@@ -18,12 +18,11 @@ func TestAPIClientCredentialsProvisioner(t *testing.T) {
 				fieldname.ClientToken:  "akab-nomoflavjuc4422e-fa2xznerxrm3teg7",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
-				CommandLine: []string{"--edgerc", "/tmp/.edgerc", "--section", "default"},
-				Files: map[string]sdk.OutputFile{
-					"/tmp/.edgerc": {Contents: []byte(plugintest.LoadFixture(t, ".edgerc-single"))},
-				},
 				Environment: map[string]string{
-					"EDGERC": "/tmp/.edgerc",
+					"AKAMAI_HOST":          "akab-lmn789n2k53w7qrs-nfkxaa4lfk3kd6ym.luna.akamaiapis.net",
+					"AKAMAI_CLIENT_TOKEN":  "akab-nomoflavjuc4422e-fa2xznerxrm3teg7",
+					"AKAMAI_CLIENT_SECRET": "abcdE23FNkBxy456z25qx9Yp5CPUxlEfQeTDkfh4QA=I",
+					"AKAMAI_ACCESS_TOKEN":  "akab-zyx987xa6osbli4k-e7jf5ikib5jknes3",
 				},
 			},
 		},

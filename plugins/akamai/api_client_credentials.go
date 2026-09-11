@@ -71,39 +71,22 @@ func APIClientCredentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(configFile,
-			provision.Filename(".edgerc"),
-			provision.AddArgs(
-				"--edgerc", "{{ .Path }}",
-				"--section", "default",
-			),
-			provision.SetPathAsEnvVar("EDGERC"), // for Akamai Terraform provider
-		),
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			TryAkamaiConfigFile(),
 		)}
 }
 
-func configFile(in sdk.ProvisionInput) ([]byte, error) {
-	contents := "[default]\n"
-
-	if clientsecret, ok := in.ItemFields[fieldname.ClientSecret]; ok {
-		contents += "client_secret = " + clientsecret + "\n"
-	}
-
-	if host, ok := in.ItemFields[fieldname.Host]; ok {
-		contents += "host = " + host + "\n"
-	}
-
-	if accesstoken, ok := in.ItemFields[fieldname.AccessToken]; ok {
-		contents += "access_token = " + accesstoken + "\n"
-	}
-
-	if clienttoken, ok := in.ItemFields[fieldname.ClientToken]; ok {
-		contents += "client_token = " + clienttoken + "\n"
-	}
-
-	return []byte(contents), nil
+// Akamai's edgegrid library (used by the Akamai CLI and its sub-packages) checks these
+// environment variables before falling back to the ~/.edgerc file. Using them avoids
+// relying on command-line flag injection, which several Akamai CLI packages (e.g. cli-gtm)
+// don't parse correctly when the flags are appended after the subcommand.
+// See: https://github.com/akamai/AkamaiOPEN-edgegrid-golang/blob/master/pkg/edgegrid/config.go
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"AKAMAI_HOST":          fieldname.Host,
+	"AKAMAI_CLIENT_TOKEN":  fieldname.ClientToken,
+	"AKAMAI_CLIENT_SECRET": fieldname.ClientSecret,
+	"AKAMAI_ACCESS_TOKEN":  fieldname.AccessToken,
 }
 
 // Load credentials from the ~/.edgerc file.
