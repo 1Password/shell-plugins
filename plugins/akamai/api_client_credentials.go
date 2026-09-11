@@ -73,7 +73,7 @@ func APIClientCredentials() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.TempFile(configFile,
 			provision.Filename(".edgerc"),
-			provision.AddArgs(
+			provision.AppendArgs(
 				"--edgerc", "{{ .Path }}",
 				"--section", "default",
 			),
