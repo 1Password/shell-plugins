@@ -8,7 +8,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/BurntSushi/toml v1.2.1
 	github.com/aws/aws-sdk-go-v2 v1.42.1
-	github.com/aws/aws-sdk-go-v2/service/sts v1.44.0
+	github.com/aws/aws-sdk-go-v2/service/sts v1.44.1
 	github.com/fatih/color v1.13.0
 	github.com/hashicorp/go-plugin v1.4.6
 	github.com/stretchr/testify v1.11.1
