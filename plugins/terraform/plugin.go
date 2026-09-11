@@ -12,6 +12,9 @@ func New() schema.Plugin {
 			Name:     "Terraform",
 			Homepage: sdk.URL("https://www.terraform.io"),
 		},
+		Credentials: []schema.CredentialType{
+			APIToken(),
+		},
 		Executables: []schema.Executable{
 			TerraformCLI(),
 		},
