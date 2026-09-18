@@ -3,6 +3,7 @@ package akamai
 import (
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/needsauth"
+	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
@@ -27,6 +28,14 @@ func AkamaiCLI() schema.Executable {
 		Uses: []schema.CredentialUsage{
 			{
 				Name: credname.APIClientCredentials,
+				Provisioner: provision.TempFile(configFile,
+					provision.Filename(".edgerc"),
+					provision.AddArgs(
+						"--edgerc", "{{ .Path }}",
+						"--section", "default",
+					),
+					provision.SetPathAsEnvVar("EDGERC"), // for Akamai Terraform provider
+				),
 			},
 		},
 	}
