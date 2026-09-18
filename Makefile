@@ -48,4 +48,4 @@ lint:
 
 %/remove-local: beta-notice
 	$(eval plugin := $(firstword $(subst /, ,$@)))
-	rm -f ~/.op/plugins/local/$(plugin)
+	rm -f $(plugins_dir)/$(plugin)
