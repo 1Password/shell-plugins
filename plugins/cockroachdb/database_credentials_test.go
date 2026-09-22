@@ -29,7 +29,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 						fieldname.User:     "root",
 						fieldname.Password: "password123",
 						fieldname.Database: "defaultdb",
-						"insecure":         "1",
+						"Insecure":         "1",
 					},
 				},
 			},
@@ -65,7 +65,7 @@ func TestDatabaseCredentialsImporter(t *testing.T) {
 						fieldname.User:     "produser",
 						fieldname.Password: "securepass123",
 						fieldname.Database: "proddb",
-						"insecure":         "0",
+						"Insecure":         "0",
 					},
 				},
 			},
@@ -82,7 +82,7 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				fieldname.User:     "root",
 				fieldname.Password: "password123",
 				fieldname.Database: "defaultdb",
-				"insecure":         "1",
+				"Insecure":         "1",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
