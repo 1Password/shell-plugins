@@ -40,7 +40,7 @@ func DatabaseCredentials() schema.CredentialType {
 				Optional:            true,
 			},
 			{
-				Name:                "insecure",
+				Name:                "Insecure",
 				MarkdownDescription: "Connect in insecure mode (skip TLS verification). Set to '1' to skip TLS verification.",
 				Optional:            true,
 			},
@@ -56,5 +56,5 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"COCKROACH_USER":     fieldname.User,
 	"COCKROACH_PASSWORD": fieldname.Password,
 	"COCKROACH_DATABASE": fieldname.Database,
-	"COCKROACH_INSECURE": "insecure",
+	"COCKROACH_INSECURE": "Insecure",
 }
