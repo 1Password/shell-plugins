@@ -1,11 +1,11 @@
 package plugintest
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
 	"strings"
-	"time"
 
 	"github.com/1Password/shell-plugins/sdk/schema"
 )
@@ -17,9 +17,6 @@ const (
 	symbols             = "~!@#$%^&*()-_+={}[]\\|<,>.?/\"';:`"
 	secretExampleSuffix = "EXAMPLE"
 )
-
-var seededRand = rand.New(
-	rand.NewSource(time.Now().UnixNano()))
 
 func ExampleSecretFromComposition(v schema.ValueComposition) string {
 	prefix := getPrefix(v)
@@ -65,10 +62,14 @@ func stringFromCharset(length int, charset string) (string, error) {
 	if charset == "" {
 		return "", fmt.Errorf("invalid charset provided")
 	}
-
+	max := big.NewInt(int64(len(charset)))
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = charset[seededRand.Intn(len(charset))]
+		n, err := rand.Int(rand.Reader, max)
+		if err != nil {
+			return "", fmt.Errorf("reading random: %w", err)
+		}
+		b[i] = charset[n.Int64()]
 	}
 	return string(b), nil
 }

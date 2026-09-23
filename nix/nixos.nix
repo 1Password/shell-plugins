@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 import ./shell-plugins.nix {
   inherit pkgs;
   inherit lib;

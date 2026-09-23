@@ -35,6 +35,7 @@ func TerraformCLI() schema.Executable {
 					needsauth.ForCommand("test"),
 					needsauth.ForCommand("output"),
 					needsauth.ForCommand("taint"),	
+					needsauth.ForCommand("workspace"),
 				),
 			},
 		},

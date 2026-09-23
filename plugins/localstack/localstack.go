@@ -15,10 +15,11 @@ func LocalStackCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotWhenContainsArgs("auth"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
-				Name: credname.APIKey,
+				Name: credname.AuthToken,
 			},
 		},
 	}

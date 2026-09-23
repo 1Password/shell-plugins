@@ -1,26 +1,35 @@
 name: Test and Validate
 on:
   push:
+    branches: [main]
     paths-ignore:
-      - '**.md'
-      - '.github/ISSUE_TEMPLATE/**'
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
   pull_request:
     paths-ignore:
-      - '**.md'
-      - '.github/ISSUE_TEMPLATE/**'
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
+
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
-          go-version: ^1.18
+          egress-policy: audit
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go 1.x
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version: ^1.18
 
       - name: Test
         run: make test
@@ -28,20 +37,28 @@ jobs:
       - name: Validate
         run: make validate
   golangci:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      pull-requests: read # for golangci/golangci-lint-action to fetch pull requests
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: "Set up Go 1.x"
-        uses: actions/setup-go@v3
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
-          go-version: 1.19
+          egress-policy: audit
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Lint with golanci-lint
-        uses: golangci/golangci-lint-action@v3
+      - name: "Set up Go 1.x"
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version: 1.24
+
+      - name: Lint with golangci-lint
+        uses: step-security/golangci-lint-action@2697867e9c204558ca23d0decdd0039dc21f2b93 # v9.3.0
         with:
           # version of golangci-lint to use
           # Version should stay in sync with version used for local linting (lint job in Makefile).
-          version: v1.50.1
+          version: v2.12.2
