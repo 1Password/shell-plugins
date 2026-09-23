@@ -16,14 +16,30 @@ const (
 	digits              = "0123456789"
 	symbols             = "~!@#$%^&*()-_+={}[]\\|<,>.?/\"';:`"
 	secretExampleSuffix = "EXAMPLE"
+	defaultBodyLength   = 24
 )
 
+// ExampleSecretFromComposition returns a Length-character value (just the prefix if that's longer).
+// Unset Length: prefix + defaultBodyLength random characters + EXAMPLE if the charset has letters.
 func ExampleSecretFromComposition(v schema.ValueComposition) string {
 	prefix := getPrefix(v)
-	suffix := getSuffix(v)
-	base := generateBase(v, v.Length-len(prefix)-len(suffix))
+	suffix := getSuffix(v.Charset)
 
-	return prefix + base + suffix
+	if v.Length == 0 {
+		return prefix + generateBase(v, defaultBodyLength) + suffix
+	}
+
+	// Only add the suffix if at least one random character still fits.
+	if v.Length <= len(prefix)+len(suffix) {
+		suffix = ""
+	}
+
+	baseLength := v.Length - len(prefix) - len(suffix)
+	if baseLength < 0 {
+		baseLength = 0
+	}
+
+	return prefix + generateBase(v, baseLength) + suffix
 }
 
 func getPrefix(v schema.ValueComposition) string {
@@ -45,17 +61,16 @@ func generateBase(v schema.ValueComposition, baseLength int) string {
 	return generatedStr
 }
 
-func getSuffix(v schema.ValueComposition) string {
-	var suffix string
-
-	if v.Length > len(secretExampleSuffix) && (v.Charset.Uppercase || v.Charset.Lowercase) {
-		suffix = secretExampleSuffix
-		if v.Charset.Lowercase && !v.Charset.Uppercase {
-			suffix = strings.ToLower(secretExampleSuffix)
-		}
+func getSuffix(c schema.Charset) string {
+	if c.Uppercase {
+		return secretExampleSuffix
 	}
 
-	return suffix
+	if c.Lowercase {
+		return strings.ToLower(secretExampleSuffix)
+	}
+
+	return ""
 }
 
 func stringFromCharset(length int, charset string) (string, error) {
