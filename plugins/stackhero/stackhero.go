@@ -9,11 +9,15 @@ import (
 
 func StackheroCLI() schema.Executable {
 	return schema.Executable{
-		Name:      "Stackhero CLI", // TODO: Check if this is correct
-		Runs:      []string{"stackhero"},
-		DocsURL:   sdk.URL("https://stackhero.com/docs/cli"), // TODO: Replace with actual URL
+		Name:    "Stackhero CLI",
+		Runs:    []string{"stackhero"},
+		DocsURL: sdk.URL("https://www.stackhero.io/stackhero/documentations/Use-the-CLI"),
 		NeedsAuth: needsauth.IfAll(
+			needsauth.NotForCommand("login"),
+			needsauth.NotForCommand("logout"),
+			needsauth.NotForCommand("self-update"),
 			needsauth.NotForHelpOrVersion(),
+			needsauth.NotWhenContainsArgs("--help-agents"),
 			needsauth.NotWithoutArgs(),
 		),
 		Uses: []schema.CredentialUsage{
