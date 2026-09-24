@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -116,6 +117,15 @@ func TryMySQLConfigFile(path string) sdk.Importer {
 	})
 }
 
+// MySQL decodes \" in option files according to its source code.
+// Its own docs don't mention it but MariaDB's docs do.
 func configFileEntry(key string, value string) string {
-	return fmt.Sprintf("%s=%s\n", key, value)
+	return fmt.Sprintf("%s=\"%s\"\n", key, optionValueEscaper.Replace(value))
 }
+
+var optionValueEscaper = strings.NewReplacer(
+	`\`, `\\`,
+	`"`, `\"`,
+	"\n", `\n`,
+	"\r", `\r`,
+)
