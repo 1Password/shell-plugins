@@ -2,6 +2,8 @@ package akamai
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -85,25 +87,34 @@ func APIClientCredentials() schema.CredentialType {
 }
 
 func configFile(in sdk.ProvisionInput) ([]byte, error) {
-	contents := "[default]\n"
-
-	if clientsecret, ok := in.ItemFields[fieldname.ClientSecret]; ok {
-		contents += "client_secret = " + clientsecret + "\n"
+	fields := []struct {
+		name sdk.FieldName
+		key  string
+	}{
+		{fieldname.ClientSecret, "client_secret"},
+		{fieldname.Host, "host"},
+		{fieldname.AccessToken, "access_token"},
+		{fieldname.ClientToken, "client_token"},
 	}
 
-	if host, ok := in.ItemFields[fieldname.Host]; ok {
-		contents += "host = " + host + "\n"
+	var contents strings.Builder
+	contents.WriteString("[default]\n")
+
+	for _, field := range fields {
+		value, ok := in.ItemFields[field.name]
+		if !ok {
+			continue
+		}
+		// INI parsers ignore surrounding whitespace, so trimming it only drops
+		// harmless leading or trailing line breaks, such as from a paste.
+		value = strings.TrimSpace(value)
+		if strings.ContainsAny(value, "\r\n") {
+			return nil, fmt.Errorf("Akamai credential field %q cannot contain line breaks", field.name)
+		}
+		contents.WriteString(field.key + " = " + value + "\n")
 	}
 
-	if accesstoken, ok := in.ItemFields[fieldname.AccessToken]; ok {
-		contents += "access_token = " + accesstoken + "\n"
-	}
-
-	if clienttoken, ok := in.ItemFields[fieldname.ClientToken]; ok {
-		contents += "client_token = " + clienttoken + "\n"
-	}
-
-	return []byte(contents), nil
+	return []byte(contents.String()), nil
 }
 
 // Load credentials from the ~/.edgerc file.

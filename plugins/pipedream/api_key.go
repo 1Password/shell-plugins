@@ -2,6 +2,8 @@ package pipedream
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -88,15 +90,29 @@ type Config struct {
 }
 
 func pipedreamConfig(in sdk.ProvisionInput) ([]byte, error) {
-	contents := ""
-
-	if apikey, ok := in.ItemFields[fieldname.APIKey]; ok {
-		contents += "api_key = " + apikey + "\n"
+	fields := []struct {
+		name sdk.FieldName
+		key  string
+	}{
+		{fieldname.APIKey, "api_key"},
+		{fieldname.OrgID, "org_id"},
 	}
 
-	if orgid, ok := in.ItemFields[fieldname.OrgID]; ok {
-		contents += "org_id = " + orgid + "\n"
+	var contents strings.Builder
+
+	for _, field := range fields {
+		value, ok := in.ItemFields[field.name]
+		if !ok {
+			continue
+		}
+		// INI parsers ignore surrounding whitespace, so trimming it only drops
+		// harmless leading or trailing line breaks, such as from a paste.
+		value = strings.TrimSpace(value)
+		if strings.ContainsAny(value, "\r\n") {
+			return nil, fmt.Errorf("Pipedream credential field %q cannot contain line breaks", field.name)
+		}
+		contents.WriteString(field.key + " = " + value + "\n")
 	}
 
-	return []byte(contents), nil
+	return []byte(contents.String()), nil
 }
