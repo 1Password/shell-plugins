@@ -50,7 +50,7 @@ func TestPipedreamConfigRejectsLineBreaks(t *testing.T) {
 				contents, err := pipedreamConfig(sdk.ProvisionInput{ItemFields: fields})
 
 				assert.Nil(t, contents)
-				require.EqualError(t, err, fmt.Sprintf("Pipedream credential field %q cannot contain line breaks", field))
+				require.EqualError(t, err, fmt.Sprintf("line breaks are not allowed in the Pipedream %q field", field))
 				assert.NotContains(t, err.Error(), "[other]")
 			})
 		}

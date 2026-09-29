@@ -109,7 +109,7 @@ func configFile(in sdk.ProvisionInput) ([]byte, error) {
 		// harmless leading or trailing line breaks, such as from a paste.
 		value = strings.TrimSpace(value)
 		if strings.ContainsAny(value, "\r\n") {
-			return nil, fmt.Errorf("Akamai credential field %q cannot contain line breaks", field.name)
+			return nil, fmt.Errorf("line breaks are not allowed in the Akamai %q field", field.name)
 		}
 		contents.WriteString(field.key + " = " + value + "\n")
 	}

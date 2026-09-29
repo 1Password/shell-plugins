@@ -56,7 +56,7 @@ func TestConfigFileRejectsLineBreaks(t *testing.T) {
 				contents, err := configFile(sdk.ProvisionInput{ItemFields: fields})
 
 				assert.Nil(t, contents)
-				require.EqualError(t, err, fmt.Sprintf("Akamai credential field %q cannot contain line breaks", field))
+				require.EqualError(t, err, fmt.Sprintf("line breaks are not allowed in the Akamai %q field", field))
 				assert.NotContains(t, err.Error(), "debug = true")
 			})
 		}
