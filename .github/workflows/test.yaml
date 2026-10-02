@@ -32,6 +32,8 @@ jobs:
           go-version: ^1.18
 
       - name: Test
+        env:
+          COCKROACHDB_INTEGRATION: "1"
         run: make test
 
       - name: Validate
