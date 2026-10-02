@@ -40,7 +40,7 @@ func DatabaseCredentials() schema.CredentialType {
 			},
 			{
 				Name:                "Insecure",
-				MarkdownDescription: "Connect in insecure mode (skip TLS verification). Set to '1' to skip TLS verification.",
+				MarkdownDescription: "Connect without TLS. Set to '1' only for an insecure development cluster.",
 				Optional:            true,
 			},
 		},
