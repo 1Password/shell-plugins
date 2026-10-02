@@ -11,9 +11,8 @@ import (
 
 func DatabaseCredentials() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.DatabaseCredentials,
-		DocsURL:       sdk.URL("https://www.cockroachlabs.com/docs/stable/connection-parameters.html"),
-		ManagementURL: sdk.URL("https://cockroachlabs.cloud/"),
+		Name:    credname.DatabaseCredentials,
+		DocsURL: sdk.URL("https://www.cockroachlabs.com/docs/stable/connection-parameters.html"),
 		Fields: []schema.CredentialField{
 			{
 				Name:                fieldname.Host,

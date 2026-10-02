@@ -159,6 +159,11 @@ func TestCockroachSQLExecutable(t *testing.T) {
 func TestPluginValidation(t *testing.T) {
 	plugin := New()
 
+	// Database items cannot store URL fields in the 1Password CLI.
+	if DatabaseCredentials().ManagementURL != nil {
+		t.Error("Database credentials must not set a management URL")
+	}
+
 	// Basic plugin validation
 	if plugin.Name != "cockroachdb" {
 		t.Errorf("Expected plugin name 'cockroachdb', got '%s'", plugin.Name)
