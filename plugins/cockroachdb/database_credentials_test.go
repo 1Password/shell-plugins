@@ -11,7 +11,11 @@ import (
 )
 
 func TestDatabaseCredentialsImporter(t *testing.T) {
+	for name := range defaultEnvVarMapping {
+		t.Setenv(name, "")
+	}
 	plugintest.TestImporter(t, DatabaseCredentials().Importer, map[string]plugintest.ImportCase{
+		"no environment variables": {},
 		"environment variables - complete": {
 			Environment: map[string]string{
 				"COCKROACH_HOST":     "localhost",
@@ -128,11 +132,9 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 	})
 }
 
-// TestCockroachSQLExecutable tests the cockroach sql executable configuration
 func TestCockroachSQLExecutable(t *testing.T) {
 	plugin := New()
 
-	// Find the cockroach sql executable
 	var cockroachSQL *schema.Executable
 	for _, exec := range plugin.Executables {
 		if exec.Name == "cockroach" {
@@ -145,9 +147,8 @@ func TestCockroachSQLExecutable(t *testing.T) {
 		t.Fatal("cockroach sql executable not found in plugin")
 	}
 
-	// Test that it uses database credentials
 	if len(cockroachSQL.Uses) != 1 {
-		t.Errorf("Expected 1 credential usage, got %d", len(cockroachSQL.Uses))
+		t.Fatalf("Expected 1 credential usage, got %d", len(cockroachSQL.Uses))
 	}
 
 	if cockroachSQL.Uses[0].Name != credname.DatabaseCredentials {
@@ -155,16 +156,20 @@ func TestCockroachSQLExecutable(t *testing.T) {
 	}
 }
 
-// TestPluginValidation tests that the plugin passes all validation checks
 func TestPluginValidation(t *testing.T) {
 	plugin := New()
+
+	for _, report := range plugin.DeepValidate() {
+		if report.HasErrors() {
+			t.Errorf("Plugin validation failed: %+v", report)
+		}
+	}
 
 	// Database items cannot store URL fields in the 1Password CLI.
 	if DatabaseCredentials().ManagementURL != nil {
 		t.Error("Database credentials must not set a management URL")
 	}
 
-	// Basic plugin validation
 	if plugin.Name != "cockroachdb" {
 		t.Errorf("Expected plugin name 'cockroachdb', got '%s'", plugin.Name)
 	}
@@ -176,4 +181,16 @@ func TestPluginValidation(t *testing.T) {
 	if len(plugin.Executables) != 1 {
 		t.Errorf("Expected 1 executable, got %d", len(plugin.Executables))
 	}
+}
+
+func TestCockroachNeedsAuth(t *testing.T) {
+	plugintest.TestNeedsAuth(t, Cockroach().NeedsAuth, map[string]plugintest.NeedsAuthCase{
+		"interactive SQL": {Args: []string{"sql"}, ExpectedNeedsAuth: true},
+		"SQL query":       {Args: []string{"sql", "--execute", "SELECT 1"}, ExpectedNeedsAuth: true},
+		"SQL help":        {Args: []string{"sql", "--help"}},
+		"help":            {Args: []string{"help"}},
+		"version":         {Args: []string{"version"}},
+		"start server":    {Args: []string{"start-single-node", "--insecure"}},
+		"no arguments":    {},
+	})
 }
