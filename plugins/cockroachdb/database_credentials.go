@@ -53,7 +53,7 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"COCKROACH_HOST":     fieldname.Host,
 	"COCKROACH_PORT":     fieldname.Port,
 	"COCKROACH_USER":     fieldname.User,
-	"COCKROACH_PASSWORD": fieldname.Password,
+	"PGPASSWORD":         fieldname.Password,
 	"COCKROACH_DATABASE": fieldname.Database,
 	"COCKROACH_INSECURE": "Insecure",
 }
