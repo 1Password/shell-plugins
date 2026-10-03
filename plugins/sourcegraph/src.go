@@ -11,7 +11,7 @@ func SourcegraphCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "Sourcegraph CLI",
 		Runs:    []string{"src"},
-		DocsURL: sdk.URL("https://docs.sourcegraph.com/cli"),
+		DocsURL: sdk.URL("https://sourcegraph.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),

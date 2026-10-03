@@ -110,6 +110,129 @@ func TestSecretWithExpectedLength(t *testing.T) {
 	assert.Equal(t, expectedLength, len(result), fmt.Sprintf("should have %d chars length", expectedLength))
 }
 
+func TestSecretWithFixedLengthAndPrefix(t *testing.T) {
+	v := schema.ValueComposition{
+		Length: 40,
+		Prefix: "ghp_",
+		Charset: schema.Charset{
+			Uppercase: true,
+			Lowercase: true,
+			Digits:    true,
+		},
+	}
+	result := ExampleSecretFromComposition(v)
+
+	assert.Equal(t, 40, len(result), "should have exactly the declared length")
+	assert.True(t, strings.HasPrefix(result, "ghp_"), "should contain ghp_ prefix")
+	assert.True(t, strings.HasSuffix(result, secretExampleSuffix), fmt.Sprintf("should contain %s suffix", secretExampleSuffix))
+	assertOnlyCharsFrom(t, strings.TrimPrefix(result, "ghp_"), v.Charset)
+}
+
+func TestSecretWithoutLengthIsComposedAdditively(t *testing.T) {
+	cases := map[string]struct {
+		prefix         string
+		charset        schema.Charset
+		expectedSuffix string
+	}{
+		"no prefix, letters": {
+			charset:        schema.Charset{Uppercase: true, Digits: true},
+			expectedSuffix: secretExampleSuffix,
+		},
+		"letters, digits, @ and .": {
+			charset:        schema.Charset{Lowercase: true, Uppercase: true, Digits: true, Specific: []rune{'@', '.'}},
+			expectedSuffix: secretExampleSuffix,
+		},
+		"letters, digits and symbols": {
+			charset:        schema.Charset{Lowercase: true, Uppercase: true, Digits: true, Symbols: true},
+			expectedSuffix: secretExampleSuffix,
+		},
+		"pypi- prefix": {
+			prefix:         "pypi-",
+			charset:        schema.Charset{Uppercase: true, Lowercase: true, Digits: true, Specific: []rune{'-', '_'}},
+			expectedSuffix: secretExampleSuffix,
+		},
+		"lowercase letters": {
+			prefix:         "abc_",
+			charset:        schema.Charset{Lowercase: true},
+			expectedSuffix: strings.ToLower(secretExampleSuffix),
+		},
+		"no letters": {
+			prefix:  "12-",
+			charset: schema.Charset{Digits: true},
+		},
+		"prefix longer than the default body": {
+			prefix:         strings.Repeat("p", defaultBodyLength+10),
+			charset:        schema.Charset{Uppercase: true, Lowercase: true},
+			expectedSuffix: secretExampleSuffix,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			v := schema.ValueComposition{Prefix: tc.prefix, Charset: tc.charset}
+
+			var result string
+			assert.NotPanics(t, func() { result = ExampleSecretFromComposition(v) })
+
+			assert.Equal(t, len(tc.prefix)+defaultBodyLength+len(tc.expectedSuffix), len(result))
+			assert.True(t, strings.HasPrefix(result, tc.prefix))
+			assert.True(t, strings.HasSuffix(result, tc.expectedSuffix))
+			body := strings.TrimSuffix(strings.TrimPrefix(result, tc.prefix), tc.expectedSuffix)
+			assert.Len(t, body, defaultBodyLength)
+			assertOnlyCharsFrom(t, body, tc.charset)
+		})
+	}
+}
+
+func TestSecretWithShortLengthAndPrefix(t *testing.T) {
+	cases := map[string]struct {
+		length         int
+		prefix         string
+		expectedLength int
+		hasSuffix      bool
+	}{
+		"suffix is dropped to keep the declared length": {
+			length:         8,
+			prefix:         "pypi-",
+			expectedLength: 8,
+		},
+		"suffix is dropped when it would leave no random characters": {
+			length:         12,
+			prefix:         "pypi-",
+			expectedLength: 12,
+		},
+		"suffix is kept once a random character fits": {
+			length:         13,
+			prefix:         "pypi-",
+			expectedLength: 13,
+			hasSuffix:      true,
+		},
+		"prefix is kept whole when longer than length": {
+			length:         3,
+			prefix:         "pypi-",
+			expectedLength: 5,
+		},
+	}
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			v := schema.ValueComposition{
+				Length:  tc.length,
+				Prefix:  tc.prefix,
+				Charset: schema.Charset{Uppercase: true, Lowercase: true},
+			}
+
+			var result string
+			assert.NotPanics(t, func() { result = ExampleSecretFromComposition(v) })
+
+			assert.Equal(t, tc.expectedLength, len(result))
+			assert.True(t, strings.HasPrefix(result, tc.prefix))
+			assert.Equal(t, tc.hasSuffix, strings.HasSuffix(result, secretExampleSuffix))
+			assertOnlyCharsFrom(t, strings.TrimPrefix(result, tc.prefix), v.Charset)
+		})
+	}
+}
+
 func TestStingFromCharsetReturnErrorWhenNoCharsetProvided(t *testing.T) {
 	_, err := stringFromCharset(10, "")
 	if err == nil {
@@ -149,6 +272,14 @@ func TestStringFromCharsetContainsOnly(t *testing.T) {
 
 			assert.Equal(t, true, hasOnly)
 		})
+	}
+}
+
+func assertOnlyCharsFrom(t *testing.T, str string, c schema.Charset) {
+	t.Helper()
+	allowed := charsToUse(c)
+	for _, r := range str {
+		assert.True(t, strings.ContainsRune(allowed, r), fmt.Sprintf("character %q in %q is not in the charset", r, str))
 	}
 }
 

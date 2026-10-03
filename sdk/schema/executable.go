@@ -130,7 +130,7 @@ func (c CredentialUsage) Validate() (bool, ValidationReport) {
 
 	report.AddCheck(ValidationCheck{
 		Description: "Credential usage has either a credential reference or selection defined, but not both",
-		Assertion:   (c.SelectFrom != nil || c.Name != "") && !(c.SelectFrom != nil && c.Name != ""),
+		Assertion:   (c.SelectFrom != nil || c.Name != "") && (c.SelectFrom == nil || c.Name == ""),
 		Severity:    ValidationSeverityError,
 	})
 	return report.IsValid(), report

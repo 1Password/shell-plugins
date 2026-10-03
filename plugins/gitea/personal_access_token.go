@@ -3,6 +3,7 @@ package gitea
 import (
 	"context"
 	"os"
+	"path/filepath"
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
@@ -14,11 +15,16 @@ import (
 )
 
 func ConfigPath() string {
+	// tea's config resolver honors XDG_CONFIG_HOME on macOS; os.UserConfigDir does not.
+	if xdgConfigHome := os.Getenv("XDG_CONFIG_HOME"); xdgConfigHome != "" {
+		return filepath.Join(xdgConfigHome, "tea", "config.yml")
+	}
+
 	configDir, err := os.UserConfigDir()
 	if err != nil {
 		return "~/.config/tea/config.yml"
 	}
-	return configDir + "/tea/config.yml"
+	return filepath.Join(configDir, "tea", "config.yml")
 }
 
 func PersonalAccessToken() schema.CredentialType {

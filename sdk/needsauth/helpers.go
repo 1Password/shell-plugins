@@ -51,6 +51,15 @@ func ForCommand(command ...string) sdk.NeedsAuthentication {
 	}
 }
 
+// NotForCommand returns a NeedsAuthentication rule to opt out of authentication for a
+// certain (sub)command and anything nested under it, e.g. ["completion"] or ["config", "get"].
+func NotForCommand(command ...string) sdk.NeedsAuthentication {
+	forCommand := ForCommand(command...)
+	return func(in sdk.NeedsAuthenticationInput) bool {
+		return !forCommand(in)
+	}
+}
+
 // Always returns a NeedsAuthentication rule to always require authentication.
 func Always() sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
