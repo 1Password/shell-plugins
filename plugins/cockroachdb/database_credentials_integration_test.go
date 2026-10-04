@@ -36,7 +36,7 @@ func TestDatabaseCredentialsIntegration(t *testing.T) {
 				start += "--insecure"
 				adminArgs = append(adminArgs, "--insecure")
 			}
-			container, err := cockroachDocker("run", "--detach", "--entrypoint=sh", "cockroachdb/cockroach:v25.2.4", "-c", start)
+			container, err := cockroachDocker("run", "--rm", "--quiet", "--detach", "--entrypoint=sh", "cockroachdb/cockroach:v25.2.4", "-c", start)
 			if err != nil {
 				t.Fatalf("Start CockroachDB: %v\n%s", err, container)
 			}
