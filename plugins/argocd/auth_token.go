@@ -36,7 +36,7 @@ func AuthToken() schema.CredentialType {
 				Optional:            true,
 			},
 		},
-		DefaultProvisioner: provision.EnvVars(envVarMapping),
+		DefaultProvisioner: addressAwareProvisioner{Provisioner: provision.EnvVars(envVarMapping)},
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(envVarMapping),
 			TryArgocdConfigFile(),
