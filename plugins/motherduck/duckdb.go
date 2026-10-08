@@ -11,27 +11,27 @@ import (
 )
 
 // The plugin is only invoked if:
-//  - environment variable motherduck_token is not set
-//  - connection string contains 'md:' and does not contain 'motherduck_token='
+//   - environment variable motherduck_token is not set
+//   - connection string contains 'md:' and does not contain 'motherduck_token='
 func ForMotherDuckButTokenNotSet() sdk.NeedsAuthentication {
-    return func(in sdk.NeedsAuthenticationInput) bool {
-        // If environment variables are already set, we don't need to authenticate
-        if envValue := os.Getenv("motherduck_token"); envValue != "" {
-            return false
-        }
-        
-        // Otherwise, check if the command uses MotherDuck
-        if len(in.CommandArgs) == 0 {
-            return false
-        }
+	return func(in sdk.NeedsAuthenticationInput) bool {
+		// If environment variables are already set, we don't need to authenticate
+		if envValue := os.Getenv("motherduck_token"); envValue != "" {
+			return false
+		}
 
-        for _, arg := range in.CommandArgs {
-            if strings.Contains(arg, "md:") && !strings.Contains(arg, "motherduck_token=") {
-                return true
-            }
-        }
-        return false
-    }
+		// Otherwise, check if the command uses MotherDuck
+		if len(in.CommandArgs) == 0 {
+			return false
+		}
+
+		for _, arg := range in.CommandArgs {
+			if strings.Contains(arg, "md:") && !strings.Contains(arg, "motherduck_token=") {
+				return true
+			}
+		}
+		return false
+	}
 }
 
 func DuckDBCLI() schema.Executable {
