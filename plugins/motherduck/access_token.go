@@ -31,7 +31,7 @@ func AccessToken() schema.CredentialType {
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
-			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.TryAllEnvVars(fieldname.Token, tokenEnvVars...),
 		)}
 }
 

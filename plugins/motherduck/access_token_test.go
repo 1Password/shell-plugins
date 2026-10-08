@@ -28,6 +28,20 @@ func TestAccessTokenImporter(t *testing.T) {
 		"environment": {
 			Environment: map[string]string{
 				"motherduck_token": "TERAkHVPg65C6UGDw42llLlgPtZhBbafxnpqs74fjyuKnDpSt7TZNODw3catnivaruR09REDcNIwystkLMlRw5foxRjvytBFmkk0t0x9iHqY0MBY40Ltbcdw8fvt3OzsCgxmbh89v0XIWrRiwCfALA1dbqWDLaatAZWOLQhJmYcggQR6YBVoKM9H7XBrBjDtP7YJOoU2Z7rc7KWgTTqS9vyCtLx7GDSBitWQLvUYuWzvgh94qk1Wt16oua34jzDtosd59ahNlvA1vEqPtkYqC5mNbDbWqcunwelka4tI4uuEfyojeXowBzkv6izjT48J3usTPIIqTFMYgJnMwUtV6n8UgeuLumEsKd86HVLywapqO37zfNrlrVLzjHSv0rGA2NjDgBAueK2clqEXAMPLE",
+				"MOTHERDUCK_TOKEN": "",
+			},
+			ExpectedCandidates: []sdk.ImportCandidate{
+				{
+					Fields: map[sdk.FieldName]string{
+						fieldname.Token: "TERAkHVPg65C6UGDw42llLlgPtZhBbafxnpqs74fjyuKnDpSt7TZNODw3catnivaruR09REDcNIwystkLMlRw5foxRjvytBFmkk0t0x9iHqY0MBY40Ltbcdw8fvt3OzsCgxmbh89v0XIWrRiwCfALA1dbqWDLaatAZWOLQhJmYcggQR6YBVoKM9H7XBrBjDtP7YJOoU2Z7rc7KWgTTqS9vyCtLx7GDSBitWQLvUYuWzvgh94qk1Wt16oua34jzDtosd59ahNlvA1vEqPtkYqC5mNbDbWqcunwelka4tI4uuEfyojeXowBzkv6izjT48J3usTPIIqTFMYgJnMwUtV6n8UgeuLumEsKd86HVLywapqO37zfNrlrVLzjHSv0rGA2NjDgBAueK2clqEXAMPLE",
+					},
+				},
+			},
+		},
+		"uppercase environment variable": {
+			Environment: map[string]string{
+				"motherduck_token": "",
+				"MOTHERDUCK_TOKEN": "TERAkHVPg65C6UGDw42llLlgPtZhBbafxnpqs74fjyuKnDpSt7TZNODw3catnivaruR09REDcNIwystkLMlRw5foxRjvytBFmkk0t0x9iHqY0MBY40Ltbcdw8fvt3OzsCgxmbh89v0XIWrRiwCfALA1dbqWDLaatAZWOLQhJmYcggQR6YBVoKM9H7XBrBjDtP7YJOoU2Z7rc7KWgTTqS9vyCtLx7GDSBitWQLvUYuWzvgh94qk1Wt16oua34jzDtosd59ahNlvA1vEqPtkYqC5mNbDbWqcunwelka4tI4uuEfyojeXowBzkv6izjT48J3usTPIIqTFMYgJnMwUtV6n8UgeuLumEsKd86HVLywapqO37zfNrlrVLzjHSv0rGA2NjDgBAueK2clqEXAMPLE",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
