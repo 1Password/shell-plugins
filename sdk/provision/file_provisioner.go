@@ -130,7 +130,7 @@ func (p FileProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, o
 	if p.outdirEnvVar != "" {
 		// Populate the specified environment variable with the output dir.
 		dir := filepath.Dir(outpath)
-		out.AddEnvVar(p.outpathEnvVar, dir)
+		out.AddEnvVar(p.outdirEnvVar, dir)
 	}
 
 	// Add args to specify the output path.

@@ -1,4 +1,4 @@
-package localstack
+package expo
 
 import (
 	"testing"
@@ -8,31 +8,31 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func TestAPIKeyProvisioner(t *testing.T) {
-	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
+func TestAccessTokenProvisioner(t *testing.T) {
+	plugintest.TestProvisioner(t, AccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.APIKey: "SzCEXAMPLE",
+				fieldname.Token: "EXAMPLEEXPOTOKEN123",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"LOCALSTACK_API_KEY": "SzCEXAMPLE",
+					"EXPO_TOKEN": "EXAMPLEEXPOTOKEN123",
 				},
 			},
 		},
 	})
 }
 
-func TestAPIKeyImporter(t *testing.T) {
-	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
+func TestAccessTokenImporter(t *testing.T) {
+	plugintest.TestImporter(t, AccessToken().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"LOCALSTACK_API_KEY": "SzCEXAMPLE",
+				"EXPO_TOKEN": "EXAMPLEEXPOTOKEN123",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "SzCEXAMPLE",
+						fieldname.Token: "EXAMPLEEXPOTOKEN123",
 					},
 				},
 			},

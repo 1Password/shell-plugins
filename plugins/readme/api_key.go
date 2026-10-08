@@ -66,7 +66,7 @@ func TryReadMeConfigFile() sdk.Importer {
 			return
 		}
 
-		var website string = "https://dash.readme.com/go/" + config.Subdomain
+		var website = "https://dash.readme.com/go/" + config.Subdomain
 
 		out.AddCandidate(sdk.ImportCandidate{
 			NameHint: config.Subdomain,

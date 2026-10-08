@@ -1,13 +1,21 @@
-name: Check signed commits in PR 
+name: Check signed commits in PR
 on: pull_request_target
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    name: Check signed commits in PR 
+    name: Check signed commits in PR
     permissions:
       contents: read
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
       - name: Check signed commits in PR
-        uses: 1Password/check-signed-commits-action@main
+        uses: 1Password/check-signed-commits-action@ed2885f3ed2577a4f5d3c3fe895432a557d23d52 # v1.2.0

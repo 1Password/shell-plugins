@@ -18,7 +18,9 @@ func New() schema.Plugin {
 		Executables: []schema.Executable{
 			AWSCLI(),
 			AWSCDKToolkit(),
+			AWSSAMCLI(),
 			eksctlCLI(),
+			awslogsCLI(),
 		},
 	}
 }

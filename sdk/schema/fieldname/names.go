@@ -4,6 +4,7 @@ import "github.com/1Password/shell-plugins/sdk"
 
 // Credential field names.
 const (
+	AccountKey      = sdk.FieldName("Account Key")
 	APIHost         = sdk.FieldName("API Host")
 	APIUrl          = sdk.FieldName("API URL")
 	APIKey          = sdk.FieldName("API Key")
@@ -28,12 +29,14 @@ const (
 	Credentials     = sdk.FieldName("Credentials")
 	Database        = sdk.FieldName("Database")
 	DefaultRegion   = sdk.FieldName("Default Region")
+	DefaultZone     = sdk.FieldName("Default Zone")
 	Deployment      = sdk.FieldName("Deployment")
 	Email           = sdk.FieldName("Email")
 	Endpoint        = sdk.FieldName("Endpoint")
 	Host            = sdk.FieldName("Host")
 	HostAddress     = sdk.FieldName("Host Address")
 	Key             = sdk.FieldName("Key")
+	ManagementKey   = sdk.FieldName("Management Key")
 	MFASerial       = sdk.FieldName("MFA Serial")
 	Mode            = sdk.FieldName("Mode")
 	Namespace       = sdk.FieldName("Namespace")
@@ -50,11 +53,13 @@ const (
 	Region          = sdk.FieldName("Region")
 	Secret          = sdk.FieldName("Secret")
 	SecretAccessKey = sdk.FieldName("Secret Access Key")
+	Space           = sdk.FieldName("Space")
 	Subdomain       = sdk.FieldName("Subdomain")
 	Token           = sdk.FieldName("Token")
 	URL             = sdk.FieldName("URL")
 	User            = sdk.FieldName("User")
 	UserAccessToken = sdk.FieldName("User Access Token")
+	UserKey         = sdk.FieldName("User Key")
 	Username        = sdk.FieldName("Username")
 	Website         = sdk.FieldName("Website")
 )
@@ -69,6 +74,7 @@ func ListAll() []sdk.FieldName {
 		AccessToken,
 		Account,
 		AccountID,
+		AccountKey,
 		AccountSID,
 		Address,
 		AppKey,
@@ -105,9 +111,11 @@ func ListAll() []sdk.FieldName {
 		Region,
 		Secret,
 		SecretAccessKey,
+		Space,
 		Token,
 		URL,
 		User,
+		UserKey,
 		Username,
 		Website,
 	}

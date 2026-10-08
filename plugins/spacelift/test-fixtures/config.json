@@ -1,0 +1,22 @@
+{
+  "currentProfileAlias": "dev",
+  "profiles": {
+    "apitoken": {
+      "alias": "dev",
+      "credentials": {
+        "type": 3,
+        "endpoint": "https://mycorp.app.spacelift.io",
+        "access_token": "token"
+      }
+    },
+    "apikey": {
+      "alias": "apikey",
+      "credentials": {
+        "type": 1,
+        "endpoint": "https://notmycorp.app.spacelift.io",
+        "key_id": "key_id_value",
+        "key_secret": "key_secret_value"
+      }
+    }
+  }
+}

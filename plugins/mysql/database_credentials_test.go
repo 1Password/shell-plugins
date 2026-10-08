@@ -51,12 +51,33 @@ func TestDatabaseCredentialsProvisioner(t *testing.T) {
 				CommandLine: []string{"mysql", "--defaults-file=/tmp/my.cnf"},
 				Files: map[string]sdk.OutputFile{
 					"/tmp/my.cnf": {
-						Contents: []byte(plugintest.LoadFixture(t, "mysql.cnf")),
+						Contents: []byte(plugintest.LoadFixture(t, "provision.cnf")),
 					},
 				},
 			},
 		},
 	})
+}
+
+// Illustrations, so a format change is visible in review. Correctness lives in
+// TestConfigFileEntryRoundTripsThroughMySQL, so any of these may change with it.
+func TestConfigFileEntryOutputFormat(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  string
+	}{
+		{"ordinary value", "123456", `password="123456"` + "\n"},
+		{"'#' would otherwise start a comment", "#4b", `password="#4b"` + "\n"},
+		{"embedded quotation mark is escaped", `a"b#c`, `password="a\"b#c"` + "\n"},
+		{"both kinds of quotation mark", `a'b"c#d`, `password="a'b\"c#d"` + "\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, configFileEntry("password", tt.value))
+		})
+	}
 }
 
 func TestMysqlConfigHandleEmptyItemFields(t *testing.T) {
