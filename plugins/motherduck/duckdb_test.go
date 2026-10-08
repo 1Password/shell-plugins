@@ -28,6 +28,10 @@ func TestDuckDBCLINeedsAuth(t *testing.T) {
 			Args:              []string{"local.ddb", "-c", "select 1"},
 			ExpectedNeedsAuth: false,
 		},
+		"md: inside another word in a command": {
+			Args:              []string{"local.ddb", "-c", "select 'cmd:ls'"},
+			ExpectedNeedsAuth: false,
+		},
 		"default MotherDuck database": {
 			Args:              []string{"md:"},
 			ExpectedNeedsAuth: true,

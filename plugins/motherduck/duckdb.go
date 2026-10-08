@@ -12,8 +12,9 @@ import (
 )
 
 // motherDuckConnection matches MotherDuck connection strings like 'md:', 'md:my_db' or 'motherduck:my_db'.
-// DuckDB treats the prefix case-insensitively.
-var motherDuckConnection = regexp.MustCompile(`(?i)(md|motherduck):`)
+// DuckDB treats the prefix case-insensitively. The prefix must not follow a word character,
+// so text like 'cmd:' inside a query doesn't count.
+var motherDuckConnection = regexp.MustCompile(`(?i)(^|[^[:alnum:]_])(md|motherduck):`)
 
 // The plugin is only invoked if:
 //   - neither the motherduck_token nor the MOTHERDUCK_TOKEN environment variable is set
@@ -28,10 +29,6 @@ func ForMotherDuckButTokenNotSet() sdk.NeedsAuthentication {
 		}
 
 		// Otherwise, check if the command uses MotherDuck
-		if len(in.CommandArgs) == 0 {
-			return false
-		}
-
 		for _, arg := range in.CommandArgs {
 			if motherDuckConnection.MatchString(arg) && !strings.Contains(arg, "motherduck_token=") {
 				return true
