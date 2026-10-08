@@ -52,13 +52,17 @@ func TestDuckDBCLINeedsAuth(t *testing.T) {
 }
 
 func TestDuckDBCLINeedsAuthWithTokenEnvVar(t *testing.T) {
-	unsetTokenEnvVars(t)
-	t.Setenv("motherduck_token", "abc")
+	for _, envVar := range []string{"motherduck_token", "MOTHERDUCK_TOKEN"} {
+		t.Run(envVar, func(t *testing.T) {
+			unsetTokenEnvVars(t)
+			t.Setenv(envVar, "abc")
 
-	plugintest.TestNeedsAuth(t, DuckDBCLI().NeedsAuth, map[string]plugintest.NeedsAuthCase{
-		"MotherDuck database": {
-			Args:              []string{"md:my_db"},
-			ExpectedNeedsAuth: false,
-		},
-	})
+			plugintest.TestNeedsAuth(t, DuckDBCLI().NeedsAuth, map[string]plugintest.NeedsAuthCase{
+				"MotherDuck database": {
+					Args:              []string{"md:my_db"},
+					ExpectedNeedsAuth: false,
+				},
+			})
+		})
+	}
 }

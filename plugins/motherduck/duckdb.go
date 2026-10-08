@@ -11,13 +11,15 @@ import (
 )
 
 // The plugin is only invoked if:
-//   - environment variable motherduck_token is not set
+//   - neither the motherduck_token nor the MOTHERDUCK_TOKEN environment variable is set
 //   - connection string contains 'md:' and does not contain 'motherduck_token='
 func ForMotherDuckButTokenNotSet() sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
-		// If environment variables are already set, we don't need to authenticate
-		if envValue := os.Getenv("motherduck_token"); envValue != "" {
-			return false
+		// If a token is already set in the environment, we don't need to authenticate
+		for _, envVar := range tokenEnvVars {
+			if os.Getenv(envVar) != "" {
+				return false
+			}
 		}
 
 		// Otherwise, check if the command uses MotherDuck

@@ -38,3 +38,7 @@ func AccessToken() schema.CredentialType {
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"motherduck_token": fieldname.Token,
 }
+
+// tokenEnvVars are the env vars the MotherDuck extension reads a token from.
+// When both are set, motherduck_token takes precedence.
+var tokenEnvVars = []string{"motherduck_token", "MOTHERDUCK_TOKEN"}
