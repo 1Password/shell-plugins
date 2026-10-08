@@ -64,6 +64,14 @@ func TestDuckDBCLINeedsAuth(t *testing.T) {
 			Args:              []string{"md:my_db?motherduck_token=abc"},
 			ExpectedNeedsAuth: false,
 		},
+		"token alias passed in the connection string": {
+			Args:              []string{"md:my_db?token=abc"},
+			ExpectedNeedsAuth: false,
+		},
+		"token passed after another connection string parameter": {
+			Args:              []string{"md:my_db?attach_mode=single&motherduck_token=abc"},
+			ExpectedNeedsAuth: false,
+		},
 	})
 }
 
