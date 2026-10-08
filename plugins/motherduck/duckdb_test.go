@@ -36,12 +36,24 @@ func TestDuckDBCLINeedsAuth(t *testing.T) {
 			Args:              []string{"md:my_db"},
 			ExpectedNeedsAuth: true,
 		},
+		"motherduck: prefix": {
+			Args:              []string{"motherduck:my_db"},
+			ExpectedNeedsAuth: true,
+		},
+		"uppercase prefix": {
+			Args:              []string{"MD:my_db"},
+			ExpectedNeedsAuth: true,
+		},
 		"MotherDuck database with a command": {
 			Args:              []string{"md:my_db", "-c", "select 1"},
 			ExpectedNeedsAuth: true,
 		},
 		"MotherDuck attached from a command": {
 			Args:              []string{"-c", "ATTACH 'md:'"},
+			ExpectedNeedsAuth: true,
+		},
+		"MotherDuck attached with the motherduck: prefix": {
+			Args:              []string{"-c", "ATTACH 'motherduck:my_db'"},
 			ExpectedNeedsAuth: true,
 		},
 		"token passed in the connection string": {

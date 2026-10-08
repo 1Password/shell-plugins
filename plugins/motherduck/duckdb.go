@@ -2,6 +2,7 @@ package motherduck
 
 import (
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -10,9 +11,13 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
+// motherDuckConnection matches MotherDuck connection strings like 'md:', 'md:my_db' or 'motherduck:my_db'.
+// DuckDB treats the prefix case-insensitively.
+var motherDuckConnection = regexp.MustCompile(`(?i)(md|motherduck):`)
+
 // The plugin is only invoked if:
 //   - neither the motherduck_token nor the MOTHERDUCK_TOKEN environment variable is set
-//   - connection string contains 'md:' and does not contain 'motherduck_token='
+//   - an argument contains an 'md:' or 'motherduck:' connection string that does not contain 'motherduck_token='
 func ForMotherDuckButTokenNotSet() sdk.NeedsAuthentication {
 	return func(in sdk.NeedsAuthenticationInput) bool {
 		// If a token is already set in the environment, we don't need to authenticate
@@ -28,7 +33,7 @@ func ForMotherDuckButTokenNotSet() sdk.NeedsAuthentication {
 		}
 
 		for _, arg := range in.CommandArgs {
-			if strings.Contains(arg, "md:") && !strings.Contains(arg, "motherduck_token=") {
+			if motherDuckConnection.MatchString(arg) && !strings.Contains(arg, "motherduck_token=") {
 				return true
 			}
 		}
