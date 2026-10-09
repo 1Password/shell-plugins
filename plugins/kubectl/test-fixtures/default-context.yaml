@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+contexts:
+- name: default
+  context:
+    cluster: prod
+    user: prod-admin
+users:
+- name: prod-admin
+  user:
+    token: test-token-not-a-secret

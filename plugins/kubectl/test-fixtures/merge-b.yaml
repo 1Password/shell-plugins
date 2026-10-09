@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: beta
+  cluster:
+    server: https://beta.example.com:6443
+contexts:
+- name: beta
+  context:
+    cluster: beta
+    user: beta-admin
+users:
+- name: beta-admin
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K

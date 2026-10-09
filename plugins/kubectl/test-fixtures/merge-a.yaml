@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: alpha
+  cluster:
+    server: https://alpha.example.com:6443
+contexts:
+- name: alpha
+  context:
+    cluster: alpha
+    user: alpha-admin
+users:
+- name: alpha-admin
+  user:
+    token: test-token-alpha

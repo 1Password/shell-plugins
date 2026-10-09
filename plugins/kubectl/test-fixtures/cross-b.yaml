@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: remote
+  cluster:
+    server: https://remote.example.com:6443
+users:
+- name: remote-admin
+  user:
+    token: test-token-not-a-secret
