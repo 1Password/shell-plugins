@@ -1,0 +1,12 @@
+[DEFAULT]
+user=ocid1.user.oc1..default-example
+tenancy=ocid1.tenancy.oc1..default-example
+fingerprint=20:3b:97:13:55:1c:default-example
+region=us-ashburn-1
+key_file=~/.oci/default.pem
+
+[TEAM]
+user=ocid1.user.oc1..team-example
+tenancy=ocid1.tenancy.oc1..team-example
+fingerprint=20:3b:97:13:55:1c:team-example
+key_file=~/.oci/team.pem
