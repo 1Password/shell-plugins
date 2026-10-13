@@ -95,6 +95,12 @@ func (p STSProvisioner) Description() string {
 
 // GetTemporaryCredentialsProviderForProfile returns the aws provider that fits the scenario described by the current configuration.
 func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string) (aws.CredentialsProvider, error) {
+	return getProviderForProfile(awsConfig, providerFactory, itemFields, nil)
+}
+
+// getProviderForProfile applies MFA once, on the long-lived keys at the chain root: AWS rejects GetSessionToken
+// signed with session credentials. mfaConfig is the profile nearest the root seen so far with MFA configured.
+func getProviderForProfile(awsConfig *confighelpers.Config, providerFactory STSProviderFactory, itemFields map[sdk.FieldName]string, mfaConfig *confighelpers.Config) (aws.CredentialsProvider, error) {
 	err := resolveLocalAnd1PasswordConfigurations(itemFields, awsConfig)
 	if err != nil {
 		return nil, err
@@ -113,23 +119,25 @@ func GetTemporaryCredentialsProviderForProfile(awsConfig *confighelpers.Config, 
 		return nil, fmt.Errorf(unsupportedMessage, "Credential Process Authentication", "https://github.com/1Password/shell-plugins/issues/213")
 	}
 
+	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
+		mfaConfig = awsConfig
+	}
+
 	var sourceCredentialsProvider aws.CredentialsProvider
 	if awsConfig.HasSourceProfile() {
-		sourceProfileProvider, err := GetTemporaryCredentialsProviderForProfile(awsConfig.SourceProfile, providerFactory, itemFields)
+		sourceCredentialsProvider, err = getProviderForProfile(awsConfig.SourceProfile, providerFactory, itemFields, mfaConfig)
 		if err != nil {
 			return nil, err
 		}
-		sourceCredentialsProvider = sourceProfileProvider
 	} else {
 		sourceCredentialsProvider = providerFactory.NewAccessKeysProvider()
+		if mfaConfig != nil {
+			sourceCredentialsProvider = providerFactory.NewMFASessionTokenProvider(mfaConfig, sourceCredentialsProvider)
+		}
 	}
 
 	if awsConfig.HasRole() {
 		return providerFactory.NewAssumeRoleProvider(awsConfig, sourceCredentialsProvider), nil
-	}
-
-	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return providerFactory.NewMFASessionTokenProvider(awsConfig, sourceCredentialsProvider), nil
 	}
 
 	return sourceCredentialsProvider, nil
@@ -155,11 +163,6 @@ func (m CacheProviderFactory) NewAssumeRoleProvider(awsConfig *confighelpers.Con
 	}
 
 	cacheWriter := NewSTSCacheWriter(roleCacheKey, m.OutCache)
-
-	if awsConfig.HasMfaSerial() && awsConfig.MfaToken != "" {
-		return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, m.NewMFASessionTokenProvider(awsConfig, sourcedCredentialsProvider)), cacheWriter)
-	}
-
 	return initAssumeRoleProvider(awsConfig, getSTSClient(awsConfig.Region, sourcedCredentialsProvider), cacheWriter)
 }
 
