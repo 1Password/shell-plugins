@@ -54,4 +54,3 @@ var defaultEnvVarMapping = map[string]sdk.FieldName{
 func TryOpenBaoConfigFile() sdk.Importer {
 	return importer.NoOp()
 }
-
