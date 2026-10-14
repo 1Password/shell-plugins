@@ -44,6 +44,16 @@ The plugin ecosystem allows you to [locally build](#make-plugin-build) your plug
 You can add tests to your plugin using the SDK's [`plugintest` package](sdk/plugintest/), which provides helpers so that you only have to care about the test cases themselves.
 You can use the [`example-secrets` command](#make-plugin-example-secrets) to help create test fixtures.
 
+### Tests with external dependencies
+
+Keep tests that start containers or require installed CLIs in a plugin's root directory, in files named `*_integration_test.go`. Skip them unless `SHELL_PLUGINS_INTEGRATION=1`; ordinary `make test` must not require those dependencies. Use pinned tool or container versions, temporary test credentials, bounded waits, and cleanup on failure. Tests must not require a real account or repository secrets.
+
+Run one plugin locally with `SHELL_PLUGINS_INTEGRATION=1 go test -count=1 -timeout=10m ./plugins/<name>`.
+
+The optional **Plugin Integration** workflow runs only affected integration-test packages on pull requests. Its selector compares the PR merge commit with its first parent, including deleted/renamed paths and local Go test dependencies. SDK, module or workflow changes run every integration package. A manual workflow run also tests every integration package. Keep this workflow non-required: path filters can leave required checks pending, and external dependency availability should not block unrelated changes. Existing unit, lint and validation checks remain separate.
+
+The CockroachDB test also accepts its existing `COCKROACHDB_INTEGRATION=1` opt-in for compatibility.
+
 <!----><a name="makefile-commands"></a>
 ## 👷 Makefile Commands
 
