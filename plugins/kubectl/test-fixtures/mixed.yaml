@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+- name: eks
+  cluster:
+    server: https://eks.example.com
+contexts:
+- name: prod
+  context:
+    cluster: prod
+    user: prod-admin
+- name: eks
+  context:
+    cluster: eks
+    user: eks
+users:
+- name: prod-admin
+  user:
+    token: test-token-not-a-secret
+- name: eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      command: aws

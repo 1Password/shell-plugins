@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+- name: dev
+  cluster:
+    server: https://dev.example.com:6443
+contexts:
+- name: prod
+  context:
+    cluster: prod
+    user: with-token
+- name: dev
+  context:
+    cluster: dev
+    user: without-token
+users:
+- name: with-token
+  user:
+    token: test-token-not-a-secret
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key-data: "not!base64"
+- name: without-token
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key-data: "not!base64"
