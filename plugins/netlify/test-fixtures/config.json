@@ -1,0 +1,16 @@
+{
+	"telemetryDisabled": false,
+	"cliId": "55f2daf5-ee38-4fa0-8fd8-e67892a123d6",
+	"userId": "5f3a1b2c4d5e6f7a8b9c0d1e",
+	"users": {
+		"5f3a1b2c4d5e6f7a8b9c0d1e": {
+			"id": "5f3a1b2c4d5e6f7a8b9c0d1e",
+			"name": "Wendy Appleseed",
+			"email": "wendy.appleseed@example.com",
+			"auth": {
+				"token": "nfp_kV9wTq3ZtN0aB4cD7eF1gH5iJ8kL2mN6EXAMPLE",
+				"github": {}
+			}
+		}
+	}
+}

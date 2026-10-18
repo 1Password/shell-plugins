@@ -1,6 +1,8 @@
 package netlify
 
 import (
+	"context"
+
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
 	"github.com/1Password/shell-plugins/sdk/provision"
@@ -22,10 +24,48 @@ func PersonalAccessToken() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping),
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
+			importer.MacOnly(TryNetlifyConfigFile("~/Library/Preferences/netlify/config.json")),
+			importer.LinuxOnly(TryNetlifyConfigFile("~/.config/netlify/config.json")),
+		),
 	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"NETLIFY_AUTH_TOKEN": fieldname.Token,
+}
+
+// TryNetlifyConfigFile imports the token that `netlify login` stores in the global config.json,
+// under users.<userId>.auth.token for the active userId.
+func TryNetlifyConfigFile(path string) sdk.Importer {
+	return importer.TryFile(path, func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
+		var config Config
+		if err := contents.ToJSON(&config); err != nil {
+			out.AddError(err)
+			return
+		}
+
+		user, ok := config.Users[config.UserID]
+		if !ok || user.Auth.Token == "" {
+			return
+		}
+
+		out.AddCandidate(sdk.ImportCandidate{
+			Fields: map[sdk.FieldName]string{
+				fieldname.Token: user.Auth.Token,
+			},
+		})
+	})
+}
+
+type Config struct {
+	UserID string                `json:"userId"`
+	Users  map[string]ConfigUser `json:"users"`
+}
+
+type ConfigUser struct {
+	Auth struct {
+		Token string `json:"token"`
+	} `json:"auth"`
 }
