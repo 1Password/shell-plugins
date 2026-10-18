@@ -12,11 +12,11 @@ func TestPersonalAccessTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.Token: "kV9wTq3ZtN0aB4cD7eF1gH5iJ8kL2mN6oP0qR4sT8uV",
+				fieldname.Token: "kV9wTq3ZtN0aB4cD7eF1gH5iJ8kL2mN6oP0qR4sT8uVexample",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"NETLIFY_AUTH_TOKEN": "kV9wTq3ZtN0aB4cD7eF1gH5iJ8kL2mN6oP0qR4sT8uV",
+					"NETLIFY_AUTH_TOKEN": "kV9wTq3ZtN0aB4cD7eF1gH5iJ8kL2mN6oP0qR4sT8uVexample",
 				},
 			},
 		},
