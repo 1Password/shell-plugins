@@ -9,9 +9,9 @@ import (
 
 func OpenBaoCLI() schema.Executable {
 	return schema.Executable{
-		Name:    "OpenBao CLI", // TODO: Check if this is correct
+		Name:    "OpenBao CLI",
 		Runs:    []string{"bao"},
-		DocsURL: sdk.URL("https://openbao.com/docs/cli"), // TODO: Replace with actual URL
+		DocsURL: sdk.URL("https://openbao.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
