@@ -27,7 +27,7 @@ func TestCLIProvisioner(t *testing.T) {
 		"with api key and resource group": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey:                "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
-				sdk.FieldName("resource group"): "my-resource-group",
+				sdk.FieldName("Resource Group"): "my-resource-group",
 			},
 			CommandLine: []string{"ibmcloud", "login"},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -40,7 +40,7 @@ func TestCLIProvisioner(t *testing.T) {
 		"with resource group but not login command": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey:                "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
-				sdk.FieldName("resource group"): "my-resource-group",
+				sdk.FieldName("Resource Group"): "my-resource-group",
 			},
 			CommandLine: []string{"target"},
 			ExpectedOutput: sdk.ProvisionOutput{
@@ -53,7 +53,7 @@ func TestCLIProvisioner(t *testing.T) {
 		"with resource group and existing group flag": {
 			ItemFields: map[sdk.FieldName]string{
 				fieldname.APIKey:                "GeYS3RmGXo7cQhY8UboUSLmWarFF1HGqv4fVKEXAMPLE",
-				sdk.FieldName("resource group"): "my-resource-group",
+				sdk.FieldName("Resource Group"): "my-resource-group",
 			},
 			CommandLine: []string{"login", "-g", "existing-group"},
 			ExpectedOutput: sdk.ProvisionOutput{

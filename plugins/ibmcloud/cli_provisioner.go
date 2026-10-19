@@ -20,7 +20,7 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	targetGroup := ""
 	found := false
 	// Try exact match first
-	if tg, ok := in.ItemFields[sdk.FieldName("resource group")]; ok && tg != "" {
+	if tg, ok := in.ItemFields[sdk.FieldName("Resource Group")]; ok && tg != "" {
 		targetGroup = tg
 		found = true
 	}
@@ -30,7 +30,7 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 		for fieldName, fieldValue := range in.ItemFields {
 			fieldNameStr := string(fieldName)
 			trimmedName := strings.TrimSpace(fieldNameStr)
-			if trimmedName == "resource group" && fieldValue != "" {
+			if trimmedName == "Resource Group" && fieldValue != "" {
 				targetGroup = fieldValue
 				found = true
 				break
