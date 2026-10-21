@@ -2,6 +2,8 @@ module github.com/1Password/shell-plugins
 
 go 1.24
 
+toolchain go1.26.10
+
 require (
 	github.com/99designs/aws-vault/v7 v7.0.0-rc2
 	github.com/99designs/keyring v1.2.2
