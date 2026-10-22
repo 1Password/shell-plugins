@@ -1,0 +1,14 @@
+default_connection_name = "jwt"
+
+[connections.jwt]
+account = "myorg-myaccount"
+user = "jdoe"
+authenticator = "SNOWFLAKE_JWT"
+private_key_file = "~/.snowflake/rsa_key.p8"
+role = "SYSADMIN"
+warehouse = "COMPUTE_WH"
+
+[connections.password]
+account = "myorg-myaccount"
+user = "jdoe"
+password = "password1234"
