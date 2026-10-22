@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: shared
+  cluster:
+    server: https://dev.example.com:6443
+contexts:
+- name: shared
+  context:
+    cluster: shared
+    user: shared-admin
+users:
+- name: shared-admin
+  user:
+    token: test-token-not-a-secret

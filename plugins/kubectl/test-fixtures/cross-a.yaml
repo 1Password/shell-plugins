@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Config
+contexts:
+- name: cross
+  context:
+    cluster: remote
+    user: remote-admin

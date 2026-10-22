@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+contexts:
+- name: lexical
+  context:
+    cluster: prod
+    user: lexical-admin
+users:
+- name: lexical-admin
+  user:
+    token: test-token-lexical
