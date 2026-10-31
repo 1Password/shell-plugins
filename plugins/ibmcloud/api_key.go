@@ -25,6 +25,7 @@ func APIKey() schema.CredentialType {
 						Uppercase: true,
 						Lowercase: true,
 						Digits:    true,
+						Specific:  []rune{'-', '_'},
 					},
 				},
 			},
