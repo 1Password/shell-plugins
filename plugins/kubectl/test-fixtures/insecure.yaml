@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: local
+  cluster:
+    server: https://127.0.0.1:7443
+    insecure-skip-tls-verify: true
+contexts:
+- name: local
+  context:
+    cluster: local
+    user: local-admin
+users:
+- name: local-admin
+  user:
+    token: test-token-not-a-secret

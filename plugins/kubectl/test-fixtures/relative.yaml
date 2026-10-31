@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: dev
+  cluster:
+    server: https://dev.example.com:6443
+contexts:
+- name: relative
+  context:
+    cluster: dev
+    user: dev-admin
+users:
+- name: dev-admin
+  user:
+    client-certificate: certs/client.crt
+    client-key: certs/client.key
