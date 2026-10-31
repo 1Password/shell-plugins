@@ -102,6 +102,30 @@ func (out *ProvisionOutput) AddEnvVar(name string, value string) {
 	out.Environment[name] = value
 }
 
+func (out *ProvisionOutput) AddArgsAtIndex(position int, args ...string) {
+	if position == -1 || position >= len(out.CommandLine) {
+		out.CommandLine = append(out.CommandLine, args...)
+		return
+	}
+
+	if position <= 0 {
+		out.CommandLine = append(args, out.CommandLine...)
+		return
+	}
+
+	out.CommandLine = append(out.CommandLine[:position], append(args, out.CommandLine[position:]...)...)
+}
+
+// PrependArgs can be used to add additional arguments to the command line of the provision output.
+func (out *ProvisionOutput) PrependArgs(args ...string) {
+	out.AddArgsAtIndex(1, args...)
+}
+
+// AppendArgs can be used to add additional arguments to the command line of the provision output.
+func (out *ProvisionOutput) AppendArgs(args ...string) {
+	out.AddArgsAtIndex(-1, args...)
+}
+
 // AddArgs can be used to add additional arguments to the command line of the provision output.
 func (out *ProvisionOutput) AddArgs(args ...string) {
 	out.CommandLine = append(out.CommandLine, args...)
