@@ -11,7 +11,7 @@ func IBMCloudCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "IBM Cloud CLI",
 		Runs:    []string{"ibmcloud"},
-		DocsURL: sdk.URL("https://ibmcloud.com/docs/cli"),
+		DocsURL: sdk.URL("https://cloud.ibm.com/docs/cli"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
