@@ -13,10 +13,10 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-// Run with COCKROACHDB_INTEGRATION=1 make test. Docker pulls the pinned image if needed.
+// Run with SHELL_PLUGINS_INTEGRATION=1 make test. Docker pulls the pinned image if needed.
 func TestDatabaseCredentialsIntegration(t *testing.T) {
-	if os.Getenv("COCKROACHDB_INTEGRATION") != "1" {
-		t.Skip("Set COCKROACHDB_INTEGRATION=1 to test against CockroachDB in Docker")
+	if os.Getenv("SHELL_PLUGINS_INTEGRATION") != "1" && os.Getenv("COCKROACHDB_INTEGRATION") != "1" {
+		t.Skip("Set SHELL_PLUGINS_INTEGRATION=1 to test against CockroachDB in Docker")
 	}
 
 	for _, secure := range []bool{false, true} {
