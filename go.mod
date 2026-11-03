@@ -8,7 +8,7 @@ require (
 	github.com/99designs/aws-vault/v7 v7.0.0-rc2
 	github.com/99designs/keyring v1.2.2
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/BurntSushi/toml v1.2.1
+	github.com/BurntSushi/toml v1.6.0
 	github.com/aws/aws-sdk-go-v2 v1.47.5
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.4
 	github.com/fatih/color v1.13.0
