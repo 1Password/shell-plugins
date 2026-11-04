@@ -7,7 +7,6 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
-	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -73,14 +72,7 @@ func APIClientCredentials() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: provision.TempFile(configFile,
-			provision.Filename(".edgerc"),
-			provision.AddArgs(
-				"--edgerc", "{{ .Path }}",
-				"--section", "default",
-			),
-			provision.SetPathAsEnvVar("EDGERC"), // for Akamai Terraform provider
-		),
+		DefaultProvisioner: nil,
 		Importer: importer.TryAll(
 			TryAkamaiConfigFile(),
 		)}
