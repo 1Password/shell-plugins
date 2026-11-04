@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+    certificate-authority: "-----BEGIN CERTIFICATE-----"
+- name: dev
+  cluster:
+    server: https://dev.example.com:6443
+    certificate-authority: bad-ca.crt
+contexts:
+- name: pem-path
+  context:
+    cluster: prod
+    user: pem-path
+- name: bad-file
+  context:
+    cluster: dev
+    user: bad-file
+users:
+- name: pem-path
+  user:
+    token: test-token-one
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    client-key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+- name: bad-file
+  user:
+    token: test-token-two
+    client-certificate: bad-cert.crt
+    client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tClptRnJaUT09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
