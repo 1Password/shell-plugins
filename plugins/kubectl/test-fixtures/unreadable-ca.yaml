@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+    certificate-authority: missing-ca.crt
+- name: dev
+  cluster:
+    server: https://dev.example.com:6443
+    certificate-authority-data: "not!base64"
+contexts:
+- name: prod
+  context:
+    cluster: prod
+    user: admin
+- name: dev
+  context:
+    cluster: dev
+    user: admin
+users:
+- name: admin
+  user:
+    token: test-token-not-a-secret

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+    certificate-authority: missing-ca.crt
+contexts:
+- name: one
+  context:
+    cluster: prod
+    user: one
+- name: two
+  context:
+    cluster: prod
+    user: two
+users:
+- name: one
+  user:
+    token: test-token-one
+- name: two
+  user:
+    token: test-token-two
