@@ -1,0 +1,12 @@
+[default]
+account = "myorg-myaccount"
+user = "jdoe"
+authenticator = "snowflake_jwt"
+private_key_raw = """
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+MIIFHDBOBgkqhkiG9w0BBQ0wQTApBgkqhkiG9w0BBQwwHAQIEXAMPLE
+-----END ENCRYPTED PRIVATE KEY-----
+"""
+private_key_file_pwd = "passphrase1234"
+database = "MY_DB"
+schema = "PUBLIC"
