@@ -742,6 +742,16 @@ func TestStripAndReturnProfileFlag(t *testing.T) {
 			expectedArgs:      []string{"--", "wrapped command", "--profile", "dev"},
 			expectedFlagValue: "",
 		},
+		{
+			args:              []string{"iam", "get-user", "--profile", "alice", "--user-name", "alice"},
+			expectedArgs:      []string{"iam", "get-user", "--user-name", "alice"},
+			expectedFlagValue: "alice",
+		},
+		{
+			args:              []string{"iam", "get-user", "--profile=alice", "--user-name", "alice"},
+			expectedArgs:      []string{"iam", "get-user", "--user-name", "alice"},
+			expectedFlagValue: "alice",
+		},
 	} {
 		t.Run(fmt.Sprintf("test case %d", i), func(t *testing.T) {
 			flag, args, err := stripAndReturnProfileFlag(scenario.args)
