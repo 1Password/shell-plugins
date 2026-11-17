@@ -1,4 +1,4 @@
-package localstack
+package grok
 
 import (
 	"testing"
@@ -12,11 +12,11 @@ func TestAPIKeyProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, APIKey().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
 			ItemFields: map[sdk.FieldName]string{
-				fieldname.APIKey: "SzCEXAMPLE",
+				fieldname.APIKey: "xai-EXAMPLE1234abcdefEXAMPLE1234abcdef",
 			},
 			ExpectedOutput: sdk.ProvisionOutput{
 				Environment: map[string]string{
-					"LOCALSTACK_API_KEY": "SzCEXAMPLE",
+					"XAI_API_KEY": "xai-EXAMPLE1234abcdefEXAMPLE1234abcdef",
 				},
 			},
 		},
@@ -27,12 +27,12 @@ func TestAPIKeyImporter(t *testing.T) {
 	plugintest.TestImporter(t, APIKey().Importer, map[string]plugintest.ImportCase{
 		"environment": {
 			Environment: map[string]string{
-				"LOCALSTACK_API_KEY": "SzCEXAMPLE",
+				"XAI_API_KEY": "xai-EXAMPLE1234abcdefEXAMPLE1234abcdef",
 			},
 			ExpectedCandidates: []sdk.ImportCandidate{
 				{
 					Fields: map[sdk.FieldName]string{
-						fieldname.APIKey: "SzCEXAMPLE",
+						fieldname.APIKey: "xai-EXAMPLE1234abcdefEXAMPLE1234abcdef",
 					},
 				},
 			},

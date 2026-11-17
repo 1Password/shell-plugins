@@ -107,7 +107,7 @@ func (t *RPCServer) ExecutableNeedsAuth(req proto.ExecutableNeedsAuthRequest, re
 	needsAuth, ok := t.needsAuth[req.ExecutableID]
 	if !ok || needsAuth == nil {
 		return &errFunctionFieldNotSet{
-			objName:  req.ExecutableID.String(),
+			objName:  req.String(),
 			funcName: "NeedsAuth",
 		}
 	}
@@ -134,7 +134,7 @@ func (t *RPCServer) CredentialImport(req proto.ImportCredentialRequest, resp *sd
 	importer, ok := t.importers[req.CredentialID]
 	if !ok || importer == nil {
 		return &errFunctionFieldNotSet{
-			objName:  req.CredentialID.String(),
+			objName:  req.String(),
 			funcName: "Importer",
 		}
 	}

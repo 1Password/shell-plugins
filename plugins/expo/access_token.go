@@ -1,4 +1,4 @@
-package localstack
+package expo
 
 import (
 	"github.com/1Password/shell-plugins/sdk"
@@ -9,32 +9,25 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
 )
 
-func APIKey() schema.CredentialType {
+func AccessToken() schema.CredentialType {
 	return schema.CredentialType{
-		Name:          credname.APIKey,
-		DocsURL:       sdk.URL("https://docs.localstack.cloud/getting-started/api-key/"),
-		ManagementURL: sdk.URL("https://app.localstack.cloud/account/apikeys"),
+		Name:          credname.AccessToken,
+		DocsURL:       sdk.URL("https://docs.expo.dev/accounts/programmatic-access/"),
+		ManagementURL: sdk.URL("https://expo.dev/accounts/[account]/settings/access-tokens"),
 		Fields: []schema.CredentialField{
 			{
-				Name:                fieldname.APIKey,
-				MarkdownDescription: "API Key used to authenticate to LocalStack.",
+				Name:                fieldname.Token,
+				MarkdownDescription: "Access token used to authenticate to Expo.",
 				Secret:              true,
-				Composition: &schema.ValueComposition{
-					Length: 10,
-					Charset: schema.Charset{
-						Uppercase: true,
-						Lowercase: true,
-						Digits:    true,
-					},
-				},
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
 			importer.TryEnvVarPair(defaultEnvVarMapping),
-		)}
+		),
+	}
 }
 
 var defaultEnvVarMapping = map[string]sdk.FieldName{
-	"LOCALSTACK_API_KEY": fieldname.APIKey,
+	"EXPO_TOKEN": fieldname.Token,
 }

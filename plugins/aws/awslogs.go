@@ -7,7 +7,7 @@ import (
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 )
 
-func awslogsCli() schema.Executable {
+func awslogsCLI() schema.Executable {
 	return schema.Executable{
 		Name:    "awslogs",
 		Runs:    []string{"awslogs"},

@@ -59,7 +59,7 @@ type ValidationReportPrinter struct {
 }
 
 func (p *ValidationReportPrinter) Print() {
-	if p.Reports == nil || len(p.Reports) == 0 {
+	if len(p.Reports) == 0 {
 		color.Cyan("No reports to print")
 		return
 	}
@@ -108,19 +108,19 @@ func (p *ValidationReportPrinter) printChecks(checks []schema.ValidationCheck) {
 }
 
 func (p *ValidationReportPrinter) printHeading(heading string) {
-	p.Format.Heading.Printf("# %s\n\n", heading)
+	_, _ = p.Format.Heading.Printf("# %s\n\n", heading)
 }
 
 func (p *ValidationReportPrinter) printCheck(check schema.ValidationCheck) {
 	if check.Assertion {
-		p.Format.Success.Printf("✔ %s\n", check.Description)
+		_, _ = p.Format.Success.Printf("✔ %s\n", check.Description)
 		return
 	}
 
 	if check.Severity == schema.ValidationSeverityWarning {
-		p.Format.Warning.Printf("⚠ %s\n", check.Description)
+		_, _ = p.Format.Warning.Printf("⚠ %s\n", check.Description)
 		return
 	}
 
-	p.Format.Error.Printf("✘ %s\n", check.Description)
+	_, _ = p.Format.Error.Printf("✘ %s\n", check.Description)
 }

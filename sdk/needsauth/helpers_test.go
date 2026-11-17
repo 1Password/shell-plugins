@@ -87,22 +87,85 @@ func TestContainsArgs(t *testing.T) {
 }
 
 func TestForCommand(t *testing.T) {
-	plugintest.TestNeedsAuth(t, NotWhenContainsArgs("--mode", "dry-run"), map[string]plugintest.NeedsAuthCase{
-		"yes by default": {
+	plugintest.TestNeedsAuth(t, ForCommand("config"), map[string]plugintest.NeedsAuthCase{
+		"no by default": {
 			Args:              []string{"deploy"},
-			ExpectedNeedsAuth: true,
-		},
-		"yes when only one of the args is present": {
-			Args:              []string{"deploy", "--mode", "live"},
-			ExpectedNeedsAuth: true,
-		},
-		"yes when both args are present, but not in sequence": {
-			Args:              []string{"deploy", "--mode", "live", "--app-name", "dry-run"},
-			ExpectedNeedsAuth: true,
-		},
-		"no when all args are present in sequence": {
-			Args:              []string{"deploy", "--mode", "dry-run"},
 			ExpectedNeedsAuth: false,
+		},
+		"no without args": {
+			Args:              []string{},
+			ExpectedNeedsAuth: false,
+		},
+		"yes for the bare command": {
+			Args:              []string{"config"},
+			ExpectedNeedsAuth: true,
+		},
+		"yes for a subcommand of the command": {
+			Args:              []string{"config", "get", "token"},
+			ExpectedNeedsAuth: true,
+		},
+		"yes for the command with flags": {
+			Args:              []string{"config", "--global"},
+			ExpectedNeedsAuth: true,
+		},
+		"no when the command appears after another command": {
+			Args:              []string{"deploy", "config"},
+			ExpectedNeedsAuth: false,
+		},
+		"no for a command that merely starts with the same characters": {
+			Args:              []string{"configure"},
+			ExpectedNeedsAuth: false,
+		},
+	})
+
+	plugintest.TestNeedsAuth(t, ForCommand(), map[string]plugintest.NeedsAuthCase{
+		"no without a command to match": {
+			Args:              []string{"config"},
+			ExpectedNeedsAuth: false,
+		},
+	})
+}
+
+func TestForNestedCommand(t *testing.T) {
+	plugintest.TestNeedsAuth(t, ForCommand("shell-completions", "install"), map[string]plugintest.NeedsAuthCase{
+		"yes for the exact nested command": {
+			Args:              []string{"shell-completions", "install"},
+			ExpectedNeedsAuth: true,
+		},
+		"yes for the nested command with args": {
+			Args:              []string{"shell-completions", "install", "--shell", "bash"},
+			ExpectedNeedsAuth: true,
+		},
+		"no for only the first part of the nested command": {
+			Args:              []string{"shell-completions"},
+			ExpectedNeedsAuth: false,
+		},
+		"no for the nested command's parts in the wrong order": {
+			Args:              []string{"install", "shell-completions"},
+			ExpectedNeedsAuth: false,
+		},
+	})
+}
+
+// NotForCommand negates ForCommand, so the prefix matching itself is covered above. What is
+// worth pinning here is the inversion, and that NotForCommand() opts out of nothing, where
+// NotForExactArgs() matches the empty arg list and is aliased as NotWithoutArgs().
+func TestNotForCommand(t *testing.T) {
+	plugintest.TestNeedsAuth(t, NotForCommand("config"), map[string]plugintest.NeedsAuthCase{
+		"no for the command and anything nested under it": {
+			Args:              []string{"config", "get", "token"},
+			ExpectedNeedsAuth: false,
+		},
+		"yes when the command is not in command position": {
+			Args:              []string{"deploy", "config"},
+			ExpectedNeedsAuth: true,
+		},
+	})
+
+	plugintest.TestNeedsAuth(t, NotForCommand(), map[string]plugintest.NeedsAuthCase{
+		"yes without a command to opt out of": {
+			Args:              []string{"config"},
+			ExpectedNeedsAuth: true,
 		},
 	})
 }
