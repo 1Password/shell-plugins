@@ -22,6 +22,27 @@ func (p CLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	}
 	stsProvisioner := NewSTSProvisioner(profile)
 	stsProvisioner.Provision(ctx, in, out)
+	keepProfileWhenYielding(profile, out)
+}
+
+// keepProfileWhenYielding passes the profile selected with `--profile` on to the executable as
+// AWS_PROFILE when the provisioner supplied no credentials for it.
+//
+// The `--profile` flag is always stripped from the command line, because an explicit flag makes
+// the AWS CLI ignore the provisioned environment credentials. When the provisioner yields (the
+// profile belongs to the other credential type), dropping the flag would make the executable run
+// against the default profile unless another linked credential provisions for it. Setting
+// AWS_PROFILE keeps the user's selection instead: if another linked credential does provision,
+// its AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY take precedence over AWS_PROFILE; if none does,
+// the executable resolves the requested profile on its own, as it would without the plugin.
+func keepProfileWhenYielding(profile string, out *sdk.ProvisionOutput) {
+	if profile == "" || len(out.Diagnostics.Errors) > 0 {
+		return
+	}
+	if _, provisioned := out.Environment["AWS_ACCESS_KEY_ID"]; provisioned {
+		return
+	}
+	out.AddEnvVar("AWS_PROFILE", profile)
 }
 
 // stripAndReturnProfileFlag strips all occurrences of the `--profile` flag and returns the last occurrence's value.
@@ -79,6 +100,7 @@ func (p SSOCLIProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput,
 		out.CommandLine = editedCommandLine
 	}
 	NewSSOProvisioner(profile).Provision(ctx, in, out)
+	keepProfileWhenYielding(profile, out)
 }
 
 func (p SSOCLIProvisioner) Deprovision(ctx context.Context, in sdk.DeprovisionInput, out *sdk.DeprovisionOutput) {
