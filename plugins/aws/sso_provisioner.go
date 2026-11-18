@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/1Password/shell-plugins/sdk"
@@ -260,10 +259,8 @@ func assertSSOTokenCacheSafe(path string) error {
 	if fi.Mode().Perm()&0o077 != 0 {
 		return fmt.Errorf("AWS SSO token cache %q is group/world readable (mode %o); chmod 600 it and re-run", path, fi.Mode().Perm())
 	}
-	if st, ok := fi.Sys().(*syscall.Stat_t); ok {
-		if st.Uid != uint32(os.Geteuid()) {
-			return fmt.Errorf("AWS SSO token cache %q is not owned by the current user", path)
-		}
+	if !ownedByCurrentUser(fi) {
+		return fmt.Errorf("AWS SSO token cache %q is not owned by the current user", path)
 	}
 	return nil
 }

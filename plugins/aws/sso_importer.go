@@ -7,7 +7,6 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"syscall"
 
 	"gopkg.in/ini.v1"
 
@@ -144,10 +143,8 @@ func validateExternalConfigPath(path string) error {
 	if !fi.Mode().IsRegular() {
 		return fmt.Errorf("AWS_CONFIG_FILE %q is not a regular file", path)
 	}
-	if st, ok := fi.Sys().(*syscall.Stat_t); ok {
-		if st.Uid != uint32(os.Geteuid()) {
-			return fmt.Errorf("AWS_CONFIG_FILE %q is not owned by the current user", path)
-		}
+	if !ownedByCurrentUser(fi) {
+		return fmt.Errorf("AWS_CONFIG_FILE %q is not owned by the current user", path)
 	}
 	return nil
 }
