@@ -74,12 +74,6 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	})
 
 	report.AddCheck(ValidationCheck{
-		Description: "Has no more than one credential type defined. Plugins with multiple credential types are not supported yet",
-		Assertion:   len(p.Credentials) <= 1,
-		Severity:    ValidationSeverityError,
-	})
-
-	report.AddCheck(ValidationCheck{
 		Description: "Credentials referenced in executables are included in the same plugin definition",
 		Assertion:   CredentialReferencesInCredentialList(p),
 		Severity:    ValidationSeverityError,
@@ -88,6 +82,12 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	report.AddCheck(ValidationCheck{
 		Description: "Credentials are uniquely identifiable inside a plugin",
 		Assertion:   NoDuplicateCredentials(p),
+		Severity:    ValidationSeverityError,
+	})
+
+	report.AddCheck(ValidationCheck{
+		Description: "If more than one credential type is defined, each one is used by at least one executable",
+		Assertion:   AllCredentialsUsedWhenMultipleDefined(p),
 		Severity:    ValidationSeverityError,
 	})
 
@@ -119,6 +119,9 @@ func (p Plugin) DeepValidate() []ValidationReport {
 	return reports
 }
 
+// MarshalJSON returns the plugin's entry for the plugin registry JSON file. The entry describes the
+// platform, not the individual credential types, so a plugin gets one entry no matter how many
+// credential types it defines.
 func (p Plugin) MarshalJSON() ([]byte, error) {
 	if len(p.Credentials) == 0 {
 		return nil, nil
@@ -127,14 +130,19 @@ func (p Plugin) MarshalJSON() ([]byte, error) {
 		PlatformName  string `json:"platform_name"`
 		ManagementURL string `json:"management_url,omitempty"`
 	}{
-		PlatformName: p.Platform.Name,
-		ManagementURL: func() string {
-			if p.Credentials[0].ManagementURL != nil {
-				return p.Credentials[0].ManagementURL.String()
-			} else {
-				return ""
-			}
-		}(),
+		PlatformName:  p.Platform.Name,
+		ManagementURL: p.managementURL(),
 	}
 	return json.Marshal(plugin)
+}
+
+// managementURL returns the management URL of the first credential type that has one, or an empty
+// string if none of the plugin's credential types do.
+func (p Plugin) managementURL() string {
+	for _, credential := range p.Credentials {
+		if credential.ManagementURL != nil {
+			return credential.ManagementURL.String()
+		}
+	}
+	return ""
 }

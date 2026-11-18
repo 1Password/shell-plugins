@@ -16,6 +16,10 @@ type Executable struct {
 	Name string
 
 	// Which credentials the executable requires to run and how these should be provisioned.
+	//
+	// The order is significant when there is more than one. Configurations saved before an executable
+	// supported several credentials do not record which usage they belong to and are matched to the
+	// first one, so new usages should be added after the existing ones.
 	Uses []CredentialUsage
 
 	// (Optional) A URL to the documentation about this executable.
@@ -49,7 +53,9 @@ type CredentialUsage struct {
 	// `NeedsAuth`, which can still be used for more generic authentications opt-outs, such as the help flag.
 	NeedsAuth sdk.NeedsAuthentication
 
-	// Whether this credential is needed for the executable to run. If set to true, the executable cannot run without provisioning this credential.
+	// (Optional) Whether the executable can run without this credential. If set to true, the user can skip
+	// this credential when configuring the executable. Defaults to false, in which case the credential is
+	// required.
 	Optional bool
 }
 
