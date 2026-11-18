@@ -195,12 +195,7 @@ func (p errProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
 	return aws.Credentials{}, p.err
 }
 
-// translateSSORetrieveError rewrites token-not-found / token-expired errors from ssocreds into
-// a friendly message that points the user at `aws sso login`. For other smithy.APIError variants
-// returned by the SSO endpoint, it maps known codes to plugin-controlled strings; unknown codes
-// get a generic message so attacker-controlled error text from a hostile endpoint never reaches
-// the user-visible UI. Non-smithy errors (e.g. our own filesystem fail-closed errors from
-// assertSSOTokenCacheSafe) are passed through unchanged because they are locally produced.
+// ssoLoginCommand returns the command the user should run to sign in for the given profile.
 func ssoLoginCommand(profile string) string {
 	if profile != defaultProfileName {
 		return fmt.Sprintf("aws sso login --profile %s", profile)
@@ -208,6 +203,12 @@ func ssoLoginCommand(profile string) string {
 	return "aws sso login"
 }
 
+// translateSSORetrieveError rewrites token-not-found / token-expired errors from ssocreds into
+// a friendly message that points the user at `aws sso login`. For other smithy.APIError variants
+// returned by the SSO endpoint, it maps known codes to plugin-controlled strings; unknown codes
+// get a generic message so attacker-controlled error text from a hostile endpoint never reaches
+// the user-visible UI. Non-smithy errors (e.g. our own filesystem fail-closed errors from
+// assertSSOTokenCacheSafe) are passed through unchanged because they are locally produced.
 func translateSSORetrieveError(err error, profile string) error {
 	var invalid *ssocreds.InvalidTokenError
 	if errors.As(err, &invalid) {
