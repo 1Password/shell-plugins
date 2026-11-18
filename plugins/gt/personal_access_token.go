@@ -48,6 +48,11 @@ func PersonalAccessToken() schema.CredentialType {
 					Prefix: "https://",
 				},
 			},
+			{
+				Name:                fieldname.User,
+				MarkdownDescription: "Your Gitea username",
+				Secret:              false,
+			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
@@ -56,7 +61,7 @@ func PersonalAccessToken() schema.CredentialType {
 				"GITEA_TOKEN":    fieldname.Token,
 				"GITEA_CLI_HOST": fieldname.HostAddress,
 			}),
-			TryGiteaConfigFile(),
+			TryGiteaHostsFile(),
 		)}
 }
 
@@ -82,10 +87,6 @@ func configDir() string {
 	return filepath.Join(configDir, "gitea-cli")
 }
 
-func ConfigPath() string {
-	return filepath.Join(configDir(), "config.yml")
-}
-
 func HostsPath() string {
 	return filepath.Join(configDir(), "hosts.yml")
 }
@@ -100,9 +101,14 @@ func credentialFilename(instance string, user string) string {
 	return filepath.Join(configDir(), "credentials", identity(instance, user)+".json")
 }
 
-func loadCredentialFromFile(hostname string, username string) (Credential, error) {
+func loadCredentialFromFile(hostname string, username string, rootDir string) (Credential, error) {
 	var credential Credential
-	credBytes, err := os.ReadFile(credentialFilename(hostname, username))
+	// In test environments, absolute paths are prefixed with RootDir
+	credPath := credentialFilename(hostname, username)
+	if rootDir != "" && filepath.IsAbs(credPath) {
+		credPath = filepath.Join(rootDir, credPath)
+	}
+	credBytes, err := os.ReadFile(credPath)
 	if err != nil {
 		return Credential{}, err
 	}
@@ -114,7 +120,7 @@ func loadCredentialFromFile(hostname string, username string) (Credential, error
 	return credential, nil
 }
 
-func TryGiteaConfigFile() sdk.Importer {
+func TryGiteaHostsFile() sdk.Importer {
 	return importer.TryFile(HostsPath(), func(ctx context.Context, contents importer.FileContents, in sdk.ImportInput, out *sdk.ImportAttempt) {
 		var hosts Hosts
 		if err := contents.ToYAML(&hosts); err != nil {
@@ -125,7 +131,7 @@ func TryGiteaConfigFile() sdk.Importer {
 		for hostname, host := range hosts.Hosts {
 			for username, account := range host.Users {
 				if account.CredentialStore == "file" && account.AuthMethod == "token" {
-					credential, err := loadCredentialFromFile(hostname, username)
+					credential, err := loadCredentialFromFile(hostname, username, in.RootDir)
 					if err != nil {
 						out.AddError(err)
 						continue
