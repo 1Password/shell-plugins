@@ -156,18 +156,22 @@ func (f SSOCacheProviderFactory) NewSSORoleCredentialsProvider(awsConfig *config
 	clientConfig := ssoClientConfig(awsConfig.SSORegion)
 	ssoClient := sso.NewFromConfig(clientConfig)
 
+	// A login through an `sso-session` yields an access token that expires after about an hour, together
+	// with a refresh token. Let the SDK refresh the access token, as the AWS CLI does, instead of asking
+	// the user to log in again. The legacy form has no refresh token, so there is nothing to refresh.
+	var tokenProvider *ssocreds.SSOTokenProvider
+	if awsConfig.HasSSOSession() {
+		tokenProvider = ssocreds.NewSSOTokenProvider(ssooidc.NewFromConfig(clientConfig), cachedTokenFilepath)
+	}
+
 	provider := ssocreds.New(ssoClient, awsConfig.SSOAccountID, awsConfig.SSORoleName, awsConfig.SSOStartURL, func(o *ssocreds.Options) {
 		o.CachedTokenFilepath = cachedTokenFilepath
-		// A login through an `sso-session` yields an access token that expires after about an hour, together
-		// with a refresh token. Let the SDK refresh the access token, as the AWS CLI does, instead of asking
-		// the user to log in again. The legacy form has no refresh token, so there is nothing to refresh.
-		if awsConfig.HasSSOSession() {
-			o.SSOTokenProvider = ssocreds.NewSSOTokenProvider(ssooidc.NewFromConfig(clientConfig), cachedTokenFilepath)
-		}
+		o.SSOTokenProvider = tokenProvider
 	})
 
 	return &ssoRoleCacheWritingProvider{
 		Provider:       provider,
+		tokenProvider:  tokenProvider,
 		stsCacheWriter: NewSTSCacheWriter(cacheKey, f.OutCache),
 	}
 }
@@ -185,10 +189,20 @@ func ssoSessionKey(awsConfig *confighelpers.Config) string {
 // successful retrievals are persisted in the shell plugin's encrypted cache.
 type ssoRoleCacheWritingProvider struct {
 	*ssocreds.Provider
+	tokenProvider *ssocreds.SSOTokenProvider
 	stsCacheWriter
 }
 
 func (p *ssoRoleCacheWritingProvider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	// The SDK reports a missing login, or one that can no longer be refreshed, as a plain error when a
+	// token provider is used. Check the login first and report those cases as an invalid token, like the
+	// SDK does without a token provider, so that the user is told to run `aws sso login`.
+	if p.tokenProvider != nil {
+		if _, err := p.tokenProvider.RetrieveBearerToken(ctx); err != nil {
+			return aws.Credentials{}, &ssocreds.InvalidTokenError{Err: err}
+		}
+	}
+
 	creds, err := p.Provider.Retrieve(ctx)
 	if err != nil {
 		return aws.Credentials{}, err

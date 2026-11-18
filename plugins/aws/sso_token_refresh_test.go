@@ -25,6 +25,8 @@ type ssoTestServer struct {
 	*httptest.Server
 	refreshRequests int
 	bearerTokens    []string
+	// rejectRefresh makes the server refuse to refresh, as it does once the SSO session has ended.
+	rejectRefresh bool
 }
 
 func newSSOTestServer(t *testing.T) *ssoTestServer {
@@ -34,6 +36,11 @@ func newSSOTestServer(t *testing.T) *ssoTestServer {
 	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		s.refreshRequests++
 		w.Header().Set("Content-Type", "application/json")
+		if s.rejectRefresh {
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte(`{"error":"invalid_grant","error_description":"the refresh token is no longer valid"}`))
+			return
+		}
 		_, _ = w.Write([]byte(`{"accessToken":"refreshed-access-token","refreshToken":"next-refresh-token","expiresIn":3600,"tokenType":"Bearer"}`))
 	})
 	mux.HandleFunc("/federation/credentials", func(w http.ResponseWriter, r *http.Request) {
@@ -136,4 +143,46 @@ func TestSSOProviderDoesNotRefreshLegacyToken(t *testing.T) {
 	require.True(t, errors.As(err, &invalidToken), "expected an invalid token error, got %v", err)
 	assert.Equal(t, 0, server.refreshRequests)
 	assert.Empty(t, server.bearerTokens)
+}
+
+func TestSSOProviderReportsUnusableSessionLoginAsInvalidToken(t *testing.T) {
+	sessionConfig := &confighelpers.Config{
+		SSOSession:   "my-sso",
+		SSOStartURL:  "https://example.awsapps.com/start",
+		SSORegion:    "us-east-1",
+		SSOAccountID: "123456789012",
+		SSORoleName:  "ExampleRole",
+	}
+
+	t.Run("no login in the token cache", func(t *testing.T) {
+		server := newSSOTestServer(t)
+		t.Setenv("HOME", t.TempDir())
+
+		provider, _ := newTestSSOProvider(sessionConfig)
+		_, err := provider.Retrieve(context.Background())
+
+		var invalidToken *ssocreds.InvalidTokenError
+		require.True(t, errors.As(err, &invalidToken), "expected an invalid token error, got %v", err)
+		assert.Empty(t, server.bearerTokens)
+	})
+
+	t.Run("refresh is rejected", func(t *testing.T) {
+		server := newSSOTestServer(t)
+		server.rejectRefresh = true
+		writeSSOTokenCache(t, "my-sso", map[string]string{
+			"accessToken":           "expired-access-token",
+			"expiresAt":             time.Now().Add(-time.Minute).UTC().Format(time.RFC3339),
+			"refreshToken":          "refresh-token",
+			"clientId":              "client-id",
+			"clientSecret":          "client-secret",
+			"registrationExpiresAt": time.Now().Add(24 * time.Hour).UTC().Format(time.RFC3339),
+		})
+
+		provider, _ := newTestSSOProvider(sessionConfig)
+		_, err := provider.Retrieve(context.Background())
+
+		var invalidToken *ssocreds.InvalidTokenError
+		require.True(t, errors.As(err, &invalidToken), "expected an invalid token error, got %v", err)
+		assert.Empty(t, server.bearerTokens)
+	})
 }
