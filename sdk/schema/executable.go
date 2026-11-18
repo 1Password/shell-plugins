@@ -17,9 +17,9 @@ type Executable struct {
 
 	// Which credentials the executable requires to run and how these should be provisioned.
 	//
-	// The order is significant when there is more than one. Configurations saved before an executable
-	// supported several credentials do not record which usage they belong to and are matched to the
-	// first one, so new usages should be added after the existing ones.
+	// The order is significant when there is more than one. 1Password CLI attributes configurations
+	// that were saved before an executable had several credential usages to the first one, because
+	// they do not record which usage they belong to. Add new usages after the existing ones.
 	Uses []CredentialUsage
 
 	// (Optional) A URL to the documentation about this executable.

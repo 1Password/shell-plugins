@@ -125,12 +125,15 @@ func NoDuplicateCredentials(plugin Plugin) bool {
 }
 
 // AllCredentialsUsedWhenMultipleDefined reports whether every credential type of a plugin that defines
-// more than one is used by at least one of the plugin's executables. A credential type that no executable
-// uses can never be selected when configuring the plugin, which usually means it was added to the plugin
-// definition but not to its executables.
+// more than one can be chosen for at least one of the plugin's executables. A credential type that no
+// executable uses usually means it was added to the plugin definition but not to its executables.
 //
-// Plugins with a single credential type, or without executables, always pass: a plugin can exist only to
-// offer a credential type to the executables of other plugins.
+// A credential type counts as used when an executable names it, or when an executable lets the user
+// select from all credential types. Plugins with a single credential type, or without executables,
+// always pass.
+//
+// This cannot see the executables of other plugins, so it also reports a credential type that is only
+// offered for other plugins to use. That is why the corresponding validation check is a warning.
 func AllCredentialsUsedWhenMultipleDefined(plugin Plugin) bool {
 	if len(plugin.Credentials) <= 1 || len(plugin.Executables) == 0 {
 		return true
@@ -139,6 +142,9 @@ func AllCredentialsUsedWhenMultipleDefined(plugin Plugin) bool {
 	used := map[string]bool{}
 	for _, executable := range plugin.Executables {
 		for _, usage := range executable.Uses {
+			if usage.SelectFrom != nil && usage.SelectFrom.IncludeAllCredentials {
+				return true
+			}
 			if usage.Name != "" && (usage.Plugin == "" || usage.Plugin == plugin.Name) {
 				used[usage.Name.ID().String()] = true
 			}

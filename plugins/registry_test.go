@@ -62,7 +62,7 @@ func testPlugins(t *testing.T) []schema.Plugin {
 			Name:     "double",
 			Platform: schema.PlatformInfo{Name: "Double"},
 			Credentials: []schema.CredentialType{
-				{Name: sdk.CredentialName("Access Key"), ManagementURL: testURL(t, "https://double.example.com/access-keys")},
+				{Name: sdk.CredentialName("Access Key")},
 				{Name: sdk.CredentialName("SSO Profile"), ManagementURL: testURL(t, "https://double.example.com/sso")},
 			},
 		},
@@ -139,10 +139,10 @@ func TestRegistryJSON(t *testing.T) {
 	result, err := RegistryJSON()
 
 	require.NoError(t, err)
-	// A plugin gets a single entry, no matter how many credential types it has, and plugins without
-	// credential types are left out.
+	// A plugin gets a single entry, no matter how many credential types it has, with the management URL
+	// of the first credential type that has one. Plugins without credential types are left out.
 	assert.JSONEq(t, `[
 		{"platform_name": "Single", "management_url": "https://single.example.com/keys"},
-		{"platform_name": "Double", "management_url": "https://double.example.com/access-keys"}
+		{"platform_name": "Double", "management_url": "https://double.example.com/sso"}
 	]`, string(result))
 }

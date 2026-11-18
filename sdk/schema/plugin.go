@@ -88,7 +88,7 @@ func (p Plugin) Validate() (bool, ValidationReport) {
 	report.AddCheck(ValidationCheck{
 		Description: "If more than one credential type is defined, each one is used by at least one executable",
 		Assertion:   AllCredentialsUsedWhenMultipleDefined(p),
-		Severity:    ValidationSeverityError,
+		Severity:    ValidationSeverityWarning,
 	})
 
 	return report.IsValid(), report

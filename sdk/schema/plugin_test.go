@@ -80,6 +80,7 @@ func testPluginWithTwoCredentialTypes(t *testing.T) Plugin {
 	}
 }
 
+// failedChecks returns the descriptions of all checks that did not pass, warnings included.
 func failedChecks(report ValidationReport) []string {
 	var failed []string
 	for _, check := range report.Checks {
@@ -100,6 +101,8 @@ func TestPluginValidate(t *testing.T) {
 	cases := map[string]struct {
 		modify         func(p *Plugin)
 		expectedFailed []string
+		// expectedError is whether one of the failed checks is an error instead of a warning.
+		expectedError bool
 	}{
 		"two credential types that are both used": {
 			modify: func(p *Plugin) {},
@@ -127,6 +130,25 @@ func TestPluginValidate(t *testing.T) {
 				}
 			},
 		},
+		"two credential types of which one is used with the plugin named explicitly": {
+			modify: func(p *Plugin) {
+				p.Executables[0].Uses[1].Plugin = p.Name
+			},
+		},
+		"two credential types of which one is only reachable through a selection of all credentials": {
+			modify: func(p *Plugin) {
+				p.Executables[0].Uses[1] = CredentialUsage{
+					SelectFrom: &CredentialSelection{ID: "project", IncludeAllCredentials: true},
+				}
+			},
+		},
+		"two credential types and an executable that only has a selection of all credentials": {
+			modify: func(p *Plugin) {
+				p.Executables[0].Uses = []CredentialUsage{
+					{SelectFrom: &CredentialSelection{ID: "project", IncludeAllCredentials: true}},
+				}
+			},
+		},
 		"two credential types of which one is not used by any executable": {
 			modify: func(p *Plugin) {
 				p.Executables[0].Uses = []CredentialUsage{{Name: testAccessKey}}
@@ -145,12 +167,14 @@ func TestPluginValidate(t *testing.T) {
 				p.Executables[0].Uses = []CredentialUsage{{Name: testAccessKey}}
 			},
 			expectedFailed: []string{uniqueCredentialsCheck},
+			expectedError:  true,
 		},
 		"executable uses a credential type that the plugin does not define": {
 			modify: func(p *Plugin) {
 				p.Credentials = p.Credentials[:1]
 			},
 			expectedFailed: []string{referencesCheck},
+			expectedError:  true,
 		},
 	}
 
@@ -163,6 +187,7 @@ func TestPluginValidate(t *testing.T) {
 
 			assert.Equal(t, tc.expectedFailed, failedChecks(report))
 			assert.Equal(t, len(tc.expectedFailed) == 0, valid)
+			assert.Equal(t, tc.expectedError, report.HasErrors())
 		})
 	}
 }
