@@ -41,7 +41,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/iam v1.19.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.39.5
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.44.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.44.5
 	github.com/aws/smithy-go v1.28.9
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/dvsekhvalnov/jose2go v1.6.0 // indirect

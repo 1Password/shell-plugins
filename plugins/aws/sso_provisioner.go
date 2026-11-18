@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials/ssocreds"
 	"github.com/aws/aws-sdk-go-v2/service/sso"
+	"github.com/aws/aws-sdk-go-v2/service/ssooidc"
 	smithy "github.com/aws/smithy-go"
 )
 
@@ -22,6 +23,12 @@ import (
 // reached via an attacker-influenceable region if the local AWS config is compromised; a per-call
 // deadline ensures one bad config cannot wedge the plugin indefinitely.
 const ssoRetrieveTimeout = 30 * time.Second
+
+// ssoClientConfig returns the configuration for the clients that call the AWS SSO endpoints in the
+// given region. Tests replace it to point the clients at a local server.
+var ssoClientConfig = func(region string) aws.Config {
+	return aws.Config{Region: region}
+}
 
 // SSOProvisioner provisions short-lived AWS credentials by exchanging an SSO access token
 // (cached by `aws sso login`) for role credentials via sso:GetRoleCredentials.
@@ -146,10 +153,17 @@ func (f SSOCacheProviderFactory) NewSSORoleCredentialsProvider(awsConfig *config
 		return errProvider{err: err}
 	}
 
-	ssoClient := sso.NewFromConfig(aws.Config{Region: awsConfig.SSORegion})
+	clientConfig := ssoClientConfig(awsConfig.SSORegion)
+	ssoClient := sso.NewFromConfig(clientConfig)
 
 	provider := ssocreds.New(ssoClient, awsConfig.SSOAccountID, awsConfig.SSORoleName, awsConfig.SSOStartURL, func(o *ssocreds.Options) {
 		o.CachedTokenFilepath = cachedTokenFilepath
+		// A login through an `sso-session` yields an access token that expires after about an hour, together
+		// with a refresh token. Let the SDK refresh the access token, as the AWS CLI does, instead of asking
+		// the user to log in again. The legacy form has no refresh token, so there is nothing to refresh.
+		if awsConfig.HasSSOSession() {
+			o.SSOTokenProvider = ssocreds.NewSSOTokenProvider(ssooidc.NewFromConfig(clientConfig), cachedTokenFilepath)
+		}
 	})
 
 	return &ssoRoleCacheWritingProvider{
