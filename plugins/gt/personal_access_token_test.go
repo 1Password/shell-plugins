@@ -54,7 +54,7 @@ func TestHostsPath(t *testing.T) {
 func TestPersonalAccessTokenProvisioner(t *testing.T) {
 	plugintest.TestProvisioner(t, PersonalAccessToken().DefaultProvisioner, map[string]plugintest.ProvisionCase{
 		"default": {
-			ItemFields: map[sdk.FieldName]string{ // TODO: Check if this is correct
+			ItemFields: map[sdk.FieldName]string{
 				fieldname.Token:       "5obcw3wk772a2beqezslabcmivghbci4qexample",
 				fieldname.HostAddress: "https://git.example.com",
 				fieldname.User:        "example",
