@@ -30,7 +30,7 @@ func ConfigPath() string {
 func PersonalAccessToken() schema.CredentialType {
 	return schema.CredentialType{
 		Name:          credname.PersonalAccessToken,
-		DocsURL:       sdk.URL("https://docs.gitea.io/en-us/api-usage/#generating-and-listing-api-tokens"),
+		DocsURL:       sdk.URL("https://docs.gitea.com/development/api-usage/#generating-and-listing-api-tokens"),
 		ManagementURL: sdk.URL("https://gitea.com/user/settings/applications"),
 		Fields: []schema.CredentialField{
 			{
