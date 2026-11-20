@@ -1,0 +1,5 @@
+organizations:
+    example:
+        api_token: bkua_abcdefghijklmnopqrstuvwxyz1234567890abcd
+    example2:
+        api_token: bkua_abcdefghijklmnopqrstuvwxyz1234567890defg
