@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: ref-cluster
+  cluster:
+    server: https://remote.example.com:6443
+    certificate-authority: ca.crt
+users:
+- name: ref-user
+  user:
+    client-certificate: client.crt
+    client-key: keys/client.key

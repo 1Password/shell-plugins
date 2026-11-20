@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Config
+contexts:
+- name: cross-ref
+  context:
+    cluster: ref-cluster
+    user: ref-user

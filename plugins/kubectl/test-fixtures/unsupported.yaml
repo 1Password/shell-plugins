@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Config
+clusters:
+- name: prod
+  cluster:
+    server: https://prod.example.com:6443
+contexts:
+- name: eks
+  context:
+    cluster: prod
+    user: eks
+- name: oidc
+  context:
+    cluster: prod
+    user: oidc
+- name: basic
+  context:
+    cluster: prod
+    user: basic
+- name: token-file
+  context:
+    cluster: prod
+    user: token-file
+- name: nothing
+  context:
+    cluster: prod
+    user: nothing
+users:
+- name: eks
+  user:
+    token: test-token-not-a-secret
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      command: aws
+      args: [eks, get-token, --cluster-name, prod]
+- name: oidc
+  user:
+    token: test-token-not-a-secret
+    auth-provider:
+      name: oidc
+      config:
+        client-id: kubernetes
+- name: basic
+  user:
+    username: admin
+    password: test-password-not-a-secret
+- name: token-file
+  user:
+    tokenFile: /var/run/secrets/token
+- name: nothing
+  user: {}
