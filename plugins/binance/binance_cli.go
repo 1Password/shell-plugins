@@ -15,6 +15,8 @@ func BinanceCLI() schema.Executable {
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
 			needsauth.NotWithoutArgs(),
+			needsauth.NotForCommand("profile"),
+			needsauth.NotForCommand("completion"),
 			needsauth.NotWhenContainsArgs("t"),
 			needsauth.NotWhenContainsArgs("i"),
 			needsauth.NotWhenContainsArgs("book"),
