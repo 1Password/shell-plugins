@@ -47,11 +47,15 @@ func GetByExecutable(executableQuery string) (schema.Plugin, schema.Executable, 
 	return schema.Plugin{}, schema.Executable{}, fmt.Errorf("unknown plugin: %s", executableQuery)
 }
 
+// GetCredentialType returns the credential type with the given name from the given plugin. The
+// credential can be identified by its name (e.g. "Access Key") or by its ID (e.g. "access_key").
 func GetCredentialType(pluginName string, credentialName string) (schema.CredentialType, error) {
 	for _, p := range registry {
 		if p.Name == pluginName {
 			for _, credential := range p.Credentials {
-				return credential, nil
+				if credential.Name.String() == credentialName || credential.Name.ID().String() == credentialName {
+					return credential, nil
+				}
 			}
 			return schema.CredentialType{}, fmt.Errorf("unknown credential: %s (%s)", credentialName, pluginName)
 		}
