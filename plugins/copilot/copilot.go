@@ -14,7 +14,6 @@ func CopilotCLI() schema.Executable {
 		DocsURL: sdk.URL("https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference"),
 		NeedsAuth: needsauth.IfAll(
 			needsauth.NotForHelpOrVersion(),
-			needsauth.NotWithoutArgs(),
 			needsauth.NotForExactArgs("login"),
 			needsauth.NotForExactArgs("version"),
 			needsauth.NotWhenContainsArgs("completion"),
