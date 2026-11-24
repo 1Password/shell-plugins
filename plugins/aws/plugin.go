@@ -14,6 +14,7 @@ func New() schema.Plugin {
 		},
 		Credentials: []schema.CredentialType{
 			AccessKey(),
+			SSOProfile(),
 		},
 		Executables: []schema.Executable{
 			AWSCLI(),

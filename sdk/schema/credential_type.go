@@ -26,6 +26,13 @@ type CredentialType struct {
 
 	// The default provisioner to use for this credential if the executable doesn't override it.
 	DefaultProvisioner sdk.Provisioner
+
+	// (Optional) Set to true when the credential's secret material lives in an external token cache
+	// rather than in the 1Password vault item. AWS IAM Identity Center is the canonical example: the
+	// vault item only stores configuration (start URL, region, account, role), and the bearer token
+	// is read from `~/.aws/sso/cache/<sha1>.json` written by `aws sso login`. When this flag is set,
+	// the "has at least 1 secret field" validator does not require a Secret-true field.
+	AllowsExternalSecretCache bool
 }
 
 // CredentialField provides the schema of a single field on a credential type.
@@ -168,9 +175,13 @@ func (c CredentialType) Validate() (bool, ValidationReport) {
 		Severity:    ValidationSeverityError,
 	})
 
+	// Most credentials carry a long-lived secret, but some (e.g. AWS IAM Identity Center) keep their
+	// token in an external cache and only store configuration in 1Password. Such credentials must
+	// opt out by setting AllowsExternalSecretCache=true; the assertion stays an Error otherwise so
+	// the guard rail is preserved for the rest of the catalogue.
 	report.AddCheck(ValidationCheck{
 		Description: "Has at least 1 field that is secret",
-		Assertion:   hasSecretField,
+		Assertion:   hasSecretField || c.AllowsExternalSecretCache,
 		Severity:    ValidationSeverityError,
 	})
 
