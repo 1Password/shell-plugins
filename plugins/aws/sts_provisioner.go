@@ -66,6 +66,10 @@ func (p STSProvisioner) Provision(ctx context.Context, in sdk.ProvisionInput, ou
 	// this provisioner is not the right one to handle the request. Yield
 	// silently so the SSO Profile provisioner — which the user has linked in
 	// the same `Uses` block — can supply credentials.
+	//
+	// Only the profile's own SSO settings count here. getAWSAuthConfigurationForProfile
+	// drops the SSO settings that the config loader copies from the default profile, so
+	// a profile without SSO settings is not treated as SSO when the default profile is.
 	if awsConfig.HasSSOStartURL() || awsConfig.HasSSOSession() {
 		return
 	}
@@ -227,7 +231,33 @@ func getAWSAuthConfigurationForProfile(profile string) (*confighelpers.Config, e
 		return nil, err
 	}
 
+	// The config loader fills in the settings that a profile leaves out with those of the default profile.
+	// The AWS CLI does not do that, and for the SSO settings it would turn every profile without SSO settings
+	// into an SSO profile as soon as the default profile is one. Only keep the SSO settings of profiles that
+	// select SSO themselves, for the active profile and for the source profiles of a role chain.
+	for c := configuration; c != nil; c = c.SourceProfile {
+		if !profileSelectsSSO(configFile, c.ProfileName) {
+			clearSSOSettings(c)
+		}
+	}
+
 	return configuration, nil
+}
+
+// profileSelectsSSO reports whether the profile's own section in the config file selects AWS IAM Identity
+// Center (SSO), through either an `sso_session` or an `sso_start_url` setting.
+func profileSelectsSSO(configFile *confighelpers.ConfigFile, profile string) bool {
+	section, ok := configFile.ProfileSection(profile)
+	return ok && (section.SSOSession != "" || section.SSOStartURL != "")
+}
+
+func clearSSOSettings(awsConfig *confighelpers.Config) {
+	awsConfig.SSOSession = ""
+	awsConfig.SSOStartURL = ""
+	awsConfig.SSORegion = ""
+	awsConfig.SSORegistrationScopes = ""
+	awsConfig.SSOAccountID = ""
+	awsConfig.SSORoleName = ""
 }
 
 // resolveLocalAnd1PasswordConfigurations goes over configurations present in both local settings and 1Password and resolves conflicts using the following rules:
