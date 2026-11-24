@@ -139,14 +139,17 @@ type SSOCacheProviderFactory struct {
 }
 
 func (f SSOCacheProviderFactory) NewSSORoleCredentialsProvider(awsConfig *confighelpers.Config) aws.CredentialsProvider {
-	cacheKey := getSSORoleCacheKey(awsConfig.SSOAccountID, awsConfig.SSORoleName, ssoSessionKey(awsConfig))
-	if f.InCache.Has(cacheKey) {
-		return NewStsCacheProvider(cacheKey, f.InCache)
-	}
-
 	cachedTokenFilepath, err := ssocreds.StandardCachedTokenFilepath(ssoSessionKey(awsConfig))
 	if err != nil {
 		return errProvider{err: err}
+	}
+
+	// `aws sso logout` deletes the login together with the role credentials that the AWS CLI has cached.
+	// Only use the role credentials cached by the plugin while the login is still there, so that a logout
+	// takes effect here as well instead of when those credentials expire.
+	cacheKey := getSSORoleCacheKey(awsConfig.SSOAccountID, awsConfig.SSORoleName, ssoSessionKey(awsConfig))
+	if f.InCache.Has(cacheKey) && ssoLoginExists(cachedTokenFilepath) {
+		return NewStsCacheProvider(cacheKey, f.InCache)
 	}
 
 	if err := assertSSOTokenCacheSafe(cachedTokenFilepath); err != nil {
@@ -174,6 +177,14 @@ func (f SSOCacheProviderFactory) NewSSORoleCredentialsProvider(awsConfig *config
 		tokenProvider:  tokenProvider,
 		stsCacheWriter: NewSTSCacheWriter(cacheKey, f.OutCache),
 	}
+}
+
+// ssoLoginExists reports whether there is a cached SSO login at the given path. It does not look at
+// whether that login is still valid: role credentials stay usable after the access token has expired,
+// as they do for the AWS CLI.
+func ssoLoginExists(cachedTokenFilepath string) bool {
+	_, err := os.Lstat(cachedTokenFilepath)
+	return err == nil
 }
 
 // ssoSessionKey returns the value used to derive the shared `~/.aws/sso/cache/<sha1>.json`

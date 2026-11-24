@@ -71,6 +71,7 @@ func TestCLIProvisionersKeepProfileWhenYielding(t *testing.T) {
 		provisioner     sdk.Provisioner
 		itemFields      map[sdk.FieldName]string
 		cache           sdk.CacheState
+		ssoLogin        string // session name or start URL of an SSO login to put in the token cache
 		envProfile      string
 		commandLine     []string
 		expectedCommand []string
@@ -124,6 +125,7 @@ func TestCLIProvisionersKeepProfileWhenYielding(t *testing.T) {
 		"SSO profile provisions for an SSO profile and does not set AWS_PROFILE": {
 			provisioner:     SSOCLIProvisioner{},
 			cache:           ssoCache,
+			ssoLogin:        "https://example.awsapps.com/start",
 			commandLine:     []string{"aws", "--profile", "sso-legacy", "s3", "ls"},
 			expectedCommand: []string{"aws", "s3", "ls"},
 			expectedEnv: map[string]string{
@@ -140,6 +142,13 @@ func TestCLIProvisionersKeepProfileWhenYielding(t *testing.T) {
 			t.Setenv("AWS_CONFIG_FILE", configPath)
 			t.Setenv("AWS_PROFILE", c.envProfile)
 			t.Setenv("AWS_DEFAULT_REGION", "")
+			if c.ssoLogin != "" {
+				// Cached role credentials are only used while the SSO login is still there.
+				writeSSOTokenCache(t, c.ssoLogin, map[string]string{
+					"accessToken": "access-token",
+					"expiresAt":   time.Now().Add(time.Hour).UTC().Format(time.RFC3339),
+				})
+			}
 
 			itemFields := c.itemFields
 			if itemFields == nil {

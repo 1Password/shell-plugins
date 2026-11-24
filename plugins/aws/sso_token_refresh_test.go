@@ -186,3 +186,60 @@ func TestSSOProviderReportsUnusableSessionLoginAsInvalidToken(t *testing.T) {
 		assert.Empty(t, server.bearerTokens)
 	})
 }
+
+func TestSSOProviderUsesCachedRoleCredentialsOnlyWhileLoggedIn(t *testing.T) {
+	startURL := "https://example.awsapps.com/start"
+	legacyConfig := &confighelpers.Config{
+		SSOStartURL:  startURL,
+		SSORegion:    "us-east-1",
+		SSOAccountID: "123456789012",
+		SSORoleName:  "ExampleRole",
+	}
+
+	// newProviderWithCachedRoleCredentials returns a provider for which the plugin's cache already holds
+	// role credentials that have not expired yet.
+	newProviderWithCachedRoleCredentials := func(t *testing.T) aws.CredentialsProvider {
+		t.Helper()
+		cached := aws.Credentials{
+			AccessKeyID:     "ASIACACHED",
+			SecretAccessKey: "cached-secret",
+			SessionToken:    "cached-session-token",
+			CanExpire:       true,
+			Expires:         time.Now().Add(30 * time.Minute),
+		}
+		data, err := json.Marshal(cached)
+		require.NoError(t, err)
+		cacheKey := getSSORoleCacheKey(legacyConfig.SSOAccountID, legacyConfig.SSORoleName, ssoSessionKey(legacyConfig))
+		factory := SSOCacheProviderFactory{
+			InCache:  sdk.CacheState{cacheKey: sdk.CacheEntry{Data: data, ExpiresAt: cached.Expires}},
+			OutCache: sdk.CacheOperations{Puts: map[string]sdk.CacheEntry{}},
+		}
+		return factory.NewSSORoleCredentialsProvider(legacyConfig)
+	}
+
+	t.Run("login is still there", func(t *testing.T) {
+		server := newSSOTestServer(t)
+		// The access token has expired, which does not matter for role credentials that were already issued.
+		writeSSOTokenCache(t, startURL, map[string]string{
+			"accessToken": "expired-access-token",
+			"expiresAt":   time.Now().Add(-time.Minute).UTC().Format(time.RFC3339),
+		})
+
+		creds, err := newProviderWithCachedRoleCredentials(t).Retrieve(context.Background())
+
+		require.NoError(t, err)
+		assert.Equal(t, "ASIACACHED", creds.AccessKeyID)
+		assert.Empty(t, server.bearerTokens)
+	})
+
+	t.Run("login was removed by aws sso logout", func(t *testing.T) {
+		server := newSSOTestServer(t)
+		t.Setenv("HOME", t.TempDir())
+
+		_, err := newProviderWithCachedRoleCredentials(t).Retrieve(context.Background())
+
+		var invalidToken *ssocreds.InvalidTokenError
+		require.True(t, errors.As(err, &invalidToken), "expected an invalid token error, got %v", err)
+		assert.Empty(t, server.bearerTokens)
+	})
+}
