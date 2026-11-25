@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"path/filepath"
+	"slices"
 	"time"
 )
 
@@ -105,6 +106,11 @@ func (out *ProvisionOutput) AddEnvVar(name string, value string) {
 // AddArgs can be used to add additional arguments to the command line of the provision output.
 func (out *ProvisionOutput) AddArgs(args ...string) {
 	out.CommandLine = append(out.CommandLine, args...)
+}
+
+// PrependArgs can be used to insert additional arguments at the beginning of the command line of the provision output.
+func (out *ProvisionOutput) PrependArgs(args ...string) {
+	out.CommandLine = slices.Insert(out.CommandLine, 1, args...)
 }
 
 // AddSecretFile can be used to add a file containing secrets to the provision output.
