@@ -43,10 +43,22 @@ func APIKey() schema.CredentialType {
 			},
 		},
 		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
-		Importer:           importer.TryEnvVarPair(defaultEnvVarMapping)}
+		Importer: importer.TryAll(
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"BINANCE_API_KEY":    fieldname.APIKey,
+				"BINANCE_SECRET_KEY": fieldname.APISecret,
+			}),
+			importer.TryEnvVarPair(map[string]sdk.FieldName{
+				"BINANCE_API_KEY":    fieldname.APIKey,
+				"BINANCE_API_SECRET": fieldname.APISecret,
+			}),
+		)}
 }
 
+// binance-cli v2 reads the secret from BINANCE_SECRET_KEY, while v1 reads BINANCE_API_SECRET,
+// so both are provisioned to support either version.
 var defaultEnvVarMapping = map[string]sdk.FieldName{
 	"BINANCE_API_KEY":    fieldname.APIKey,
+	"BINANCE_SECRET_KEY": fieldname.APISecret,
 	"BINANCE_API_SECRET": fieldname.APISecret,
 }
