@@ -1,0 +1,9 @@
+current_context: production
+contexts:
+  - name: production
+    api_key: 9f4c2a7e-1b3d-4e5f-8a6b-7c8d9e0f1a2b|qX7vR2kP9mT4wZ8nB3cJ6hL1sD5fGa8Yt2Wk4Ns6Pd0Rm3VhEXAMPLE
+    account_id: 3e8b1c4d-5f6a-4b7c-9d0e-1f2a3b4c5d6e
+  - name: staging
+    endpoint: grpc.staging.example.com:443
+    api_key_command: op read op://Private/qdrant-staging/credential
+    account_id: 7a6b5c4d-3e2f-4a1b-8c9d-0e1f2a3b4c5d
