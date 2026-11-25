@@ -1,0 +1,74 @@
+name: Plugin Integration
+
+on:
+  pull_request:
+    paths:
+      - "plugins/**"
+      - "sdk/**"
+      - "go.mod"
+      - "go.sum"
+      - "cmd/ci/integration-matrix/**"
+      - ".github/workflows/integration.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    name: Select integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      has-tests: ${{ steps.select.outputs.has-tests }}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Select affected plugins
+        id: select
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = workflow_dispatch ]; then
+            matrix=$(go run ./cmd/ci/integration-matrix --all)
+          else
+            matrix=$(go run ./cmd/ci/integration-matrix --base HEAD^1 --head HEAD)
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "has-tests=$(jq '.plugin | length > 0' <<< "$matrix")" >> "$GITHUB_OUTPUT"
+  integration:
+    name: Integration (${{ matrix.plugin }})
+    needs: select
+    if: needs.select.outputs.has-tests == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    steps:
+      - name: Harden the runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Run integration tests
+        env:
+          SHELL_PLUGINS_INTEGRATION: "1"
+          PLUGIN: ${{ matrix.plugin }}
+        run: go test -count=1 -timeout=10m "./plugins/$PLUGIN"
