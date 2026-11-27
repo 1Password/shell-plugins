@@ -5,6 +5,7 @@ import (
 
 	"github.com/1Password/shell-plugins/sdk"
 	"github.com/1Password/shell-plugins/sdk/importer"
+	"github.com/1Password/shell-plugins/sdk/provision"
 	"github.com/1Password/shell-plugins/sdk/schema"
 	"github.com/1Password/shell-plugins/sdk/schema/credname"
 	"github.com/1Password/shell-plugins/sdk/schema/fieldname"
@@ -30,26 +31,17 @@ func APIToken() schema.CredentialType {
 				},
 			},
 		},
-		DefaultProvisioner: vercelProvisioner{},
+		DefaultProvisioner: provision.EnvVars(defaultEnvVarMapping),
 		Importer: importer.TryAll(
+			importer.TryEnvVarPair(defaultEnvVarMapping),
 			importer.MacOnly(TryVercelConfigFile("~/Library/Application Support/com.vercel.cli/auth.json")),
 			importer.LinuxOnly(TryVercelConfigFile("~/.config/com.vercel.cli/auth.json")),
 		),
 	}
 }
 
-type vercelProvisioner struct{}
-
-func (v vercelProvisioner) Description() string {
-	return "Vercel cli token provisioner"
-}
-
-func (v vercelProvisioner) Provision(ctx context.Context, input sdk.ProvisionInput, output *sdk.ProvisionOutput) {
-	output.AddArgs("--token", input.ItemFields[fieldname.Token])
-}
-
-func (v vercelProvisioner) Deprovision(ctx context.Context, input sdk.DeprovisionInput, output *sdk.DeprovisionOutput) {
-	// No-op
+var defaultEnvVarMapping = map[string]sdk.FieldName{
+	"VERCEL_TOKEN": fieldname.Token,
 }
 
 func TryVercelConfigFile(path string) sdk.Importer {

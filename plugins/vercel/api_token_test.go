@@ -16,7 +16,9 @@ func TestAPITokenProvisioner(t *testing.T) {
 					fieldname.Token: "tZk79pLyPLGgUVlkHbnLeXgl",
 				},
 				ExpectedOutput: sdk.ProvisionOutput{
-					CommandLine: []string{"--token", "tZk79pLyPLGgUVlkHbnLeXgl"},
+					Environment: map[string]string{
+						"VERCEL_TOKEN": "tZk79pLyPLGgUVlkHbnLeXgl",
+					},
 				},
 			},
 		},
@@ -26,6 +28,18 @@ func TestAPITokenProvisioner(t *testing.T) {
 func TestAPITokenImporter(t *testing.T) {
 	plugintest.TestImporter(
 		t, APIToken().Importer, map[string]plugintest.ImportCase{
+			"environment": {
+				Environment: map[string]string{
+					"VERCEL_TOKEN": "tZk79pLyPLGgUVlkHbnLeXgl",
+				},
+				ExpectedCandidates: []sdk.ImportCandidate{
+					{
+						Fields: map[sdk.FieldName]string{
+							fieldname.Token: "tZk79pLyPLGgUVlkHbnLeXgl",
+						},
+					},
+				},
+			},
 			"config file (macOS)": {
 				OS: "darwin",
 				Files: map[string]string{
