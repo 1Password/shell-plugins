@@ -19,7 +19,7 @@ func SonarQubeCLI() schema.Executable {
 			needsauth.NotForExactArgs("auth", "logout"),
 			needsauth.NotWhenContainsArgs("config"),
 			needsauth.NotWhenContainsArgs("system"),
-			needsauth.NotWhenContainsArgs("self-update"),
+			needsauth.NotWhenContainsArgs("update", "status"),
 		),
 		Uses: []schema.CredentialUsage{
 			{
