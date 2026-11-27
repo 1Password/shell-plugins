@@ -17,7 +17,7 @@ func SonarQubeCLI() schema.Executable {
 			needsauth.NotWithoutArgs(),
 			needsauth.NotForExactArgs("auth", "login"),
 			needsauth.NotForExactArgs("auth", "logout"),
-			needsauth.NotWhenContainsArgs("config", "telemetry"),
+			needsauth.NotWhenContainsArgs("config"),
 			needsauth.NotWhenContainsArgs("system"),
 			needsauth.NotWhenContainsArgs("self-update"),
 		),
